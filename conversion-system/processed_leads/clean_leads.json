@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Vijaypargavan R S",
+    "company": "Zedbee",
+    "email": "rsvijaypargavan@gmail.com",
+    "phone": "+917604896187",
+    "status": "ROUTED_TO_SALES",
+    "timestamp": "2025-11-25T19:00:22.093Z",
+    "last_call_sid": "CA5cf7b57fb4b93c570198d89c2e1f2597",
+    "last_called": "2025-11-25T22:23:48.457Z",
+    "last_sms_time": "2025-11-25T22:49:53.697Z",
+    "score": 43,
+    "stage": 1,
+    "last_contacted": "2025-11-25T21:38:41.006Z",
+    "last_error": null,
+    "category": "🌤️ WARM",
+    "intelligence_action": "Send SMS",
+    "last_scored": "2025-11-25T23:32:05.624Z",
+    "owner": "Alice",
+    "routed_at": "2025-11-25T23:41:33.018Z",
+    "last_response_digit": "2",
+    "last_reply": "2025-11-25T22:50:02.189Z"
+  }
+]

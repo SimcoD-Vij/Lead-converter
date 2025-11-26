@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "useragent": "^2.3.0"
+  }
+}

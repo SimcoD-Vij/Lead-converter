@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Fake User",
+    "company": "Unknown",
+    "email": "fake@gmail.com",
+    "phone": {},
+    "status": "INVALID_EMAIL",
+    "timestamp": "2025-11-25T15:43:35.260Z"
+  }
+]
