@@ -10,7 +10,7 @@ var path = require('path'); // CONFIG
 
 var LEADS_FILE = path.resolve(__dirname, '../processed_leads/clean_leads.json'); // MOCK SALES TEAM
 
-var SALES_AGENTS = ["Alice", "Bob", "Charlie"]; // HELPER: Generate Message
+var SALES_AGENTS = ["Tony", "Sai", "CR7"]; // HELPER: Generate Message
 
 var generateSummary = function generateSummary(lead, owner, priority) {
   return "\n    =========================================\n    ".concat(priority, " LEAD NOTIFICATION\n    =========================================\n    \uD83D\uDC64 Lead:   ").concat(lead.name, "\n    \uD83C\uDFE2 Comp:   ").concat(lead.company, "\n    \uD83D\uDCDE Phone:  ").concat(lead.phone, "\n    -----------------------------------------\n    \uD83C\uDFC6 Score:  ").concat(lead.score, " (").concat(lead.category, ")\n    \uD83D\uDCAC Action: ").concat(lead.last_response_digit ? "Pressed " + lead.last_response_digit : "Passive", "\n    \uD83D\uDCCA Status: ").concat(lead.status, "\n    -----------------------------------------\n    \uD83D\uDC49 ASSIGNED TO: @").concat(owner, "\n    =========================================\n    ");

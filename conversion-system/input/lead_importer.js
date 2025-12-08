@@ -181,7 +181,7 @@ const testLeads = [
         phone: "7604896187", 
         email: "rsvijaypargavan@gmail.com", 
         country: "IN", 
-        company: "zedbee" 
+        company: "hivericks" 
     },
     { 
         name: "Fake User", 

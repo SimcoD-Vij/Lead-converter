@@ -1,7 +1,7 @@
 "use strict";
 
 // ---------------------------------------------------------
-// TASK 2 EXTENSION: INBOX REPLY MONITOR (FIXED SSL)
+// TASK 2 EXTENSION: INBOX REPLY MONITOR (DEBUG MODE)
 // ---------------------------------------------------------
 require('dotenv').config({
   path: '../.env'
@@ -17,13 +17,12 @@ var fs = require('fs');
 var path = require('path'); // CONFIG
 
 
-var LEADS_FILE = path.join(__dirname, '../processed_leads/clean_leads.json');
-var CHECK_INTERVAL = 60000;
+var LEADS_FILE = path.join(__dirname, '../processed_leads/clean_leads.json'); // KEYWORDS
+
 var INTENTS = {
   INTERESTED: ['yes', 'sure', 'interested', 'call me', 'schedule', 'demo', 'time'],
   STOP: ['stop', 'unsubscribe', 'remove', 'spam', 'not interested', 'no thanks']
-}; // 1. IMAP CONFIGURATION (Updated with SSL Fix)
-
+};
 var config = {
   imap: {
     user: process.env.EMAIL_USER,
@@ -32,55 +31,58 @@ var config = {
     port: 993,
     tls: true,
     authTimeout: 10000,
-    // Increased timeout to 10s
     tlsOptions: {
-      rejectUnauthorized: false // <--- THE FIX: Allow self-signed certs (Antivirus/Proxy)
-
+      rejectUnauthorized: false
     }
   }
-}; // 2. HELPER: UPDATE LEAD STATUS
+}; // HELPER: UPDATE LEAD
 
 var updateLead = function updateLead(emailFrom, status, snippet) {
-  if (!fs.existsSync(LEADS_FILE)) return;
-  var leads = JSON.parse(fs.readFileSync(LEADS_FILE, 'utf-8')); // Normalize email (case insensitive)
+  console.log("   \uD83D\uDD0E Searching database for: ".concat(emailFrom));
+  if (!fs.existsSync(LEADS_FILE)) return console.log("   ❌ Error: DB File missing.");
+  var leads = JSON.parse(fs.readFileSync(LEADS_FILE, 'utf-8')); // STRICTER MATCHING: Extract plain email from string like "John <john@gmail.com>"
 
+  var cleanEmail = emailFrom.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi);
+  var targetEmail = cleanEmail ? cleanEmail[0].toLowerCase() : emailFrom.toLowerCase();
   var lead = leads.find(function (l) {
-    return l.email.toLowerCase() === emailFrom.toLowerCase();
+    return l.email.toLowerCase() === targetEmail;
   });
 
   if (lead) {
-    console.log("   \uD83C\uDFAF MATCH FOUND: ".concat(lead.name)); // Only update if we haven't already marked them
+    console.log("   \u2705 FOUND: ".concat(lead.name, " (Current Status: ").concat(lead.status, ")")); // UPDATE
 
-    if (lead.status !== "STOPPED" && lead.status !== "INTERESTED") {
-      lead.status = status;
-      lead.last_reply = new Date().toISOString();
-      lead.last_reply_snippet = snippet;
-      fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
-      console.log("   \uD83D\uDCBE Updated Status to: ".concat(status));
-    }
+    lead.status = status;
+    lead.last_reply = new Date().toISOString();
+    lead.last_reply_snippet = snippet;
+    fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
+    console.log("   \uD83D\uDCBE SUCCESS: Updated status to \"".concat(status, "\""));
   } else {
-    console.log("   \u26A0\uFE0F Unknown Sender: ".concat(emailFrom, " (Not in lead list)"));
+    console.log("   \u26A0\uFE0F FAILED: Could not find lead with email \"".concat(targetEmail, "\""));
   }
-}; // 3. ANALYZE EMAIL BODY
+}; // ANALYZE INTENT
 
 
 var analyzeIntent = function analyzeIntent(text) {
-  var lowerText = text.toLowerCase();
+  var lowerText = (text || "").toLowerCase();
+  console.log("   \uD83E\uDDE0 Analyzing Text: \"".concat(lowerText.substring(0, 50), "...\""));
 
   if (INTENTS.STOP.some(function (word) {
     return lowerText.includes(word);
   })) {
+    console.log("      👉 Detected STOP intent");
     return "STOPPED";
   }
 
   if (INTENTS.INTERESTED.some(function (word) {
     return lowerText.includes(word);
   })) {
+    console.log("      👉 Detected INTERESTED intent");
     return "INTERESTED";
   }
 
+  console.log("      👉 Detected NEUTRAL intent");
   return "REPLIED";
-}; // 4. MAIN CHECKER FUNCTION
+}; // MAIN CHECKER
 
 
 var checkInbox = function checkInbox() {
@@ -101,7 +103,6 @@ var checkInbox = function checkInbox() {
           return regeneratorRuntime.awrap(connection.openBox('INBOX'));
 
         case 7:
-          // Search for UNSEEN emails
           searchCriteria = ['UNSEEN'];
           fetchOptions = {
             bodies: ['HEADER', 'TEXT'],
@@ -132,88 +133,102 @@ var checkInbox = function checkInbox() {
 
         case 22:
           if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-            _context.next = 40;
+            _context.next = 48;
             break;
           }
 
           item = _step.value;
+          _context.prev = 24;
           all = item.parts.find(function (part) {
             return part.which === 'TEXT';
           });
           id = item.attributes.uid;
           idHeader = "Imap-Id: " + id + "\r\n";
-          _context.next = 29;
+          _context.next = 30;
           return regeneratorRuntime.awrap(simpleParser(idHeader + all.body));
 
-        case 29:
+        case 30:
           mail = _context.sent;
-          fromAddress = mail.from.value[0].address;
+
+          if (!(!mail.from || !mail.from.value || !mail.from.value[0])) {
+            _context.next = 33;
+            break;
+          }
+
+          return _context.abrupt("continue", 45);
+
+        case 33:
+          fromAddress = mail.from.value[0].address; // Use address property directly
+
           subject = mail.subject;
           bodyText = mail.text;
-          console.log("   \uD83D\uDCE9 From: ".concat(fromAddress, " | Sub: ").concat(subject));
+          console.log("\n   \uD83D\uDCE9 NEW MAIL From: ".concat(fromAddress));
           sentiment = analyzeIntent(bodyText);
-          snippet = bodyText.substring(0, 100).replace(/\n/g, ' ');
+          snippet = bodyText ? bodyText.substring(0, 100).replace(/\n/g, ' ') : "No Content";
           updateLead(fromAddress, sentiment, snippet);
-
-        case 37:
-          _iteratorNormalCompletion = true;
-          _context.next = 22;
-          break;
-
-        case 40:
-          _context.next = 46;
+          _context.next = 45;
           break;
 
         case 42:
           _context.prev = 42;
-          _context.t0 = _context["catch"](20);
-          _didIteratorError = true;
-          _iteratorError = _context.t0;
+          _context.t0 = _context["catch"](24);
+          console.log("   \u26A0\uFE0F Parse Error: ".concat(_context.t0.message));
 
-        case 46:
-          _context.prev = 46;
-          _context.prev = 47;
+        case 45:
+          _iteratorNormalCompletion = true;
+          _context.next = 22;
+          break;
+
+        case 48:
+          _context.next = 54;
+          break;
+
+        case 50:
+          _context.prev = 50;
+          _context.t1 = _context["catch"](20);
+          _didIteratorError = true;
+          _iteratorError = _context.t1;
+
+        case 54:
+          _context.prev = 54;
+          _context.prev = 55;
 
           if (!_iteratorNormalCompletion && _iterator["return"] != null) {
             _iterator["return"]();
           }
 
-        case 49:
-          _context.prev = 49;
+        case 57:
+          _context.prev = 57;
 
           if (!_didIteratorError) {
-            _context.next = 52;
+            _context.next = 60;
             break;
           }
 
           throw _iteratorError;
 
-        case 52:
-          return _context.finish(49);
-
-        case 53:
-          return _context.finish(46);
-
-        case 54:
-          connection.end();
-          _context.next = 61;
-          break;
-
-        case 57:
-          _context.prev = 57;
-          _context.t1 = _context["catch"](1);
-          console.log("❌ IMAP Error:", _context.t1.message);
-
-          if (_context.t1.message.includes("AUTHENTICATIONFAILED")) {
-            console.log("   👉 Tip: Check .env EMAIL_PASS (Must be App Password)");
-          }
+        case 60:
+          return _context.finish(57);
 
         case 61:
+          return _context.finish(54);
+
+        case 62:
+          connection.end();
+          _context.next = 68;
+          break;
+
+        case 65:
+          _context.prev = 65;
+          _context.t2 = _context["catch"](1);
+          console.log("❌ IMAP Error:", _context.t2.message);
+
+        case 68:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[1, 57], [20, 42, 46, 54], [47,, 49, 53]]);
+  }, null, null, [[1, 65], [20, 50, 54, 62], [24, 42], [55,, 57, 61]]);
 };
 
 checkInbox();

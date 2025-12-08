@@ -8,7 +8,7 @@ const path = require('path');
 const LEADS_FILE = path.resolve(__dirname, '../processed_leads/clean_leads.json');
 
 // MOCK SALES TEAM
-const SALES_AGENTS = ["Alice", "Bob", "Charlie"];
+const SALES_AGENTS = ["Tony", "Sai", "CR7"];
 
 // HELPER: Generate Message
 const generateSummary = (lead, owner, priority) => {
