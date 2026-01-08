@@ -1,0 +1,38 @@
+[
+  {
+    "type": "metadata",
+    "version": "1.0",
+    "lead_id": "+917604896187",
+    "sid": "CAeb4a1a4a0313211ee991197de4bd89e1",
+    "created_at": "2026-01-06T16:46:51.795Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T16:46:51.795Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: The User, Vijay R, initiates contact with an Assistant from Hivericks after previously speaking about the XOptimus Smart Charger. The current time is mentioned as a potential benefit of using this product. The conversation then turns to discussing the product itself and its benefits in terms of energy conservation and battery life extension."
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time.",
+    "timestamp": "2026-01-06T16:47:00.425Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Right? So, I've got your XOptimus Smart Charger on speed dial. How can I help you today?",
+    "timestamp": "2026-01-06T16:47:09.503Z"
+  },
+  {
+    "role": "user",
+    "text": "Well, I want to know the price.",
+    "timestamp": "2026-01-06T16:47:22.049Z"
+  },
+  {
+    "role": "assistant",
+    "text": "The regular price for the XOptimus Smart Charger is $99. Would you like me to check if there's any discount or promotion available?",
+    "timestamp": "2026-01-06T16:47:30.128Z"
+  }
+]

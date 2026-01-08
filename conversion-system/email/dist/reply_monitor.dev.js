@@ -1,7 +1,7 @@
 "use strict";
 
 // ---------------------------------------------------------
-// TASK 2 EXTENSION: INBOX REPLY MONITOR (DEBUG MODE)
+// TASK 2+: EMAIL AI RESPONDER (HEADER FIX - FULL VERSION)
 // ---------------------------------------------------------
 require('dotenv').config({
   path: '../.env'
@@ -12,17 +12,14 @@ var imaps = require('imap-simple');
 var _require = require('mailparser'),
     simpleParser = _require.simpleParser;
 
-var fs = require('fs');
+var nodemailer = require('nodemailer');
 
-var path = require('path'); // CONFIG
+var _require2 = require('../ai/ollama_engine'),
+    generateResponse = _require2.generateResponse; // ---------------------------------------------------------
+// IMAP CONFIG
+// ---------------------------------------------------------
 
 
-var LEADS_FILE = path.join(__dirname, '../processed_leads/clean_leads.json'); // KEYWORDS
-
-var INTENTS = {
-  INTERESTED: ['yes', 'sure', 'interested', 'call me', 'schedule', 'demo', 'time'],
-  STOP: ['stop', 'unsubscribe', 'remove', 'spam', 'not interested', 'no thanks']
-};
 var config = {
   imap: {
     user: process.env.EMAIL_USER,
@@ -30,205 +27,251 @@ var config = {
     host: 'imap.gmail.com',
     port: 993,
     tls: true,
-    authTimeout: 10000,
     tlsOptions: {
       rejectUnauthorized: false
-    }
+    },
+    authTimeout: 15000
   }
-}; // HELPER: UPDATE LEAD
+}; // ---------------------------------------------------------
+// HELPER: SEND AI REPLY
+// ---------------------------------------------------------
 
-var updateLead = function updateLead(emailFrom, status, snippet) {
-  console.log("   \uD83D\uDD0E Searching database for: ".concat(emailFrom));
-  if (!fs.existsSync(LEADS_FILE)) return console.log("   ❌ Error: DB File missing.");
-  var leads = JSON.parse(fs.readFileSync(LEADS_FILE, 'utf-8')); // STRICTER MATCHING: Extract plain email from string like "John <john@gmail.com>"
-
-  var cleanEmail = emailFrom.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi);
-  var targetEmail = cleanEmail ? cleanEmail[0].toLowerCase() : emailFrom.toLowerCase();
-  var lead = leads.find(function (l) {
-    return l.email.toLowerCase() === targetEmail;
-  });
-
-  if (lead) {
-    console.log("   \u2705 FOUND: ".concat(lead.name, " (Current Status: ").concat(lead.status, ")")); // UPDATE
-
-    lead.status = status;
-    lead.last_reply = new Date().toISOString();
-    lead.last_reply_snippet = snippet;
-    fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
-    console.log("   \uD83D\uDCBE SUCCESS: Updated status to \"".concat(status, "\""));
-  } else {
-    console.log("   \u26A0\uFE0F FAILED: Could not find lead with email \"".concat(targetEmail, "\""));
-  }
-}; // ANALYZE INTENT
-
-
-var analyzeIntent = function analyzeIntent(text) {
-  var lowerText = (text || "").toLowerCase();
-  console.log("   \uD83E\uDDE0 Analyzing Text: \"".concat(lowerText.substring(0, 50), "...\""));
-
-  if (INTENTS.STOP.some(function (word) {
-    return lowerText.includes(word);
-  })) {
-    console.log("      👉 Detected STOP intent");
-    return "STOPPED";
-  }
-
-  if (INTENTS.INTERESTED.some(function (word) {
-    return lowerText.includes(word);
-  })) {
-    console.log("      👉 Detected INTERESTED intent");
-    return "INTERESTED";
-  }
-
-  console.log("      👉 Detected NEUTRAL intent");
-  return "REPLIED";
-}; // MAIN CHECKER
-
-
-var checkInbox = function checkInbox() {
-  var connection, searchCriteria, fetchOptions, messages, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, item, all, id, idHeader, mail, fromAddress, subject, bodyText, sentiment, snippet;
-
-  return regeneratorRuntime.async(function checkInbox$(_context) {
+var sendReply = function sendReply(toEmail, subject, aiBody) {
+  var transporter;
+  return regeneratorRuntime.async(function sendReply$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          console.log("\n📬 Checking Inbox for new replies...");
+          console.log("      🚀 STEP 4: Initializing SMTP...");
           _context.prev = 1;
-          _context.next = 4;
+          transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS
+            }
+          });
+          console.log("      \uD83D\uDE80 STEP 5: Sending reply to ".concat(toEmail, "..."));
+          _context.next = 6;
+          return regeneratorRuntime.awrap(transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: toEmail,
+            subject: "Re: ".concat(subject),
+            text: aiBody
+          }));
+
+        case 6:
+          console.log("      \u2705 STEP 6: Email SENT Successfully!");
+          return _context.abrupt("return", true);
+
+        case 10:
+          _context.prev = 10;
+          _context.t0 = _context["catch"](1);
+          console.log("      \u274C SMTP ERROR: ".concat(_context.t0.message));
+          return _context.abrupt("return", false);
+
+        case 14:
+        case "end":
+          return _context.stop();
+      }
+    }
+  }, null, null, [[1, 10]]);
+}; // ---------------------------------------------------------
+// MAIN: CHECK INBOX & AUTO-REPLY
+// ---------------------------------------------------------
+
+
+var checkAndReply = function checkAndReply() {
+  var connection, searchCriteria, fetchOptions, messages, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, item, headerPart, textPart, fullRawEmail, mail, fromAddress, subject, bodyText, aiReply, sent;
+
+  return regeneratorRuntime.async(function checkAndReply$(_context2) {
+    while (1) {
+      switch (_context2.prev = _context2.next) {
+        case 0:
+          console.log("\n📬 Checking Inbox for AI Auto-Response...");
+          _context2.prev = 1;
+          _context2.next = 4;
           return regeneratorRuntime.awrap(imaps.connect(config));
 
         case 4:
-          connection = _context.sent;
-          _context.next = 7;
+          connection = _context2.sent;
+          _context2.next = 7;
           return regeneratorRuntime.awrap(connection.openBox('INBOX'));
 
         case 7:
           searchCriteria = ['UNSEEN'];
           fetchOptions = {
             bodies: ['HEADER', 'TEXT'],
-            markSeen: true
+            markSeen: false
           };
-          _context.next = 11;
+          _context2.next = 11;
           return regeneratorRuntime.awrap(connection.search(searchCriteria, fetchOptions));
 
         case 11:
-          messages = _context.sent;
+          messages = _context2.sent;
 
           if (!(messages.length === 0)) {
-            _context.next = 16;
+            _context2.next = 16;
             break;
           }
 
-          console.log("   (No new unread emails found)");
+          console.log("   (No new emails)");
           connection.end();
-          return _context.abrupt("return");
+          return _context2.abrupt("return");
 
         case 16:
-          console.log("   Found ".concat(messages.length, " new messages."));
+          console.log("   \uD83D\uDD0E Found ".concat(messages.length, " new message(s). Processing..."));
           _iteratorNormalCompletion = true;
           _didIteratorError = false;
           _iteratorError = undefined;
-          _context.prev = 20;
+          _context2.prev = 20;
           _iterator = messages[Symbol.iterator]();
 
         case 22:
           if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-            _context.next = 48;
+            _context2.next = 63;
             break;
           }
 
           item = _step.value;
-          _context.prev = 24;
-          all = item.parts.find(function (part) {
-            return part.which === 'TEXT';
+          console.log("\n   --- PROCESSING NEW EMAIL ---"); // ✅ FIX: Extract HEADER + BODY
+
+          headerPart = item.parts.find(function (p) {
+            return p.which === 'HEADER';
           });
-          id = item.attributes.uid;
-          idHeader = "Imap-Id: " + id + "\r\n";
-          _context.next = 30;
-          return regeneratorRuntime.awrap(simpleParser(idHeader + all.body));
+          textPart = item.parts.find(function (p) {
+            return p.which === 'TEXT';
+          });
 
-        case 30:
-          mail = _context.sent;
-
-          if (!(!mail.from || !mail.from.value || !mail.from.value[0])) {
-            _context.next = 33;
+          if (!(!headerPart || !textPart)) {
+            _context2.next = 30;
             break;
           }
 
-          return _context.abrupt("continue", 45);
+          console.log("   ⚠️ Skipping: Malformed email parts.");
+          return _context2.abrupt("continue", 60);
 
-        case 33:
-          fromAddress = mail.from.value[0].address; // Use address property directly
+        case 30:
+          // ✅ FIX: Combine into FULL RAW EMAIL for parser
+          fullRawEmail = headerPart.body + "\r\n\r\n" + textPart.body;
+          console.log("   📝 STEP 1: Parsing email...");
+          _context2.next = 34;
+          return regeneratorRuntime.awrap(simpleParser(fullRawEmail));
 
-          subject = mail.subject;
-          bodyText = mail.text;
-          console.log("\n   \uD83D\uDCE9 NEW MAIL From: ".concat(fromAddress));
-          sentiment = analyzeIntent(bodyText);
-          snippet = bodyText ? bodyText.substring(0, 100).replace(/\n/g, ' ') : "No Content";
-          updateLead(fromAddress, sentiment, snippet);
-          _context.next = 45;
-          break;
+        case 34:
+          mail = _context2.sent;
 
-        case 42:
-          _context.prev = 42;
-          _context.t0 = _context["catch"](24);
-          console.log("   \u26A0\uFE0F Parse Error: ".concat(_context.t0.message));
+          if (!(!mail.from || !mail.from.value || !mail.from.value[0])) {
+            _context2.next = 38;
+            break;
+          }
+
+          console.log("   ⚠️ Skipping: No valid sender found.");
+          return _context2.abrupt("continue", 60);
+
+        case 38:
+          fromAddress = mail.from.value[0].address;
+          subject = mail.subject || "No Subject";
+          bodyText = mail.text ? mail.text.trim() : ""; // 🛑 Prevent Self-Reply
+
+          if (!(fromAddress === process.env.EMAIL_USER)) {
+            _context2.next = 46;
+            break;
+          }
+
+          console.log("   🛑 Skipping: This is my own email.");
+          _context2.next = 45;
+          return regeneratorRuntime.awrap(connection.addFlags(item.attributes.uid, "\\Seen"));
 
         case 45:
+          return _context2.abrupt("continue", 60);
+
+        case 46:
+          console.log("   \uD83D\uDCE9 From: ".concat(fromAddress));
+          console.log("   \uD83D\uDCC4 Content: \"".concat(bodyText.substring(0, 80), "...\"")); // 🧠 STEP 2: AI GENERATION
+
+          console.log("   🧠 STEP 2: Asking Ollama...");
+          _context2.next = 51;
+          return regeneratorRuntime.awrap(generateResponse(bodyText));
+
+        case 51:
+          aiReply = _context2.sent;
+          console.log("   \uD83D\uDCA1 STEP 3: AI Generated Answer (Length: ".concat(aiReply.length, " chars)")); // 📤 STEP 3: SEND EMAIL
+
+          _context2.next = 55;
+          return regeneratorRuntime.awrap(sendReply(fromAddress, subject, aiReply));
+
+        case 55:
+          sent = _context2.sent;
+
+          if (!sent) {
+            _context2.next = 60;
+            break;
+          }
+
+          console.log("   📌 Marking email as READ in Gmail...");
+          _context2.next = 60;
+          return regeneratorRuntime.awrap(connection.addFlags(item.attributes.uid, "\\Seen"));
+
+        case 60:
           _iteratorNormalCompletion = true;
-          _context.next = 22;
+          _context2.next = 22;
           break;
 
-        case 48:
-          _context.next = 54;
+        case 63:
+          _context2.next = 69;
           break;
 
-        case 50:
-          _context.prev = 50;
-          _context.t1 = _context["catch"](20);
+        case 65:
+          _context2.prev = 65;
+          _context2.t0 = _context2["catch"](20);
           _didIteratorError = true;
-          _iteratorError = _context.t1;
+          _iteratorError = _context2.t0;
 
-        case 54:
-          _context.prev = 54;
-          _context.prev = 55;
+        case 69:
+          _context2.prev = 69;
+          _context2.prev = 70;
 
           if (!_iteratorNormalCompletion && _iterator["return"] != null) {
             _iterator["return"]();
           }
 
-        case 57:
-          _context.prev = 57;
+        case 72:
+          _context2.prev = 72;
 
           if (!_didIteratorError) {
-            _context.next = 60;
+            _context2.next = 75;
             break;
           }
 
           throw _iteratorError;
 
-        case 60:
-          return _context.finish(57);
+        case 75:
+          return _context2.finish(72);
 
-        case 61:
-          return _context.finish(54);
+        case 76:
+          return _context2.finish(69);
 
-        case 62:
+        case 77:
+          console.log("\n🏁 Closing Connection.");
           connection.end();
-          _context.next = 68;
+          _context2.next = 84;
           break;
 
-        case 65:
-          _context.prev = 65;
-          _context.t2 = _context["catch"](1);
-          console.log("❌ IMAP Error:", _context.t2.message);
+        case 81:
+          _context2.prev = 81;
+          _context2.t1 = _context2["catch"](1);
+          console.log("❌ CRITICAL ERROR:", _context2.t1.message);
 
-        case 68:
+        case 84:
         case "end":
-          return _context.stop();
+          return _context2.stop();
       }
     }
-  }, null, null, [[1, 65], [20, 50, 54, 62], [24, 42], [55,, 57, 61]]);
-};
+  }, null, null, [[1, 81], [20, 65, 69, 77], [70,, 72, 76]]);
+}; // ---------------------------------------------------------
+// RUN
+// ---------------------------------------------------------
 
-checkInbox();
+
+checkAndReply();

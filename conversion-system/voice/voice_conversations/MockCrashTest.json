@@ -1,0 +1,27 @@
+[
+    {
+        "role": "assistant",
+        "text": "Hi",
+        "timestamp": "2026-01-06T10:00:00Z"
+    },
+    {
+        "role": "user",
+        "text": "Hello",
+        "timestamp": "2026-01-06T10:00:05Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Interest?",
+        "timestamp": "2026-01-06T10:00:10Z"
+    },
+    {
+        "role": "user",
+        "text": "Yes",
+        "timestamp": "2026-01-06T10:00:15Z"
+    },
+    {
+        "role": "assistant",
+        "text": "Good",
+        "timestamp": "2026-01-06T10:00:20Z"
+    }
+]

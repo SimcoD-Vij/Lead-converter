@@ -1,0 +1,11 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-07T05:41:22.216Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: SUMMARY:\nUser, Vijay R, is interested in our product and wants to discuss it with you via Hivericks.\nFINAL OUTCOME: The conversation will proceed with a follow-up meeting at your earliest convenience.\nNEXT STEP: Request for scheduling confirmation from Hivericks."
+  }
+]

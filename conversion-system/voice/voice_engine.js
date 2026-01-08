@@ -1,59 +1,55 @@
+// conversion-system/voice/voice_engine.js
 // ---------------------------------------------------------
-// TASK 3: VOICE ENGINE (FRESH BUILD)
+// VOICE ENGINE: PURE EXECUTION UTILITY
+// Responsibilities:
+// - Initiate calls via Twilio
+// - Handle basic success/fail logging for the dial attempt
+// - delegated by Orchestrator
 // ---------------------------------------------------------
-require('dotenv').config({ path: '../.env' });
-const client = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
-const fs = require('fs');
+
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
-const LEADS_FILE = path.resolve(__dirname, '../processed_leads/clean_leads.json');
-const SERVER_URL = process.env.SERVER_URL; // Ngrok URL
+const client = require('twilio')(
+    process.env.TWILIO_SID,
+    process.env.TWILIO_AUTH
+);
 
-const runBatch = async () => {
-    console.log("🚀 Starting Voice Engine...");
+// ---------------------------------------------------------
+// DIAL LEAD FUNCTION
+// ---------------------------------------------------------
+async function dialLead(lead) {
+    // ⚠️ CRITICAL: Always read process.env here to get the LATEST Ngrok URL
+    // (Orchestrator updates this value dynamically when switching ports)
+    const SERVER_URL = process.env.SERVER_URL;
 
-    // 1. Safety Checks
-    if (!SERVER_URL) return console.log("❌ Missing SERVER_URL in .env");
-    if (!fs.existsSync(LEADS_FILE)) return console.log("❌ Missing DB file");
-
-    // 2. Load Leads
-    let leads = JSON.parse(fs.readFileSync(LEADS_FILE, 'utf-8'));
-
-    // 3. Filter: Find VERIFIED or CONTACTED leads
-    const targets = leads.filter(l => 
-        (l.status === "VERIFIED" || l.status === "CONTACTED") && 
-        l.phone.length > 5
-    );
-
-    console.log(`📞 Found ${targets.length} leads to call.`);
-
-    // 4. Call Loop
-    for (const lead of targets) {
-        try {
-            console.log(`   ☎️ Dialing ${lead.name} (${lead.phone})...`);
-
-            const call = await client.calls.create({
-                url: `${SERVER_URL}/voice`,
-                to: lead.phone,
-                from: process.env.TWILIO_PHONE
-            });
-
-            console.log(`      ✅ Call Started! SID: ${call.sid}`);
-
-            // --- CRITICAL: SAVE SID IMMEDIATELY ---
-            // This links the Lead to the Call
-            lead.status = "CALLED";
-            lead.last_call_sid = call.sid; 
-            lead.last_called = new Date().toISOString();
-
-            // Write to disk NOW so the Brain can read it in 5 seconds
-            fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
-            console.log("      💾 Database Updated (SID Saved).");
-
-        } catch (error) {
-            console.log(`      ❌ Error: ${error.message}`);
-        }
+    if (!SERVER_URL) {
+        throw new Error("Missing SERVER_URL in environment - Is Ngrok running?");
     }
-};
 
-runBatch();
+    if (!lead.phone) {
+        throw new Error(`Lead ${lead.name} has no phone number`);
+    }
+
+    console.log(`   ☎️ VoiceEngine: Dialing ${lead.name} (${lead.phone})...`);
+    console.log(`      🔗 Webhook Server: ${SERVER_URL}`);
+
+    try {
+        const call = await client.calls.create({
+            url: `${SERVER_URL}/voice`,
+            to: lead.phone,
+            from: process.env.TWILIO_PHONE,
+            statusCallback: `${SERVER_URL}/voice/status`,
+            statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed']
+        });
+
+        console.log(`      ✅ Call Initiated! SID: ${call.sid}`);
+        return call.sid;
+
+    } catch (error) {
+        console.error(`      ❌ VoiceEngine Error: ${error.message}`);
+        throw error;
+    }
+}
+
+module.exports = { dialLead };

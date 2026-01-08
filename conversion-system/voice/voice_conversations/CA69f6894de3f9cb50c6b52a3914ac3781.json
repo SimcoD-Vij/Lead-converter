@@ -1,0 +1,41 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T00:31:34.661Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: Status: UNKNOWN. key_interests: . next_step: manual_review"
+  },
+  {
+    "role": "user",
+    "text": "Yes, good time.",
+    "timestamp": "2026-01-06T00:31:46.371Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Shall I send the details on WhatsApp?",
+    "timestamp": "2026-01-06T00:31:48.175Z"
+  },
+  {
+    "role": "user",
+    "text": "No, no no, no PSC. Uh, what we have talked",
+    "timestamp": "2026-01-06T00:31:59.205Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (Wall Adapter)",
+    "timestamp": "2026-01-06T00:32:00.489Z"
+  },
+  {
+    "role": "user",
+    "text": "Okay, I know that's the new product yourself but I want to be specific like what we have talked before.",
+    "timestamp": "2026-01-06T00:32:14.225Z"
+  },
+  {
+    "role": "assistant",
+    "text": "The price is ₹1499 and includes a 1-year warranty. Shall I send the details on WhatsApp?",
+    "timestamp": "2026-01-06T00:32:15.663Z"
+  }
+]

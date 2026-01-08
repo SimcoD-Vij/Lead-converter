@@ -1,0 +1,67 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-08T01:29:53.265Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time to talk.",
+    "timestamp": "2026-01-08T01:30:01.881Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger will help you keep your Li-Ion battery life intact and performance optimal. How can I assist you today?",
+    "timestamp": "2026-01-08T01:30:03.876Z"
+  },
+  {
+    "role": "user",
+    "text": "Well, I want the price.",
+    "timestamp": "2026-01-08T01:30:11.459Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (Wall Adapter) - $49.99",
+    "timestamp": "2026-01-08T01:30:13.403Z"
+  },
+  {
+    "role": "user",
+    "text": "Indian rupee.",
+    "timestamp": "2026-01-08T01:30:21.404Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (USD) - $29.99, INR 2499.",
+    "timestamp": "2026-01-08T01:30:22.659Z"
+  },
+  {
+    "role": "user",
+    "text": "When I want to increase Indian price, I'm not able to represent you.",
+    "timestamp": "2026-01-08T01:30:35.473Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I can't honor requests for price increases, especially for certain products like the XOptimus Smart Charger (Wall Adapter). How about we discuss ways to optimize your current product instead?",
+    "timestamp": "2026-01-08T01:30:37.497Z"
+  },
+  {
+    "role": "user",
+    "text": "I can find this charger kind of easier at some places and websites.",
+    "timestamp": "2026-01-08T01:30:50.802Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Hivericks Technologies Pvt Ltd",
+    "timestamp": "2026-01-08T01:30:52.350Z"
+  },
+  {
+    "role": "user",
+    "text": "Well, I'm cutting the call.",
+    "timestamp": "2026-01-08T01:31:00.862Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Hello, you're off the line now. Enjoy your day!",
+    "timestamp": "2026-01-08T01:31:02.091Z"
+  }
+]

@@ -1,0 +1,41 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T19:06:41.624Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: Here is a STRICTLY CONCISE summary of the conversation:"
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time to talk. And why are you calling for?",
+    "timestamp": "2026-01-06T19:06:56.011Z"
+  },
+  {
+    "role": "assistant",
+    "text": "You're running low on battery life and need an upgrade! My XOptimus Smart Charger can give you up to 3 times more power than your current one, so you can keep your devices charged all day long.",
+    "timestamp": "2026-01-06T19:06:58.237Z"
+  },
+  {
+    "role": "user",
+    "text": "Just give me the price. Wait, give me the price.",
+    "timestamp": "2026-01-06T19:07:11.010Z"
+  },
+  {
+    "role": "assistant",
+    "text": "₹1499",
+    "timestamp": "2026-01-06T19:07:12.188Z"
+  },
+  {
+    "role": "user",
+    "text": "Okay, let's just call it later. Catch up later.",
+    "timestamp": "2026-01-06T19:07:22.278Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Alright, sounds good. Catch you later!",
+    "timestamp": "2026-01-06T19:07:23.257Z"
+  }
+]

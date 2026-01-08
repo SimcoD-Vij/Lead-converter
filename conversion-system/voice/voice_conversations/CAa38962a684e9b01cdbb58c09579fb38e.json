@@ -1,0 +1,27 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-07T23:35:52.995Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time.",
+    "timestamp": "2026-01-07T23:36:03.701Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Would it be helpful if we hopped on a quick call to discuss XOptimus Smart Charger in more detail?",
+    "timestamp": "2026-01-07T23:36:05.585Z"
+  },
+  {
+    "role": "user",
+    "text": "We are on ready on a call. Say the detail.",
+    "timestamp": "2026-01-07T23:36:15.813Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Hi, I'm Vijay, a Senior Consultant at Hivericks. Would it be helpful if we hopped on a quick call to discuss the XOptimus Smart Charger (Wall Adapter)? It's a real-time parameter management system that helps prevent overcharging and overheating issues in Li-I",
+    "timestamp": "2026-01-07T23:36:17.727Z"
+  }
+]

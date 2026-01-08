@@ -1,0 +1,11 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-07T22:49:58.657Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: User Sentiment: Warm\nProduct Interest: Sales Leads and Opportunities Management Software\nFinal Outcome: The user wants to discuss the integration of our CRM system with their existing sales lead management software.\nImmediate Next Step: Schedule a follow-up call to explore this opportunity further."
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "type": "metadata",
+    "version": "1.0",
+    "lead_id": "+917604896187",
+    "sid": "CA403d90f7a8ed08cfe337b2e90bbaf50d",
+    "created_at": "2026-01-06T17:16:35.419Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T17:16:35.419Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: The User, Vijay R, is inquiring about the price of the XOptimus Smart Charger from Hivericks, specifically asking if there are any discounts or promotions available at this time. The Assistant responds by checking on the regular price and inquires about the User's interest in learning more about potential discounts or deals."
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time to talk.",
+    "timestamp": "2026-01-06T17:16:47.288Z"
+  },
+  {
+    "role": "assistant",
+    "text": "So you're interested in learning more about our XOptimus Smart Charger?",
+    "timestamp": "2026-01-06T17:16:53.108Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes, I'm interested.",
+    "timestamp": "2026-01-06T17:17:03.763Z"
+  }
+]

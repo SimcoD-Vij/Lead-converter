@@ -1,20 +1,17 @@
 // ---------------------------------------------------------
-// TASK 2 EXTENSION: INBOX REPLY MONITOR (DEBUG MODE)
+// TASK 2+: EMAIL AI RESPONDER (HEADER FIX - FULL VERSION)
 // ---------------------------------------------------------
+
 require('dotenv').config({ path: '../.env' });
+
 const imaps = require('imap-simple');
 const { simpleParser } = require('mailparser');
-const fs = require('fs');
-const path = require('path');
+const nodemailer = require('nodemailer');
+const { generateResponse } = require('../ai/ollama_engine');
 
-// CONFIG
-const LEADS_FILE = path.join(__dirname, '../processed_leads/clean_leads.json');
-
-// KEYWORDS
-const INTENTS = {
-    INTERESTED: ['yes', 'sure', 'interested', 'call me', 'schedule', 'demo', 'time'],
-    STOP: ['stop', 'unsubscribe', 'remove', 'spam', 'not interested', 'no thanks']
-};
+// ---------------------------------------------------------
+// IMAP CONFIG
+// ---------------------------------------------------------
 
 const config = {
     imap: {
@@ -23,111 +20,134 @@ const config = {
         host: 'imap.gmail.com',
         port: 993,
         tls: true,
-        authTimeout: 10000,
-        tlsOptions: { rejectUnauthorized: false }
+        tlsOptions: { rejectUnauthorized: false },
+        authTimeout: 15000
     }
 };
 
-// HELPER: UPDATE LEAD
-const updateLead = (emailFrom, status, snippet) => {
-    console.log(`   🔎 Searching database for: ${emailFrom}`);
-    
-    if (!fs.existsSync(LEADS_FILE)) return console.log("   ❌ Error: DB File missing.");
-    
-    const leads = JSON.parse(fs.readFileSync(LEADS_FILE, 'utf-8'));
-    
-    // STRICTER MATCHING: Extract plain email from string like "John <john@gmail.com>"
-    const cleanEmail = emailFrom.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi);
-    const targetEmail = cleanEmail ? cleanEmail[0].toLowerCase() : emailFrom.toLowerCase();
+// ---------------------------------------------------------
+// HELPER: SEND AI REPLY
+// ---------------------------------------------------------
 
-    const lead = leads.find(l => l.email.toLowerCase() === targetEmail);
+const sendReply = async (toEmail, subject, aiBody) => {
+    console.log("      🚀 STEP 4: Initializing SMTP...");
 
-    if (lead) {
-        console.log(`   ✅ FOUND: ${lead.name} (Current Status: ${lead.status})`);
-        
-        // UPDATE
-        lead.status = status;
-        lead.last_reply = new Date().toISOString();
-        lead.last_reply_snippet = snippet; 
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
 
-        fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
-        console.log(`   💾 SUCCESS: Updated status to "${status}"`);
-    } else {
-        console.log(`   ⚠️ FAILED: Could not find lead with email "${targetEmail}"`);
+        console.log(`      🚀 STEP 5: Sending reply to ${toEmail}...`);
+
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: toEmail,
+            subject: `Re: ${subject}`,
+            text: aiBody
+        });
+
+        console.log(`      ✅ STEP 6: Email SENT Successfully!`);
+        return true;
+
+    } catch (e) {
+        console.log(`      ❌ SMTP ERROR: ${e.message}`);
+        return false;
     }
 };
 
-// ANALYZE INTENT
-const analyzeIntent = (text) => {
-    const lowerText = (text || "").toLowerCase();
-    console.log(`   🧠 Analyzing Text: "${lowerText.substring(0, 50)}..."`);
-    
-    if (INTENTS.STOP.some(word => lowerText.includes(word))) {
-        console.log("      👉 Detected STOP intent");
-        return "STOPPED";
-    }
-    if (INTENTS.INTERESTED.some(word => lowerText.includes(word))) {
-        console.log("      👉 Detected INTERESTED intent");
-        return "INTERESTED";
-    }
-    
-    console.log("      👉 Detected NEUTRAL intent");
-    return "REPLIED"; 
-};
+// ---------------------------------------------------------
+// MAIN: CHECK INBOX & AUTO-REPLY
+// ---------------------------------------------------------
 
-// MAIN CHECKER
-const checkInbox = async () => {
-    console.log("\n📬 Checking Inbox for new replies...");
+const checkAndReply = async () => {
+    console.log("\n📬 Checking Inbox for AI Auto-Response...");
 
     try {
         const connection = await imaps.connect(config);
         await connection.openBox('INBOX');
 
         const searchCriteria = ['UNSEEN'];
-        const fetchOptions = { bodies: ['HEADER', 'TEXT'], markSeen: true }; 
+        const fetchOptions = { bodies: ['HEADER', 'TEXT'], markSeen: false };
 
         const messages = await connection.search(searchCriteria, fetchOptions);
 
         if (messages.length === 0) {
-            console.log("   (No new unread emails found)");
+            console.log("   (No new emails)");
             connection.end();
             return;
         }
 
-        console.log(`   Found ${messages.length} new messages.`);
+        console.log(`   🔎 Found ${messages.length} new message(s). Processing...`);
 
         for (const item of messages) {
-            try {
-                const all = item.parts.find(part => part.which === 'TEXT');
-                const id = item.attributes.uid;
-                const idHeader = "Imap-Id: "+id+"\r\n";
-                
-                const mail = await simpleParser(idHeader + all.body);
-                
-                // Safety Check
-                if (!mail.from || !mail.from.value || !mail.from.value[0]) continue;
+            console.log("\n   --- PROCESSING NEW EMAIL ---");
 
-                const fromAddress = mail.from.value[0].address; // Use address property directly
-                const subject = mail.subject;
-                const bodyText = mail.text; 
+            // ✅ FIX: Extract HEADER + BODY
+            const headerPart = item.parts.find(p => p.which === 'HEADER');
+            const textPart = item.parts.find(p => p.which === 'TEXT');
 
-                console.log(`\n   📩 NEW MAIL From: ${fromAddress}`);
-                
-                const sentiment = analyzeIntent(bodyText);
-                const snippet = bodyText ? bodyText.substring(0, 100).replace(/\n/g, ' ') : "No Content";
+            if (!headerPart || !textPart) {
+                console.log("   ⚠️ Skipping: Malformed email parts.");
+                continue;
+            }
 
-                updateLead(fromAddress, sentiment, snippet);
+            // ✅ FIX: Combine into FULL RAW EMAIL for parser
+            const fullRawEmail =
+                headerPart.body + "\r\n\r\n" + textPart.body;
 
-            } catch (parseError) {
-                console.log(`   ⚠️ Parse Error: ${parseError.message}`);
+            console.log("   📝 STEP 1: Parsing email...");
+            const mail = await simpleParser(fullRawEmail);
+
+            if (!mail.from || !mail.from.value || !mail.from.value[0]) {
+                console.log("   ⚠️ Skipping: No valid sender found.");
+                continue;
+            }
+
+            const fromAddress = mail.from.value[0].address;
+            const subject = mail.subject || "No Subject";
+            const bodyText = mail.text ? mail.text.trim() : "";
+
+            // 🛑 Prevent Self-Reply
+            if (fromAddress === process.env.EMAIL_USER) {
+                console.log("   🛑 Skipping: This is my own email.");
+                await connection.addFlags(item.attributes.uid, "\\Seen");
+                continue;
+            }
+
+            console.log(`   📩 From: ${fromAddress}`);
+            console.log(`   📄 Content: "${bodyText.substring(0, 80)}..."`);
+
+            // 🧠 STEP 2: AI GENERATION
+            console.log("   🧠 STEP 2: Asking Ollama...");
+            const aiReply = await generateResponse(bodyText);
+
+            console.log(
+                `   💡 STEP 3: AI Generated Answer (Length: ${aiReply.length} chars)`
+            );
+
+            // 📤 STEP 3: SEND EMAIL
+            const sent = await sendReply(fromAddress, subject, aiReply);
+
+            if (sent) {
+                console.log("   📌 Marking email as READ in Gmail...");
+                await connection.addFlags(item.attributes.uid, "\\Seen");
             }
         }
 
+        console.log("\n🏁 Closing Connection.");
         connection.end();
 
     } catch (error) {
-        console.log("❌ IMAP Error:", error.message);
+        console.log("❌ CRITICAL ERROR:", error.message);
     }
 };
 
-checkInbox();
+// ---------------------------------------------------------
+// RUN
+// ---------------------------------------------------------
+
+checkAndReply();

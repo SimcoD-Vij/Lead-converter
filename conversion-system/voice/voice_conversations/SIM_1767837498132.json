@@ -1,0 +1,12 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-08T01:58:23.223Z"
+  },
+  {
+    "role": "user",
+    "text": "What is the price in USD?",
+    "timestamp": "2026-01-08T01:58:25.244Z"
+  }
+]

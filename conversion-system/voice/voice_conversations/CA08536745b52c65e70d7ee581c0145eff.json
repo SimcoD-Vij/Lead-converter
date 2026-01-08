@@ -1,0 +1,61 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T04:25:37.009Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: User engaged in a conversation of 14 turns but AI parsing was inconclusive. Assumed interested."
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time to talk.",
+    "timestamp": "2026-01-06T04:25:46.211Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I've got something exciting to share with you about our new XOptimus Smart Chargers.",
+    "timestamp": "2026-01-06T04:25:46.919Z"
+  },
+  {
+    "role": "user",
+    "text": "The detail of your product.",
+    "timestamp": "2026-01-06T04:25:49.287Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (Wall Adapter) - Increase your battery life with our innovative solution.",
+    "timestamp": "2026-01-06T04:25:50.069Z"
+  },
+  {
+    "role": "user",
+    "text": "Okay. What is the price?",
+    "timestamp": "2026-01-06T04:26:03.838Z"
+  },
+  {
+    "role": "assistant",
+    "text": "You know, we have a great offer on this XOptimus Smart Charger (Wall Adapter). Right? It's normally priced at ₹999, but for you, I can give it to you for just ₹1499! Would you like me to send over some details?",
+    "timestamp": "2026-01-06T04:26:04.859Z"
+  },
+  {
+    "role": "user",
+    "text": "Okay. Okay. Okay.",
+    "timestamp": "2026-01-06T04:26:12.648Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Hivericks has just launched a new smart charger that's going to revolutionize the way we charge our devices. It can detect when your battery is running low and automatically switch to a power-saving mode to prevent overheating.",
+    "timestamp": "2026-01-06T04:26:13.561Z"
+  },
+  {
+    "role": "user",
+    "text": "Let's hang up the call. Okay, let's just hang up the call and talk later.",
+    "timestamp": "2026-01-06T04:26:22.750Z"
+  },
+  {
+    "role": "assistant",
+    "text": "You know, I'm always here to help you find a solution that fits your needs. Can't wait for our next call, when we can dive deeper into how XOptimus Smart Charger can benefit your business or personal life. Take care!",
+    "timestamp": "2026-01-06T04:26:23.784Z"
+  }
+]

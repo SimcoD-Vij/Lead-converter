@@ -1,0 +1,149 @@
+[
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:13:49.190Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: PENDING. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:14:53.641Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: PENDING. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:15:58.078Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: PENDING. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:17:02.492Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: PENDING. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:18:06.926Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: PENDING. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:20:21.956Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: PENDING. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:22:38.899Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_INITIATED. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:23:54.028Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_INITIATED. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:26:27.811Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_INITIATED. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:39:11.754Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_COMPLETED. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:42:23.448Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_INITIATED. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:45:52.254Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_INITIATED. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:47:12.867Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_INITIATED. Summary: No prior contact.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:53:38.369Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_COMPLETED. Summary: Connection error.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:56:37.179Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_INITIATED. Summary: Connection error.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:57:55.732Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_COMPLETED. Summary: Connection error.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T21:59:17.371Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_COMPLETED. Summary: Connection error.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T22:01:08.445Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_INITIATED. Summary: Connection error.. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T22:07:04.535Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_COMPLETED. Summary: Here is a summary of the conversation in 2 sentences:. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T22:08:24.619Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_CONNECTED. Summary: Here is a summary of the conversation in 2 sentences:. GOAL: Follow up. Check if they have questions."
+  },
+  {
+    "type": "SYSTEM_HANDSHAKE",
+    "timestamp": "2026-01-05T22:16:57.386Z",
+    "input": "SYSTEM_PREWARM_CONTEXT",
+    "output": "I AM READY",
+    "context": "Attempts: 2. Status: CALL_COMPLETED. Summary: Here is a summary of our conversation:. GOAL: Follow up. Check if they have questions."
+  }
+]

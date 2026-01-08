@@ -1,0 +1,11 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-07T22:51:47.486Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: SUMMARY:\n- User's specific product interest: Hiverricks ( unknown company)\n- Current sentiment: Hot (request for assistance)\n- Final outcome: Warm (offer of assistance)\n- Next step: Immediate next step is to provide information about the product, as it was previously discussed."
+  }
+]

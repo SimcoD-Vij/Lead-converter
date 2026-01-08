@@ -1,0 +1,51 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T04:54:28.897Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: Conversation ended. (Summary generation failed). Intent: engaged_fallback."
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good thing. Just give me the product detail.",
+    "timestamp": "2026-01-06T04:54:43.176Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (Wall Adapter) is a premium smart charger designed to increase Li-Ion battery life expectancy and performance. It helps in saving energy by maintaining optimal charge levels and prevents overcharging and heating issues using real-time parameters.",
+    "timestamp": "2026-01-06T04:54:45.428Z"
+  },
+  {
+    "role": "user",
+    "text": "Will you give me the price?",
+    "timestamp": "2026-01-06T04:54:56.930Z"
+  },
+  {
+    "role": "assistant",
+    "text": "You know, we typically sell this product for around ₹2495, but since it's a special offer today, I can do ₹1499 for you. Shall I send over the details?",
+    "timestamp": "2026-01-06T04:54:58.581Z"
+  },
+  {
+    "role": "user",
+    "text": "Little bit. I want I want to hang the call as of now. Let's talk later.",
+    "timestamp": "2026-01-06T04:55:14.734Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I'm glad you're excited about your XOptimus Smart Charger, but I think we just started our conversation and haven't discussed anything yet. What would you like to know or talk about?",
+    "timestamp": "2026-01-06T04:55:16.880Z"
+  },
+  {
+    "role": "user",
+    "text": "Let's hang up. Now, let's talk later.",
+    "timestamp": "2026-01-06T04:55:30.217Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I'm glad we could have this conversation. I'll be here whenever you're ready to continue. Have a great day!",
+    "timestamp": "2026-01-06T04:55:31.055Z"
+  }
+]

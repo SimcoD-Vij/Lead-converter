@@ -1,0 +1,61 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T03:29:37.762Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: User engaged in a conversation of 14 turns but AI parsing was inconclusive. Assumed interested."
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time to talk but what is it?",
+    "timestamp": "2026-01-06T03:29:49.584Z"
+  },
+  {
+    "role": "assistant",
+    "text": "It looks like we're about to get started! The XOptimus Smart Charger (Wall Adapter) can help you save energy and increase your battery life.",
+    "timestamp": "2026-01-06T03:29:51.636Z"
+  },
+  {
+    "role": "user",
+    "text": "I want to know the price.",
+    "timestamp": "2026-01-06T03:30:04.969Z"
+  },
+  {
+    "role": "assistant",
+    "text": "You know, our XOptimus Smart Charger is usually priced at around 500 INR for a standard model, but I can check if we have any promotions available or if it's on sale right now. Would you like me to look into that for you?",
+    "timestamp": "2026-01-06T03:30:06.891Z"
+  },
+  {
+    "role": "user",
+    "text": "I want to.",
+    "timestamp": "2026-01-06T03:30:21.351Z"
+  },
+  {
+    "role": "assistant",
+    "text": "You're ready to get started with your XOptimus Smart Charger. What's the next step? Do you need help choosing a wall adapter or do you have any questions about it?",
+    "timestamp": "2026-01-06T03:30:23.000Z"
+  },
+  {
+    "role": "user",
+    "text": "No, no, it's not like that. I will just check in and call later.",
+    "timestamp": "2026-01-06T03:30:35.794Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Hey, sounds good! We'll catch up soon.",
+    "timestamp": "2026-01-06T03:30:37.082Z"
+  },
+  {
+    "role": "user",
+    "text": "Okay. Then hang up the call.",
+    "timestamp": "2026-01-06T03:30:44.691Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Thanks for holding, I'm going to go check on that now.",
+    "timestamp": "2026-01-06T03:30:45.306Z"
+  }
+]

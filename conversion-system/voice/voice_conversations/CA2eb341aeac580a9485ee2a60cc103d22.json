@@ -1,0 +1,11 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-07T23:15:33.671Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: User Sentiment: Warm (-3/10) - The user is friendly and appreciative of the assistant's previous conversation, but seems hesitant to discuss new business."
+  }
+]

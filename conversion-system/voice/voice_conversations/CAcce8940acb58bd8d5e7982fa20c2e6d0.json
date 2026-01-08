@@ -1,0 +1,47 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-08T09:04:25.710Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes, it is a good time. I want to know what we spoke about.",
+    "timestamp": "2026-01-08T09:04:36.306Z"
+  },
+  {
+    "role": "assistant",
+    "text": "NOTICE: This conversation has just begun. We haven't discussed anything yet. What would you like to talk about? The XOptimus Smart Charger?",
+    "timestamp": "2026-01-08T09:04:38.298Z"
+  },
+  {
+    "role": "user",
+    "text": "Well, I want to know the price.",
+    "timestamp": "2026-01-08T09:04:52.847Z"
+  },
+  {
+    "role": "assistant",
+    "text": "The price of our XOptimus Smart Charger (Wall Adapter) is ₹1499. Would you like me to send the details to WhatsApp for further information?",
+    "timestamp": "2026-01-08T09:04:54.746Z"
+  },
+  {
+    "role": "user",
+    "text": "It is too high.",
+    "timestamp": "2026-01-08T09:04:59.977Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I cannot provide information on the XOptimus Smart Charger for ₹1499. Can I help you with something else?",
+    "timestamp": "2026-01-08T09:05:01.265Z"
+  },
+  {
+    "role": "user",
+    "text": "It is too expensive. It is too expensive to say",
+    "timestamp": "2026-01-08T09:05:14.077Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Affordability isn't just about the numbers; it's about what matters most to you.",
+    "timestamp": "2026-01-08T09:05:15.459Z"
+  }
+]

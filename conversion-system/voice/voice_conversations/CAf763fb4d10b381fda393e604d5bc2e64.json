@@ -1,0 +1,47 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-07T23:58:58.680Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes, it is a good time.",
+    "timestamp": "2026-01-07T23:59:07.109Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Let's move forward with the XOptimus Smart Charger installation.",
+    "timestamp": "2026-01-07T23:59:08.918Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes. Actually I want to know the details.",
+    "timestamp": "2026-01-07T23:59:17.530Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (Wall Adapter) is a device designed to increase Li-Ion battery life expectancy and performance by saving energy through optimal charge levels, preventing overcharging and heating issues, and maintaining real-time parameters for safe charging.",
+    "timestamp": "2026-01-07T23:59:20.153Z"
+  },
+  {
+    "role": "user",
+    "text": "Wait, wait, I want to know the price?",
+    "timestamp": "2026-01-07T23:59:30.750Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (Wall Adapter) is available at $49.99 for the standard model and $69.99 for the premium model with additional features.",
+    "timestamp": "2026-01-07T23:59:32.756Z"
+  },
+  {
+    "role": "user",
+    "text": "Give it an Indian rupee.",
+    "timestamp": "2026-01-07T23:59:41.540Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I can provide you with the revised version with Indian rupees.",
+    "timestamp": "2026-01-07T23:59:42.805Z"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "role": "user",
+    "text": "What is the price of the charger?",
+    "timestamp": "2026-01-07T23:56:24.428Z"
+  },
+  {
+    "role": "assistant",
+    "text": "The XOptimus Smart Charger (Wall Adapter) is priced at ₹1499.",
+    "timestamp": "2026-01-07T23:56:31.325Z"
+  }
+]

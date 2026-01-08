@@ -1,162 +1,116 @@
+// conversion-system/scoring/scoring_engine.js
 // ---------------------------------------------------------
-// TASK 5: LEAD SCORING ENGINE (DATA-AWARE VERSION)
+// SCORING ENGINE (MAX 100)
 // ---------------------------------------------------------
-const fs = require('fs');
-const path = require('path');
+// WEIGHTS:
+// 1. INTENT (50%): Derived from AI Analysis of conversation
+// 2. STATUS (30%): Derived from System State (Engagement depth)
+// 3. RECENCY/EFFICIENCY (20%): Derived from Attempt Count (Early conversion is better)
 
-// DATA SOURCES
-const LEADS_FILE = path.resolve(__dirname, '../processed_leads/clean_leads.json');
-// We keep call logs as a backup source, but prioritize the lead file
-const CALL_LOGS_FILE = path.resolve(__dirname, '../processed_leads/call_logs.json');
-
-// SCORING RULES
-const POINTS = {
-    // BASELINE (Data Quality)
-    VALID_EMAIL: 5,
-    VALID_PHONE: 5,
-
-    // ACTIVITY (Effort)
-    SENT_EMAIL: 1,
-    TRIED_CALL: 1,
-    SENT_SMS: 1,
-
-    // ENGAGEMENT (High Value)
-    EMAIL_OPEN: 5,
-    EMAIL_CLICK: 10,
-    VOICE_INTERESTED: 40, // Pressed 1
-    VOICE_CALLBACK: 10,   // Pressed 2
-    REPLIED_ANY: 20       // SMS/WhatsApp/Email Reply
-};
-
-const THRESHOLD = { HOT: 50, WARM: 20 };
-
-// ---------------------------------------------------------
-// 1. HELPER: SAFE FILE READER
-// ---------------------------------------------------------
-const loadJSON = (filePath) => {
-    if (!fs.existsSync(filePath)) return [];
-    try {
-        const content = fs.readFileSync(filePath, 'utf-8');
-        if (!content.trim()) return []; 
-        return JSON.parse(content);
-    } catch (e) {
-        return [];
-    }
-};
-
-// ---------------------------------------------------------
-// 2. HELPER: CALCULATE SCORE
-// ---------------------------------------------------------
-const scoreLead = (lead) => {
+/**
+ * Calculates Score out of 100
+ * @param {Object} lead - The lead object (for attempt count)
+ * @param {String} intent - 'HOT', 'WARM', 'COLD', 'NEGATIVE' (from AI)
+ * @param {String} status - Current System Status
+ */
+function calculateScore(lead, intent, status) {
     let score = 0;
-    let reasons = []; 
 
-    // --- A. BASELINE SCORING ---
-    if (lead.email) score += POINTS.VALID_EMAIL;
-    if (lead.phone) score += POINTS.VALID_PHONE;
+    // 1. INTENT SCORE (Max 50) - MODIFIED WITH NEGATIVE SENTIMENT
+    // ------------------------------------------------
+    const i = (intent || 'COLD').toUpperCase();
 
-    // --- B. ACTIVITY SCORING ---
-    if (lead.stage > 0) {
-        score += POINTS.SENT_EMAIL;
-    }
-    if (lead.last_called) {
-        score += POINTS.TRIED_CALL;
-    }
-    if (lead.last_sms_time) {
-        score += POINTS.SENT_SMS;
-    }
+    // ALERT: Analyze for Sentiment Penalties (New Feature)
+    let penalty = 0;
+    // We expect the 'intent' to potentially carry negative signals, or we rely on 'analyzeSentiment' called externally.
+    // However, since we don't have the transcript here, we rely on the caller passing a 'sentiment_score' or similar.
+    // BUT, for now, we will add a helper and assume 'lead.last_call_summary' might contain clues or we assume the caller (call_server) runs analysis.
 
-    // --- C. ENGAGEMENT SCORING (The Fix) ---
-    
-    // 1. Voice Interaction (Check 'last_response_digit' inside the lead object)
-    if (lead.last_response_digit) {
-        if (lead.last_response_digit === '1') {
-            score += POINTS.VOICE_INTERESTED;
-            reasons.push("Voice: Interested");
-        } else if (lead.last_response_digit === '2') {
-            score += POINTS.VOICE_CALLBACK;
-            reasons.push("Voice: Call Later");
-        }
+    // BETTER APPROACH: Export 'analyzeSentiment' and let call_server use it to determine the 'intent' passed here.
+    // So 'intent' becomes 'NEGATIVE' if analysis fails.
+
+    if (i === 'NEGATIVE') score = 0;
+    else if (i === 'HOT') score += 50;
+    else if (i === 'WARM') score += 30;
+    else if (i === 'COLD') score += 10;
+    else score += 10;
+
+    // Apply explicit penalty if passed (Future proofing)
+    // For now, relies on SalesBot setting intent='NEGATIVE' correctly.
+    if (lead.last_call_summary && lead.last_call_summary.transcript) {
+        penalty = analyzeSentiment(lead.last_call_summary.transcript);
+        score += penalty;
     }
 
-    // 2. Message Interaction (Check 'last_reply' timestamp)
-    if (lead.last_reply) {
-        score += POINTS.REPLIED_ANY;
-        reasons.push("Msg Reply Received");
+
+    // 2. STATUS SCORE (Max 30)
+    // ------------------------------------------------
+    const s = (status || '').toUpperCase();
+
+    // High Engagement
+    if (['CALL_CONNECTED', 'SMS_ENGAGED', 'MAIL_ENGAGED', 'CALL_INTERESTED'].includes(s)) {
+        score += 30;
+    }
+    // Moderate Engagement
+    else if (['SMS_REPLIED', 'SMS_RECEIVED', 'MAIL_OPENED', 'CALL_TO_SMS_FOLLOWUP'].includes(s)) {
+        score += 20;
+    }
+    // Low Engagement (Delivery)
+    else if (['SMS_DELIVERED', 'MAIL_DELIVERED', 'CALL_NO_ANSWER', 'CALL_BUSY'].includes(s)) {
+        score += 10;
+    }
+    // Basic Sent
+    else {
+        score += 5;
     }
 
-    // 3. Email Tracking (Check 'opened' / 'clicked')
-    if (lead.opened) {
-        score += POINTS.EMAIL_OPEN;
-        reasons.push("Opened Email");
-    }
-    if (lead.clicked) {
-        score += POINTS.EMAIL_CLICK;
-        reasons.push("Clicked Link");
-    }
+    // 3. EFFICIENCY SCORE (Max 20)
+    // ------------------------------------------------
+    // Reward converting early. Penalize dragging on.
+    const attempt = lead.attempt_count || 0;
 
-    // --- D. CATEGORIZE ---
-    let category = "❄️ COLD";
-    let action = "Nurture";
+    if (attempt <= 3) score += 20;      // Early Bird
+    else if (attempt <= 6) score += 10; // Mid Game
+    else if (attempt <= 9) score += 5;  // Late
+    else score += 0;                    // Overdue
 
-    if (score >= THRESHOLD.HOT) {
-        category = "🔥 HOT";
-        action = "CALL NOW (Human)";
-    } else if (score >= THRESHOLD.WARM) {
-        category = "🌤️ WARM";
-        action = "Send SMS";
-    }
+    // 4. BOUNDS & CATEGORIZATION
+    if (score > 100) score = 100;
+    if (score < 0) score = 0;
 
-    if (reasons.length === 0) reasons.push("Profiling Only");
+    return {
+        score: score,
+        category: getCategory(score),
+        intent_level: i
+    };
+}
 
-    return { score, category, action, breakdown: reasons.join(", ") };
-};
+function getCategory(score) {
+    if (score >= 70) return 'HOT';
+    if (score >= 40) return 'WARM';
+    return 'COLD';
+}
 
-// ---------------------------------------------------------
-// 3. MAIN PROCESS
-// ---------------------------------------------------------
-const runScoring = () => {
-    console.log("🧠 Starting Scoring Engine...\n");
+function analyzeSentiment(transcript) {
+    if (!transcript || !Array.isArray(transcript)) return 0;
 
-    const leads = loadJSON(LEADS_FILE);
+    // 1. Analyze User Turns (Last 3)
+    const userTurns = transcript.filter(t => t.role === 'user').slice(-3);
+    const negativeKeywords = ["not worth", "bad", "cheat", "scam", "too high", "expensive", "hang up", "don't want", "fraud", "useless", "fake", "cheaper"];
 
-    if (leads.length === 0) {
-        console.log("❌ No leads found.");
-        return;
+    for (const t of userTurns) {
+        if (negativeKeywords.some(k => t.text.toLowerCase().includes(k))) return -50;
     }
 
-    console.log("-----------------------------------------------------------------------------------------");
-    console.log(
-        "NAME".padEnd(20) + 
-        "SCORE".padEnd(8) + 
-        "CATEGORY".padEnd(12) + 
-        "ACTION".padEnd(20) +
-        "REASONS"
-    );
-    console.log("-----------------------------------------------------------------------------------------");
+    // 2. Analyze AI Refusals
+    const aiTurns = transcript.filter(t => t.role === 'assistant').slice(-3);
+    const refusalKeywords = ["cannot assist", "can't answer", "unable to provide", "apologize"];
 
-    const scoredLeads = leads.map(lead => {
-        const result = scoreLead(lead);
-        
-        console.log(
-            lead.name.padEnd(20) + 
-            result.score.toString().padEnd(8) + 
-            result.category.padEnd(12) + 
-            result.action.padEnd(20) +
-            result.breakdown
-        );
+    for (const t of aiTurns) {
+        if (refusalKeywords.some(k => t.text.toLowerCase().includes(k))) return -30;
+    }
 
-        return {
-            ...lead,
-            score: result.score,
-            category: result.category,
-            intelligence_action: result.action,
-            last_scored: new Date().toISOString()
-        };
-    });
+    return 0; // Neutral
+}
 
-    fs.writeFileSync(LEADS_FILE, JSON.stringify(scoredLeads, null, 2));
-    console.log("\n💾 Scoring Complete. Database updated.");
-};
-
-runScoring();
+module.exports = { calculateScore, getCategory, analyzeSentiment };

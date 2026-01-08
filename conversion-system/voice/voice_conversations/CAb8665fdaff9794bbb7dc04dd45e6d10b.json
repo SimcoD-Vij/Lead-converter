@@ -1,0 +1,71 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T02:47:31.222Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: User asked for clarification on the previous conversation before explicitly stating they were not interested and hanging up."
+  },
+  {
+    "role": "user",
+    "text": "That's good time, but what have we spoken recently?",
+    "timestamp": "2026-01-06T02:47:46.614Z"
+  },
+  {
+    "role": "assistant",
+    "text": "We haven't had a recent conversation. You initially asked about the XOptimus Smart Charger, but since this is our first interaction, I'm here to help with your questions and concerns. How can I assist you today?",
+    "timestamp": "2026-01-06T02:47:48.832Z"
+  },
+  {
+    "role": "user",
+    "text": "I want to know the price.",
+    "timestamp": "2026-01-06T02:48:04.302Z"
+  },
+  {
+    "role": "assistant",
+    "text": "The XOptimus Smart Charger (Wall Adapter) is a premium product, and its price may vary depending on the region and retailer. But I can give you an idea of what it might cost.",
+    "timestamp": "2026-01-06T02:48:06.426Z"
+  },
+  {
+    "role": "user",
+    "text": "Just give me the price.",
+    "timestamp": "2026-01-06T02:48:16.717Z"
+  },
+  {
+    "role": "assistant",
+    "text": "₹1499",
+    "timestamp": "2026-01-06T02:48:17.944Z"
+  },
+  {
+    "role": "user",
+    "text": "Man, that's too huge. I can find charges, which are",
+    "timestamp": "2026-01-06T02:48:28.288Z"
+  },
+  {
+    "role": "assistant",
+    "text": "You know, our XOptimus Smart Charger (Wall Adapter) is a game-changer for your devices.",
+    "timestamp": "2026-01-06T02:48:29.767Z"
+  },
+  {
+    "role": "user",
+    "text": "I can I can find charges that are at lower price than this at websites. Why should I prefer?",
+    "timestamp": "2026-01-06T02:48:39.421Z"
+  },
+  {
+    "role": "assistant",
+    "text": "You know, our XOptimus Smart Charger is not just a great value for the price, it's also backed by our 5-year warranty and dedicated customer support team to ensure you get the best possible performance out of your device.",
+    "timestamp": "2026-01-06T02:48:40.486Z"
+  },
+  {
+    "role": "user",
+    "text": "Just hang up the call. I'm not interested in this conversation.",
+    "timestamp": "2026-01-06T02:48:58.361Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Totally fair. Thanks for your time. Call completed.",
+    "timestamp": "2026-01-06T02:49:00.347Z"
+  }
+]

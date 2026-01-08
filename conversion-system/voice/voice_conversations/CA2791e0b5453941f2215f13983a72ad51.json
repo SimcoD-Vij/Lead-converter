@@ -1,0 +1,27 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T17:58:44.994Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes, it is a good time to talk.",
+    "timestamp": "2026-01-06T17:58:55.755Z"
+  },
+  {
+    "role": "user",
+    "text": "No, no no. I'm just saying if I have been called",
+    "timestamp": "2026-01-06T17:59:17.891Z"
+  },
+  {
+    "role": "user",
+    "text": "I'm hanging up the phone. I'm not interested in the product.",
+    "timestamp": "2026-01-06T17:59:37.329Z"
+  },
+  {
+    "role": "user",
+    "text": "No, I'm not interested interested.",
+    "timestamp": "2026-01-06T17:59:51.419Z"
+  }
+]

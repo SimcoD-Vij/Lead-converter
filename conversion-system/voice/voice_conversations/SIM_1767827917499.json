@@ -1,0 +1,12 @@
+[
+  {
+    "role": "user",
+    "text": "Yes, this is a good time.",
+    "timestamp": "2026-01-07T23:18:37.562Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Clarification Call",
+    "timestamp": "2026-01-07T23:18:38.027Z"
+  }
+]

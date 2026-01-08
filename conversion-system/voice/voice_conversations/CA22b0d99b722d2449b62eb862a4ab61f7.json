@@ -1,0 +1,47 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T17:42:15.490Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time.",
+    "timestamp": "2026-01-06T17:42:24.701Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Alright, let's dive into this XOptimus Smart Charger. Can you tell me more about its features and benefits?",
+    "timestamp": "2026-01-06T17:42:32.508Z"
+  },
+  {
+    "role": "user",
+    "text": "I want you to tell the details.",
+    "timestamp": "2026-01-06T17:42:45.593Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger is a game-changer for your daily routine! It's an intelligent wall adapter that uses advanced technology to optimize your battery life, prevent overcharging and overheating, and even charge multiple devices simultaneously at once.",
+    "timestamp": "2026-01-06T17:42:52.207Z"
+  },
+  {
+    "role": "user",
+    "text": "Meet with. I just wait. Wait, wait, I just need the price.",
+    "timestamp": "2026-01-06T17:43:05.928Z"
+  },
+  {
+    "role": "assistant",
+    "text": "firmly but politely I'm here to help you. Can you tell me what's on your mind? You said 'meet with' and then immediately brought up the price. Let's focus on finding a solution for you.",
+    "timestamp": "2026-01-06T17:43:07.721Z"
+  },
+  {
+    "role": "user",
+    "text": "I want a price.",
+    "timestamp": "2026-01-06T17:43:25.744Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger typically retails for ₹499. Would you like to consider purchasing it?",
+    "timestamp": "2026-01-06T17:43:27.658Z"
+  }
+]

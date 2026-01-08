@@ -1,0 +1,41 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T03:38:29.661Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: User engaged in a conversation of 12 turns but AI parsing was inconclusive. Assumed interested."
+  },
+  {
+    "role": "user",
+    "text": "Yeah, that's a good time.",
+    "timestamp": "2026-01-06T03:38:38.274Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Looks like you're ready to take the power charge out of your devices! What's the plan with this XOptimus Smart Charger?",
+    "timestamp": "2026-01-06T03:38:40.275Z"
+  },
+  {
+    "role": "user",
+    "text": "Uh I don't have time as of now. So just say the price and is it only available from Highway.",
+    "timestamp": "2026-01-06T03:38:59.175Z"
+  },
+  {
+    "role": "assistant",
+    "text": "The XOptimus Smart Charger (Wall Adapter) normally retails for ₹1,499, but we're offering a special deal on Highway.",
+    "timestamp": "2026-01-06T03:39:01.157Z"
+  },
+  {
+    "role": "user",
+    "text": "Okay. Okay. Okay. Okay, I'm just hanging up the call.",
+    "timestamp": "2026-01-06T03:39:15.556Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Alright, sounds good! Have a great day and we'll catch you later!",
+    "timestamp": "2026-01-06T03:39:16.885Z"
+  }
+]

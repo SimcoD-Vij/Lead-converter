@@ -1,0 +1,31 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-07T23:27:07.558Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: User Sentiment: Warm\nTask Outcome: The user is interested in discussing their current project with Hiverrick's sales team.\nNext Step: The assistant will schedule a call to discuss the project further."
+  },
+  {
+    "role": "user",
+    "text": "Yes, it is a good time. Yes.",
+    "timestamp": "2026-01-07T23:27:20.959Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Would it be helpful if we hopped on a quick call to discuss the XOptimus Smart Charger?",
+    "timestamp": "2026-01-07T23:27:29.300Z"
+  },
+  {
+    "role": "user",
+    "text": "They are already on a call. So,",
+    "timestamp": "2026-01-07T23:27:38.418Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I'm having trouble hearing you.",
+    "timestamp": "2026-01-07T23:27:48.460Z"
+  }
+]

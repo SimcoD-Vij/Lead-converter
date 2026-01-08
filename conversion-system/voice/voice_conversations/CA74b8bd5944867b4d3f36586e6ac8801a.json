@@ -1,0 +1,47 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-08T01:17:06.089Z"
+  },
+  {
+    "role": "user",
+    "text": "Yeah, it's a good time. Yes.",
+    "timestamp": "2026-01-08T01:17:20.474Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (Wall Adapter) ready to help you charge your devices efficiently.",
+    "timestamp": "2026-01-08T01:17:21.557Z"
+  },
+  {
+    "role": "user",
+    "text": "Okay, okay, I'm okay that you are approaching. I  want to know.",
+    "timestamp": "2026-01-08T01:17:39.169Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger is designed to increase Li-Ion battery life expectancy and performance by maintaining optimal charge levels.",
+    "timestamp": "2026-01-08T01:17:41.044Z"
+  },
+  {
+    "role": "user",
+    "text": "I want to  know the",
+    "timestamp": "2026-01-08T01:17:53.737Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (Wall Adapter)",
+    "timestamp": "2026-01-08T01:17:54.993Z"
+  },
+  {
+    "role": "user",
+    "text": "I want to know the  price.",
+    "timestamp": "2026-01-08T01:18:08.215Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (Wall Adapter) is available for purchase on our website. The current retail price is ₹1,499/-",
+    "timestamp": "2026-01-08T01:18:10.190Z"
+  }
+]

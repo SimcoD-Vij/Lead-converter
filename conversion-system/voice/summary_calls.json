@@ -1,0 +1,506 @@
+[
+  {
+    "event_id": "evt_1767666197249_0",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA56551b59ff34047c70353c64f10d6be2",
+    "generated_at": "2026-01-06T05:32:33.326Z",
+    "summary_text": "The conversation started with a request from Vijay R to play the role of a Senior Sales Consultant at Hivericks, and the Assistant began by asking if now was a good time for them to discuss something. The user then requested information about the XOptimus Smart Charger (Wall Adapter) priced at ₹1499, which led to a discussion on its features, price, and comparison with other sites where similar products could be purchased. However, the user ultimately expressed interest in waiting for lower prices due to their concern over the product's high price point."
+  },
+  {
+    "event_id": "evt_1767666198336_1",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA5932b33027af2e28799b03ce9b426c0b",
+    "generated_at": "2026-01-06T05:32:34.316Z",
+    "summary_text": "USER (Vijay): Hi Vijay R, I'm happy to take a minute to discuss XOptimus with you. I've been hearing great things about it and I'd like to learn more about its features and capabilities. Can we schedule a call to go over some specifics?"
+  },
+  {
+    "event_id": "evt_1767666199717_2",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CAabcc2471313f22c049b8588b3306b195",
+    "generated_at": "2026-01-06T05:32:35.595Z",
+    "summary_text": "The User, Vijay R, initiates contact with the Assistant from Hivericks, asking if it's a good time for them to discuss something. The Assistant responds that it is, and asks if they should share the product details via WhatsApp. However, the conversation takes an unexpected turn when Vijay reveals he wants to know the price of a specific product instead of discussing further with the Assistant."
+  },
+  {
+    "event_id": "evt_1767666201196_3",
+    "lead_id": "+917604896187",
+    "sid": "CAd114c8df722cbb86e6bd16f169528bc0",
+    "generated_at": "2026-01-06T05:32:38.166Z",
+    "summary_text": "The user, Vijay R, initiated a call to discuss the features and benefits of the XOptimus Smart Charger, a product from Hivericks. Initially, they expressed interest in learning more about its price after previously speaking with an assistant who mentioned that it was too expensive at 800 INR. The user then made a counteroffer, asking for a discount to 200 Rupees online, but the assistant instead offered a limited-time exclusive online deal of Rs. 200/- on the Hivericks website. The conversation escalated when the user asked if they could buy the charger for 5000 INR, prompting the assistant to mention that it was actually priced at 299/- and suggested alternative products from Hivericks. Despite the assistant's efforts to persuade the user, Vijay R ended the call by stating that he was not interested in purchasing the product and hung up on them."
+  },
+  {
+    "event_id": "evt_1767668241911_rec",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA4ef7cd110418e43355ec757a50ef7504",
+    "generated_at": "2026-01-06T05:32:40.167Z",
+    "summary_text": "The User, Vijay R, initiates the call by confirming his availability for a conversation with an Assistant from Hivericks. The Assistant responds by clarifying that it is indeed a good time, asking if now is suitable. However, the conversation takes a turn when the User suddenly changes topics to ask about the vehicle they are considering purchasing, leading the Assistant to clarify that the discussion is not about vehicles but rather about a product - XOptimus Smart Chargers. The User questions the pricing and warranty, prompting the Assistant to reiterate the price of ₹1499 for the specific model being discussed, before attempting to provide additional information about XOptimus Smart Charger."
+  },
+  {
+    "event_id": "evt_1767668241913_rec",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA5222689de9b6cbf05bdf153cbff39971",
+    "generated_at": "2026-01-06T05:32:41.178Z",
+    "summary_text": "The User, Vijay R, initiated a call with Vijay from Hivericks regarding XOptimus, a smart charger. He expressed interest in learning more about the product but was interrupted and asked to start over. The Assistant politely ended the call as it seemed the User's interest had waned."
+  },
+  {
+    "event_id": "evt_1767668241914_rec",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA69f6894de3f9cb50c6b52a3914ac3781",
+    "generated_at": "2026-01-06T05:32:42.500Z",
+    "summary_text": "The User, Vijay R, from Hivericks, inquires about scheduling a call after previously discussing the XOptimus Smart Charger (Wall Adapter) with an assistant earlier. He clarifies that he wants to be specific and mention their previous conversation. The Assistant agrees to send the product details on WhatsApp, but first confirms that it's not a Purchase Service Centre (PSC), suggesting a potential misunderstanding or miscommunication between them."
+  },
+  {
+    "event_id": "evt_1767668241914_rec",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA896bbf2cce9235f32e0a475929f66248",
+    "generated_at": "2026-01-06T05:32:43.890Z",
+    "summary_text": "The user, Vijay R, has expressed interest in learning more about XOptimus by contacting the sales representative from Hivericks, Vijay. He inquires about the price and warranty included, but becomes hesitant after being told that the price is ₹1499 and includes a 1-year guarantee. The assistant attempts to persuade him to consider purchasing the product, citing its value for money, but Vijay remains unconvinced."
+  },
+  {
+    "event_id": "evt_1767668241916_rec",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA8c95867e1f705e223451de836e2e1afe",
+    "generated_at": "2026-01-06T05:32:45.591Z",
+    "summary_text": "The User, Vijay R, asked if it's a good time to talk, and the Assistant, from Hivericks, responded that now would be a suitable time. The User then inquired about the product details, specifically the XOptimus Smart Charger (Wall Adapter), and the Assistant provided information on its features and benefits, including its price of ₹1499 which includes a 1-year warranty. However, Vijay R was skeptical about the price being kind of high compared to other websites and expressed interest in knowing what they had previously discussed."
+  },
+  {
+    "event_id": "evt_1767668241917_rec",
+    "lead_id": "+917604896187",
+    "sid": "CAb8665fdaff9794bbb7dc04dd45e6d10b",
+    "generated_at": "2026-01-06T05:32:47.271Z",
+    "summary_text": "The User, Vijay R, is seeking information about the XOptimus Smart Charger (Wall Adapter) from Hivericks and has initiated contact with an Assistant on Hivericks. The conversation started with a question about their previous interaction but ended abruptly when they asked for the price of the product, which was promptly provided by the Assistant. During the call, Vijay R expressed concerns that the price may be too high and requested lower prices from other websites, prompting the Assistant to explain the value proposition of the XOptimus Smart Charger, including its warranty and customer support."
+  },
+  {
+    "event_id": "evt_1767668241917_rec",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "MockCrashTest",
+    "generated_at": "2026-01-06T05:32:48.285Z",
+    "summary_text": "The user initiates a conversation, asking Hello, followed by Interest? indicating they are seeking some sort of interest or topic to discuss. The assistant responds with a positive greeting and asks Good back, suggesting the user is open to starting a conversation. The call ends with the user confirming their interest in discussing something."
+  },
+  {
+    "event_id": "evt_1767670261382",
+    "lead_id": "+917604896187",
+    "sid": "CA5d13f794f37e677d4d0900c82e5f5f81",
+    "generated_at": "2026-01-06T05:32:49.967Z",
+    "summary_text": "The User, Vijay R, initiates a call with an Assistant from Hivericks, asking if it's a good time to talk. The Assistant responds by mentioning they're about to start the conversation and highlights the benefits of using the XOptimus Smart Charger. However, the User expresses their desire for price information instead, prompting the Assistant to check on promotions or current sales. After a brief discussion, the User indicates they are ready to proceed with their purchase, at which point the call is concluded."
+  },
+  {
+    "event_id": "evt_1767670774883",
+    "lead_id": "+917604896187",
+    "sid": "CA071641b44d27151460419bcd3b3c06dd",
+    "generated_at": "2026-01-06T05:32:51.289Z",
+    "summary_text": "The User is reconnecting with an Assistant from Hivericks after they previously spoke about taking control of their devices. The current conversation revolves around the XOptimus Smart Charger, which the User expressed interest in acquiring but did not have time to discuss further. The Assistant provides a special deal on Highway, offering the product at a discounted price, and the User accepts, hanging up the call after confirming the details with the Assistant."
+  },
+  {
+    "event_id": "evt_1767671544432",
+    "lead_id": "+917604896187",
+    "sid": "CA362f0a791b6f1b565bc86e64f6397caf",
+    "generated_at": "2026-01-06T05:32:52.980Z",
+    "summary_text": "The User, Vijay R, initiates a call with the Assistant from Hivericks, inquiring about scheduling a follow-up conversation at a later time. The Assistant, responding that it's a good time to talk now, discusses the XOptimus Smart Charger, highlighting its benefits such as increasing battery life and providing a bacon bonus feature for added convenience. However, the call is cut short when Vijay R expresses his desire to end the conversation, and the Assistant wishes him well and invites him to reach out again later."
+  },
+  {
+    "event_id": "evt_1767672091405",
+    "lead_id": "+917604896187",
+    "sid": "CAdfe4a77c1960d4c35fa997262c69b488",
+    "generated_at": "2026-01-06T05:32:54.447Z",
+    "summary_text": "The User Vijay R had a previous conversation with the Assistant, asking about XOptimus Smart Charger, which is currently on sale for ₹499. The User expressed interest in purchasing it but did not confirm their intention at that time. During this call, the Assistant highlighted the recent sales figures and benefits of the product, followed by a direct request to add it to Vijay R's cart. Ultimately, the conversation ended with the Assistant recommending the purchase and wishing Vijay R well."
+  },
+  {
+    "event_id": "evt_1767672425904",
+    "lead_id": "+917604896187",
+    "sid": "CA5b34d6e8de6aa7a581b9d0cbee933e4e",
+    "generated_at": "2026-01-06T05:32:55.815Z",
+    "summary_text": "The User, Vijay R, is reaching out from Hivericks after a previous conversation indicating they are interested in discussing energy-saving solutions with the XOptimus Smart Charger. He expresses his intention to learn more about its features and price. The Assistant, who had been engaged in a discussion earlier, offers further information on the product's real-time parameter monitoring feature and agrees that it would be helpful for Vijay R's use case."
+  },
+  {
+    "event_id": "evt_1767672993826",
+    "lead_id": "+917604896187",
+    "sid": "CA80e97b76f97ae3360e885f93e78ecee1",
+    "generated_at": "2026-01-06T05:32:58.033Z",
+    "summary_text": "The conversation between Vijay R and Hivericks Assistant began with a casual inquiry from Vijay R about whether it was a good time to discuss something, followed by the user asking for an explanation of 12. The assistant responded that just having a conversation was great fun, prompting the user to clarify what they meant and express excitement about trying new food at a local restaurant. The two began discussing their respective interests in food, with Vijay R expressing enthusiasm for the restaurant's dishes and the user asking if they had any exciting plans. The conversation shifted back to the product being pitched by the assistant, who provided an overview of the XOptimus Smart Charger and its features before answering a question about price, at which point the user expressed interest in learning more."
+  },
+  {
+    "event_id": "evt_1767673614517",
+    "lead_id": "+917604896187",
+    "sid": "CA08536745b52c65e70d7ee581c0145eff",
+    "generated_at": "2026-01-06T05:32:59.408Z",
+    "summary_text": "The user, Vijay R, initiated the conversation with Hivericks as they had previously spoken about the company's products. He expressed interest in discussing the new XOptimus Smart Chargers and asked about pricing, to which the assistant replied that a special offer was available for ₹1499 instead of the normal price of ₹999. The user accepted the offer, agreeing to discuss further later, before hanging up the call with a positive note."
+  },
+  {
+    "event_id": "evt_1767674875166",
+    "lead_id": "+917604896187",
+    "sid": "CAdb029bb47bfbb9b25a1cf82c3d4b1c40",
+    "generated_at": "2026-01-06T05:33:00.639Z",
+    "summary_text": "The User, Vijay R, is inquiring about the price of the XOptimus Smart Charger from Hivericks, which he believes is a game-changer for devices, offering increased battery life and performance while preventing overheating issues. He initially shows interest in buying the charger for 100 rupees but decides to cancel the call due to other commitments."
+  },
+  {
+    "event_id": "evt_1767678710890",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA0d43fb3ab54ca4863f677056ef54e8d8",
+    "generated_at": "2026-01-06T05:51:50.890Z",
+    "summary_text": "The User, Vijay R, is reaching out to Hivericks about a XOptimus Smart Charger, specifically asking about its price in comparison to similar options available online and expressing concerns that it may be too expensive at Rs 499 per pack of two. The Assistant reassures him that the charger offers peace of mind due to its high-quality and reliable technology, but does not push for a sale, ending the call with CALL_CLOSED."
+  },
+  {
+    "event_id": "evt_1767678735290",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA2065b49649a9985882c410d9a5b7d9b7",
+    "generated_at": "2026-01-06T05:52:15.290Z",
+    "summary_text": "The user Vijay R initiated the call by asking if it was a good time to discuss the product. The assistant, XOptimus Smart Charger (Wall Adapter), responded that now is a good time and provided some details about the product from Hivericks Technologies Pvt Ltd, which includes an 1-year warranty for ₹1499. However, the user stopped mid-conversation, asking why the price was included in the warranty, indicating a desire to clarify further before proceeding with the sales conversation."
+  },
+  {
+    "event_id": "evt_1767678759429",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA7156dcb87caaa03d118f29390a006b04",
+    "generated_at": "2026-01-06T05:52:39.429Z",
+    "summary_text": "The user, Vijay R, initiated the call with an assistant from Hivericks, expressing that it was a good time since they had previously spoken about the XOptimus Smart Charger (Wall Adapter). The customer requested detailed product information and pricing, asking if there was a special offer available. However, the conversation quickly shifted to a hang-up, leaving the assistant wondering what Vijay R wanted to discuss or know before hanging up again."
+  },
+  {
+    "event_id": "evt_1767678963279",
+    "lead_id": "+917604896187",
+    "sid": "CAc954efa1cad513347a4faff9ea8a90bd",
+    "generated_at": "2026-01-06T05:56:03.279Z",
+    "summary_text": "The user, Vijay R, is a customer from Hivericks who initiated contact with an assistant on the Hivericks platform earlier, asking about the XOptimus Smart Charger product and inquiring about its price. The assistant confirmed the product details and provided pricing information, but also suggested exploring options for a lower price before making any decisions. The user thanked the assistant and ended the call without discussing further."
+  },
+  {
+    "event_id": "evt_1767679498576",
+    "lead_id": "+917604896187",
+    "sid": "CA93026491e18baab2879bcbc35b1ae60e",
+    "generated_at": "2026-01-06T06:04:58.576Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767680189342",
+    "lead_id": "+917604896187",
+    "sid": "CA760ff21c3427118d549f28647c3573fe",
+    "generated_at": "2026-01-06T06:16:29.342Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767716413886",
+    "lead_id": "+917604896187",
+    "sid": "CA9ca3a66989d655b445fc11211a3b5f49",
+    "generated_at": "2026-01-06T16:20:13.886Z",
+    "summary_text": "The user Vijay R from Hivericks is calling to inquire about a potential conversation topic, and the assistant is trying to establish a connection by asking if it's a good time to talk. However, the assistant's initial struggle with hearing makes them hesitant to engage in further conversation, leading to an awkward pause before the user responds, saying they want to know why the assistant has trouble hearing them."
+  },
+  {
+    "event_id": "evt_1767716920627",
+    "lead_id": "+917604896187",
+    "sid": "CAec24772d2827cd5aff40cf8c8ce792f5",
+    "generated_at": "2026-01-06T16:28:40.627Z",
+    "summary_text": "The User, Vijay R, initiates contact with an Assistant from Hivericks after previously speaking about the XOptimus Smart Charger. The current time is mentioned as a potential benefit of using this product. The conversation then turns to discussing the product itself and its benefits in terms of energy conservation and battery life extension."
+  },
+  {
+    "event_id": "evt_1767718979732",
+    "lead_id": "+917604896187",
+    "sid": "CA6f5002edf94cc5004fecabda5d2c3cca",
+    "generated_at": "2026-01-06T17:02:59.732Z",
+    "summary_text": "The User, Vijay R, reached out from Hivericks seeking information about the XOptimus Smart Charger product, specifically its features and benefits. The Assistant, initially assuming a follow-up conversation, clarified their role as a sales analyst and provided an overview of the product's capabilities to address Vijay's questions."
+  },
+  {
+    "event_id": "evt_1767719041199",
+    "lead_id": "+917604896187",
+    "sid": "CAae1dcddcbd441478a3a41e39a470eaf2",
+    "generated_at": "2026-01-06T17:04:01.199Z",
+    "summary_text": "The user is Vijay R, and he contacts the assistant after mentioning that they had previously spoken about using Hivericks. He asks if it's a good time to discuss their plans again. The conversation starts on a positive note with the user expressing willingness to engage in a discussion."
+  },
+  {
+    "event_id": "evt_1767719042062",
+    "lead_id": "+917604896187",
+    "sid": "CAeb4a1a4a0313211ee991197de4bd89e1",
+    "generated_at": "2026-01-06T17:04:02.062Z",
+    "summary_text": "The User, Vijay R, is inquiring about the price of the XOptimus Smart Charger from Hivericks, specifically asking if there are any discounts or promotions available at this time. The Assistant responds by checking on the regular price and inquires about the User's interest in learning more about potential discounts or deals."
+  },
+  {
+    "event_id": "evt_1767720765032",
+    "lead_id": "+917604896187",
+    "sid": "CA403d90f7a8ed08cfe337b2e90bbaf50d",
+    "generated_at": "2026-01-06T17:32:45.032Z",
+    "summary_text": "The user, Vijay R, is reaching out after speaking with the assistant earlier, indicating that he wants to continue the conversation started previously. He expresses interest in learning more about the XOptimus Smart Charger and asks if it's a good time for another call. The user has already shown some level of engagement by asking if it's a good time to talk again, suggesting that he is looking forward to continuing their discussion."
+  },
+  {
+    "event_id": "evt_1767721442367",
+    "lead_id": "+917604896187",
+    "sid": "CA22b0d99b722d2449b62eb862a4ab61f7",
+    "generated_at": "2026-01-06T17:44:02.367Z",
+    "summary_text": "The user, Vijay R, initiated contact with an assistant from Hivericks after mentioning that now was a good time. The assistant promptly asked about the details of the XOptimus Smart Charger, which is an intelligent wall adapter that optimizes battery life and prevents overcharging and overheating. However, during the conversation, the user interrupted to discuss the price, stating they wanted to know if it was worth considering purchasing. The assistant acknowledged Vijay's intention to purchase but instead presented a sales pitch focusing on the product's features rather than directly discussing pricing."
+  },
+  {
+    "event_id": "evt_1767722326628",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CAc1e0fcc4108d2161ddd78365ca2e35bc",
+    "generated_at": "2026-01-06T17:58:46.628Z",
+    "summary_text": "The user is on a call with an assistant from Hivericks, who is inquiring about the XOptimus Smart Charger after they previously discussed it. The user has had issues with their old charger overheating while charging and is considering upgrading to a newer model or one with additional features. However, they are hanging up the call before exploring these options further."
+  },
+  {
+    "event_id": "evt_1767723658497",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA2791e0b5453941f2215f13983a72ad51",
+    "generated_at": "2026-01-06T18:20:58.497Z",
+    "summary_text": "Summary: \nThe user, Vijay R from Hivericks, is warm about the previous conversation but indicates they're not interested in discussing their current product interest."
+  },
+  {
+    "event_id": "evt_1767723852323",
+    "lead_id": "+917604896187",
+    "sid": "CA1fa938e8ed42deb2ec36bd2053027435",
+    "generated_at": "2026-01-06T18:24:12.323Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary of the conversation:"
+  },
+  {
+    "event_id": "evt_1767726463410",
+    "lead_id": "+917604896187",
+    "sid": "CA2d33045abf237a08c92aa1bdda9a910b",
+    "generated_at": "2026-01-06T19:07:43.411Z",
+    "summary_text": "Summary:"
+  },
+  {
+    "event_id": "evt_1767763876242",
+    "lead_id": "+917604896187",
+    "sid": "CA403a5154fea52e4a8a4de2b0f71de952",
+    "generated_at": "2026-01-07T05:31:16.242Z",
+    "summary_text": "SUMMARY:\nUser is interested in product by Vijay R of Hivericks and the call just started."
+  },
+  {
+    "event_id": "evt_1767764248202",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "CA0ada46041767dccdcccd681d8b90cde6",
+    "generated_at": "2026-01-07T05:37:28.202Z",
+    "summary_text": "Summary: \n- The user's specific product interest is the XOptimus Smart Charger.\n- The current sentiment of the user is Warm."
+  },
+  {
+    "event_id": "evt_1767764276379",
+    "lead_id": "+917604896187",
+    "sid": "CAf1540ed07f3dbddd71f2326164c6d25a",
+    "generated_at": "2026-01-07T05:37:56.379Z",
+    "summary_text": "SUMMARY:\nUser, Vijay R, is interested in our product and wants to discuss it with you via Hivericks.\nFINAL OUTCOME: The conversation will proceed with a follow-up meeting at your earliest convenience.\nNEXT STEP: Request for scheduling confirmation from Hivericks."
+  },
+  {
+    "event_id": "evt_1767764498600",
+    "lead_id": "+917604896187",
+    "sid": "CA90fe5bc278dc218b3d96c146fe541506",
+    "generated_at": "2026-01-07T05:41:38.600Z",
+    "summary_text": "SUMMARY:\nUser's product interest: Recent conversation with Hivericks (Warm).\nSentiment: User is interested in speaking again."
+  },
+  {
+    "event_id": "evt_1767764888371",
+    "lead_id": "+917604896187",
+    "sid": "CAb7f33c932a1909569f4f310cabe1aba9",
+    "generated_at": "2026-01-07T05:48:08.371Z",
+    "summary_text": "Summary: \n- User's specific product interest: Hivericks\n- Current sentiment: Warm (last interaction was positive)\n- Final outcome of the call: The conversation is proceeding with scheduling an appointment for next week.\n- Next step: A follow-up email will be sent to confirm and schedule the appointment."
+  },
+  {
+    "event_id": "evt_1767824326175",
+    "lead_id": "+917604896187",
+    "sid": "CA5df869f4236075da86b82d12e63818f1",
+    "generated_at": "2026-01-07T22:18:46.175Z",
+    "summary_text": "SUMMARY:\n- User's specific product interest: Home Security System\n- Current sentiment: Warm (implied by the recent conversation)\n- Final outcome and next step: No immediate call to action; next step could be scheduling a demo or inquiry for further discussion on home security systems."
+  },
+  {
+    "event_id": "evt_1767824585060",
+    "lead_id": "+917604896187",
+    "sid": "CAdb76eb85741c12611955343dd2d0ee22",
+    "generated_at": "2026-01-07T22:23:05.060Z",
+    "summary_text": "USER: Hi there, it's warm. I'm interested in learning more about the new features of your product. Could you please let me know if they are available today or next week?"
+  },
+  {
+    "event_id": "evt_1767826177691",
+    "lead_id": "+917604896187",
+    "sid": "CAc60829504077209d32d77666814a56b4",
+    "generated_at": "2026-01-07T22:49:37.691Z",
+    "summary_text": "User Sentiment: Warm\nProduct Interest: Sales Leads and Opportunities Management Software\nFinal Outcome: The user wants to discuss the integration of our CRM system with their existing sales lead management software.\nImmediate Next Step: Schedule a follow-up call to explore this opportunity further."
+  },
+  {
+    "event_id": "evt_1767826277350",
+    "lead_id": "+917604896187",
+    "sid": "CA9edd899514cff668b5d85d20e4b7092d",
+    "generated_at": "2026-01-07T22:51:17.350Z",
+    "summary_text": "SUMMARY:\n- User's specific product interest: Hiverricks ( unknown company)\n- Current sentiment: Hot (request for assistance)\n- Final outcome: Warm (offer of assistance)\n- Next step: Immediate next step is to provide information about the product, as it was previously discussed."
+  },
+  {
+    "event_id": "evt_1767826460376",
+    "lead_id": "+917604896187",
+    "sid": "CAd4a4a49543516c23d5ec11fb3bdf496f",
+    "generated_at": "2026-01-07T22:54:20.376Z",
+    "summary_text": "User Sentiment: Warm\nCurrent Outcome: We discussed a potential sale of the Hivericks product earlier. The user is interested in moving forward with a conversation to finalize the purchase.\nNext Step: The assistant will schedule a follow-up call to provide more information and answer any questions the user may have about the product."
+  },
+  {
+    "event_id": "evt_1767827280009",
+    "lead_id": "+917604896187",
+    "sid": "CA4ea2aba40a291ba7d6e19745be99adc9",
+    "generated_at": "2026-01-07T23:08:00.009Z",
+    "summary_text": "SUMMARY:\n- User's specific product interest: Hiverricks\n- Current sentiment: Warm (positive tone)\n- Final outcome: No immediate next step, but scheduling call for 2 PM EST to discuss project details.\n- Next step: Schedule a call at 2 PM EST."
+  },
+  {
+    "event_id": "evt_1767827693636",
+    "lead_id": "+917604896187",
+    "sid": "CAfc29e8e94cd0fb95715ce1cea11a8a4a",
+    "generated_at": "2026-01-07T23:14:53.636Z",
+    "summary_text": "User Sentiment: Warm (-3/10) - The user is friendly and appreciative of the assistant's previous conversation, but seems hesitant to discuss new business."
+  },
+  {
+    "event_id": "evt_1767828386075",
+    "lead_id": "+917604896187",
+    "sid": "CA2eb341aeac580a9485ee2a60cc103d22",
+    "generated_at": "2026-01-07T23:26:26.075Z",
+    "summary_text": "User Sentiment: Warm\nTask Outcome: The user is interested in discussing their current project with Hiverrick's sales team.\nNext Step: The assistant will schedule a call to discuss the project further."
+  },
+  {
+    "event_id": "evt_1767828785528",
+    "lead_id": "+917604896187",
+    "sid": "CAd85cb1e41292bc25e1b243ce33094f18",
+    "generated_at": "2026-01-07T23:33:05.528Z",
+    "summary_text": "Summary: \nThe user is interested in the Hivericks product and wants to discuss the XOptimus Smart Charger, but it seems there was an interruption during their previous conversation.\nOutcome: The customer will not be able to hear the assistant due to a technical issue, so they are being transferred to another call."
+  },
+  {
+    "event_id": "evt_1767828804246",
+    "lead_id": "UNKNOWN_NUMBER",
+    "sid": "SIM_1767827917499",
+    "generated_at": "2026-01-07T23:33:24.246Z",
+    "summary_text": "Summary"
+  },
+  {
+    "event_id": "evt_1767828891157",
+    "lead_id": "+917604896187",
+    "sid": "CA90ac5d32463f3f4078bd23382046c5cd",
+    "generated_at": "2026-01-07T23:34:51.158Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767830404287",
+    "lead_id": "+917604896187",
+    "sid": "CAf763fb4d10b381fda393e604d5bc2e64",
+    "generated_at": "2026-01-08T00:00:04.288Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767833133735",
+    "lead_id": "+917604896187",
+    "sid": "CA46a0cdb3dad43487e71ad41c284c1896",
+    "generated_at": "2026-01-08T00:45:33.735Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767833997910",
+    "lead_id": "+917604896187",
+    "sid": "CA157eb4df57c8cca44a105e785945607f",
+    "generated_at": "2026-01-08T00:59:57.910Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary of the conversation:"
+  },
+  {
+    "event_id": "evt_1767835117509",
+    "lead_id": "+917604896187",
+    "sid": "CA74b8bd5944867b4d3f36586e6ac8801a",
+    "generated_at": "2026-01-08T01:18:37.509Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767835880856",
+    "lead_id": "+917604896187",
+    "sid": "CA31a32683d7a2646b867b8398866d0580",
+    "generated_at": "2026-01-08T01:31:20.856Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767837463059",
+    "lead_id": "+917604896187",
+    "sid": "SIM_1767837438146",
+    "generated_at": "2026-01-08T01:57:43.059Z",
+    "summary_text": "Summary: The user (Vijay) of Hivericks is interested in speaking with an ASSISTANT about pricing for their product.\n \n Outcome: The call is considered warm, as Vijay has expressed interest in discussing pricing. The immediate next step is to provide Vijay with the current price in USD, which will be discussed further during the call."
+  },
+  {
+    "event_id": "evt_1767837522861",
+    "lead_id": "+917604896187",
+    "sid": "SIM_1767837498132",
+    "generated_at": "2026-01-08T01:58:42.861Z",
+    "summary_text": "Summary: \n- Sentiment: Warm (the user's question implies interest and potential purchase).\n- Final outcome: The assistant will provide the price in USD.\n- Next step: The assistant will respond with the price."
+  },
+  {
+    "event_id": "evt_1767837745687",
+    "lead_id": "+917604896187",
+    "sid": "SIM_1767837721089",
+    "generated_at": "2026-01-08T02:02:25.687Z",
+    "summary_text": "Summary:\n- User has called back after being previously contacted about Winter's product.\n- User is interested in learning more about the product and its pricing."
+  },
+  {
+    "event_id": "evt_1767838005678",
+    "lead_id": "+917604896187",
+    "sid": "SIM_1767837985482",
+    "generated_at": "2026-01-08T02:06:45.678Z",
+    "summary_text": "Summary: \n- User's specific product interest: The user is interested in Hivericks products.\n- Current sentiment: Warm (User is open to discussing pricing options).\n- Final outcome and next step: The assistant will provide information on the current market prices of Hivericks' products in USD."
+  },
+  {
+    "event_id": "evt_1767838334279",
+    "lead_id": "+917604896187",
+    "sid": "CAe8480bf91a6dd35fccc0dc44b19e5a7e",
+    "generated_at": "2026-01-08T02:12:14.279Z",
+    "summary_text": "SUMMARY:\n- User's specific product interest: HVAC system\n- Current sentiment: Warm (positive)\n- Final outcome of the call: The user is interested in learning more about the company's HVAC services, and the assistant will schedule a follow-up meeting to discuss further.\n- Next step: Schedule a follow-up meeting for next Wednesday at 10am."
+  },
+  {
+    "event_id": "evt_1767838374970",
+    "lead_id": "+917604896187",
+    "sid": "CAbb9adaad6d745b367c89e9b168454558",
+    "generated_at": "2026-01-08T02:12:54.970Z",
+    "summary_text": "Summary:\nThe user (Vijay) from Hivericks expresses interest in the XOptimus Smart Charger, indicating a warm sentiment. The assistant confirms availability and provides pricing information."
+  },
+  {
+    "event_id": "evt_1767838814870",
+    "lead_id": "+917604896187",
+    "sid": "CA3b4f20f5c5ee752f44708c69086a8f4f",
+    "generated_at": "2026-01-08T02:20:14.870Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767841417959",
+    "lead_id": "+917604896187",
+    "sid": "CA31562c8674396aa5a76fbce0248bc227",
+    "generated_at": "2026-01-08T03:03:37.959Z",
+    "summary_text": "Strictly Concise Summary:"
+  },
+  {
+    "event_id": "evt_1767841880592",
+    "lead_id": "+917604896187",
+    "sid": "CAdb4af5b4ec692aa6370080258badc377",
+    "generated_at": "2026-01-08T03:11:20.592Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767842855789",
+    "lead_id": "+917604896187",
+    "sid": "CA5507d815bb94c6b79920d83123c12159",
+    "generated_at": "2026-01-08T03:27:35.789Z",
+    "summary_text": "User Interest: Hot\nUser Sentiment: Warm (implied, as the user is willing to consider alternative options despite being initially hesitant)\nOutcome: The assistant provides price details and suggests a more cautious approach.\nNext Step: The user expresses concern about the upfront cost and asks for alternatives."
+  },
+  {
+    "event_id": "evt_1767860824943",
+    "lead_id": "+917604896187",
+    "sid": "CA1384305dcd02d1003c9582bcf6e47e1b",
+    "generated_at": "2026-01-08T08:27:04.943Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767862403445",
+    "lead_id": "+917604896187",
+    "sid": "CAf8a1e16abb97c9749c01773e62158e42",
+    "generated_at": "2026-01-08T08:53:23.445Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767862827824",
+    "lead_id": "+917604896187",
+    "sid": "CAcb1c2fce7b1cea7f49c7589ef3ef9624",
+    "generated_at": "2026-01-08T09:00:27.824Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767863131076",
+    "lead_id": "+917604896187",
+    "sid": "CAcce8940acb58bd8d5e7982fa20c2e6d0",
+    "generated_at": "2026-01-08T09:05:31.076Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767864339508",
+    "lead_id": "+917604896187",
+    "sid": "CAb2c8d05ea37472e63d38a4044ad9b986",
+    "generated_at": "2026-01-08T09:25:39.508Z",
+    "summary_text": "Here is a strictly concise summary:"
+  }
+]

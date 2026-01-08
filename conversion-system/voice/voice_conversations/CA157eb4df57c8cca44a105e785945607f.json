@@ -1,0 +1,67 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-08T00:58:21.168Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time to talk.",
+    "timestamp": "2026-01-08T00:58:32.671Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger ready for your usage.",
+    "timestamp": "2026-01-08T00:58:34.439Z"
+  },
+  {
+    "role": "user",
+    "text": "Well, what's the price?",
+    "timestamp": "2026-01-08T00:58:41.658Z"
+  },
+  {
+    "role": "assistant",
+    "text": "The XOptimus Smart Charger (Wall Adapter) is priced at ₹1499. Would you like to know more about its features or how it can help with your battery life?",
+    "timestamp": "2026-01-08T00:58:43.668Z"
+  },
+  {
+    "role": "user",
+    "text": "Know, the price seems to be too high and I can find it at a much cheaper way in some websites.",
+    "timestamp": "2026-01-08T00:59:02.008Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I understand your concern, but before we proceed, I want to acknowledge your interest in finding a better deal. However, as a Senior Consultant at Hivericks, my primary goal is to ensure you're getting the best value for your money.",
+    "timestamp": "2026-01-08T00:59:04.265Z"
+  },
+  {
+    "role": "user",
+    "text": "Don't why it?",
+    "timestamp": "2026-01-08T00:59:21.967Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I can't answer that.",
+    "timestamp": "2026-01-08T00:59:23.671Z"
+  },
+  {
+    "role": "user",
+    "text": "Product is not worth buying.",
+    "timestamp": "2026-01-08T00:59:29.365Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I'm sorry to hear that the XOptimus Smart Charger didn't meet your expectations. Can you tell me more about what specifically didn't work for you?",
+    "timestamp": "2026-01-08T00:59:30.622Z"
+  },
+  {
+    "role": "user",
+    "text": "Hanging up the call.",
+    "timestamp": "2026-01-08T00:59:43.581Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger, we've covered everything. Please let me know if you have any questions or need further assistance.",
+    "timestamp": "2026-01-08T00:59:45.027Z"
+  }
+]

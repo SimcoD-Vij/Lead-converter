@@ -1,0 +1,27 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-08T02:12:08.075Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time.",
+    "timestamp": "2026-01-08T02:12:16.748Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I've got the connection for you. The XOptimus Smart Charger is ready to go.",
+    "timestamp": "2026-01-08T02:12:22.754Z"
+  },
+  {
+    "role": "user",
+    "text": "Where is what is the price of it?",
+    "timestamp": "2026-01-08T02:12:35.836Z"
+  },
+  {
+    "role": "assistant",
+    "text": "The XOptimus Smart Charger (Wall Adapter) typically costs around ₹599 for a basic model, but I can check the current price for you. Would you like me to find out and let you know?",
+    "timestamp": "2026-01-08T02:12:42.479Z"
+  }
+]

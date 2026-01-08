@@ -1,0 +1,21 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-07T05:33:15.955Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: SUMMARY:\nUser is interested in product by Vijay R of Hivericks and the call just started."
+  },
+  {
+    "role": "user",
+    "text": "A good thing.",
+    "timestamp": "2026-01-07T05:33:26.459Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger is a great addition to any home or office, right?",
+    "timestamp": "2026-01-07T05:33:27.105Z"
+  }
+]

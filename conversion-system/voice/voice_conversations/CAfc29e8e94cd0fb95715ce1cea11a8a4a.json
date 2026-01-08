@@ -1,0 +1,11 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Vijay, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-07T23:08:43.318Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: SUMMARY:\n- User's specific product interest: Hiverricks\n- Current sentiment: Warm (positive tone)\n- Final outcome: No immediate next step, but scheduling call for 2 PM EST to discuss project details.\n- Next step: Schedule a call at 2 PM EST."
+  }
+]

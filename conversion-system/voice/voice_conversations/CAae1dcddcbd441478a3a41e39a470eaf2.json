@@ -1,0 +1,28 @@
+[
+  {
+    "type": "metadata",
+    "version": "1.0",
+    "lead_id": "+917604896187",
+    "sid": "CAae1dcddcbd441478a3a41e39a470eaf2",
+    "created_at": "2026-01-06T17:02:50.240Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T17:02:50.240Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: The User, Vijay R, initiates contact with an Assistant from Hivericks after previously speaking about the XOptimus Smart Charger. The current time is mentioned as a potential benefit of using this product. The conversation then turns to discussing the product itself and its benefits in terms of energy conservation and battery life extension."
+  },
+  {
+    "role": "user",
+    "text": "Yes,  it's a good time.",
+    "timestamp": "2026-01-06T17:03:03.899Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I'm having trouble hearing you.",
+    "timestamp": "2026-01-06T17:03:23.943Z"
+  }
+]

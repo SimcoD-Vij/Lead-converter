@@ -1,0 +1,38 @@
+[
+  {
+    "type": "metadata",
+    "version": "1.0",
+    "lead_id": "+917604896187",
+    "sid": "CA6f5002edf94cc5004fecabda5d2c3cca",
+    "created_at": "2026-01-06T16:40:36.846Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Hi Vijay R, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-06T16:40:36.846Z"
+  },
+  {
+    "type": "system",
+    "content": "CONTEXT SUMMARY: The User, Vijay R, initiates contact with an Assistant from Hivericks after previously speaking about the XOptimus Smart Charger. The current time is mentioned as a potential benefit of using this product. The conversation then turns to discussing the product itself and its benefits in terms of energy conservation and battery life extension."
+  },
+  {
+    "role": "user",
+    "text": "Yes, it's a good time to talk.",
+    "timestamp": "2026-01-06T16:40:45.774Z"
+  },
+  {
+    "role": "assistant",
+    "text": "You know that I'm here to help you with your XOptimus Smart Charger questions. How can I assist you today?",
+    "timestamp": "2026-01-06T16:40:58.465Z"
+  },
+  {
+    "role": "user",
+    "text": "No, I just want to know about the product.",
+    "timestamp": "2026-01-06T16:41:12.917Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger (Wall Adapter) is a high-performance charger that helps increase Li-Ion battery life expectancy and performance. It's designed to save energy by maintaining optimal charge levels and prevents overcharging and heating issues using real-time parameters.",
+    "timestamp": "2026-01-06T16:41:22.354Z"
+  }
+]
