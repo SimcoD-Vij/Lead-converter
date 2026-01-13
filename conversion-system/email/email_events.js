@@ -109,6 +109,7 @@ const summarizeMailEvent = async (eventId) => {
     evt.status = 'CLOSED';
 
     writeEvents(events);
+    console.log(`      ✅ Event Summarized and Closed: ${eventId}`);
     return summaryData;
 };
 

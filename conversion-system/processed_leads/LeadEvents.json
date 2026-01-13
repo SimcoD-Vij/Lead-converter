@@ -879,14 +879,84 @@
           "text_summary": "Here is a strictly concise summary:"
         },
         "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1767876096810",
+        "timestamp": "2026-01-08T12:41:24.643Z",
+        "summary": {
+          "interest_level": "high",
+          "user_intent": "buy product",
+          "objections": null,
+          "next_action": "recommended next step: send customer a price quote via email or SMS",
+          "conversation_summary": "User Interest: Product interest - XOptimus Smart Charger, Current sentiment - Warm.\n Final Outcome: The product price is ₹1499 INR (≈ $18 USD) with a potential discount provider.\n Immediate Next Step: The assistant will inquire about the discount provider.",
+          "generated_at": "2026-01-08T12:41:35.783Z",
+          "text_summary": "User Interest: Product interest - XOptimus Smart Charger, Current sentiment - Warm.\n Final Outcome: The product price is ₹1499 INR (≈ $18 USD) with a potential discount provider.\n Immediate Next Step: The assistant will inquire about the discount provider."
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1767876841803",
+        "timestamp": "2026-01-08T12:53:49.155Z",
+        "summary": {
+          "interest_level": "high",
+          "user_intent": "to discuss price of XOptimus Smart Chargers",
+          "objections": null,
+          "next_action": "recommended next step: ask about Frost feature and price",
+          "conversation_summary": "Here is a STRICTLY CONCISE summary:",
+          "generated_at": "2026-01-08T12:54:01.444Z",
+          "text_summary": "Here is a STRICTLY CONCISE summary:"
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1767891765872",
+        "timestamp": "2026-01-08T17:02:33.075Z",
+        "summary": {
+          "interest_level": "high",
+          "user_intent": "XOptimus Smart Charger",
+          "objections": null,
+          "next_action": null,
+          "conversation_summary": "Here is a strictly concise summary:",
+          "generated_at": "2026-01-08T17:02:45.482Z",
+          "text_summary": "Here is a strictly concise summary:"
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1767891911861",
+        "timestamp": "2026-01-08T17:04:59.031Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "Hivericks",
+          "objections": null,
+          "next_action": "continue_with_sales_tactics",
+          "conversation_summary": "Here is a STRICTLY CONCISE summary:",
+          "generated_at": "2026-01-08T17:05:11.466Z",
+          "text_summary": "Here is a STRICTLY CONCISE summary:"
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1767936483676",
+        "timestamp": "2026-01-09T05:27:48.577Z",
+        "summary": {
+          "interest_level": "high",
+          "user_intent": "SELECTING THE OPTIMUS SMART CHARGER OVER COMPETITORS' PRODUCTS",
+          "objections": "I AM CURRENTLY CONSIDERING THE XOPTIMUS SMART CHARGER DUE TO ITS GAME-CHANGING BATTERY LIFE PROTECTION TECHNOLOGY",
+          "next_action": "EXPLAIN IN MORE DETAIL HOW THE XOPTIMUS SMART CHARGER'S ADVANTAGES OUTPACE THOSE OF COMPETITORS",
+          "conversation_summary": "Here is a STRICTLY CONCISE summary:",
+          "generated_at": "2026-01-09T05:28:03.315Z",
+          "text_summary": "Here is a STRICTLY CONCISE summary:"
+        },
+        "attempt_count": 3
       }
     ],
-    "master_summary": "Here is a strictly concise summary:",
+    "master_summary": "Here is a STRICTLY CONCISE summary:",
     "last_processed_time": "2026-01-06T16:21:59.692Z",
     "final_summary": {
-      "generated_at": "2026-01-08T09:25:28.999Z"
+      "generated_at": "2026-01-09T05:27:48.577Z"
     },
-    "last_updated": "2026-01-08T09:25:28.999Z"
+    "last_updated": "2026-01-09T05:27:48.577Z"
   },
   {
     "lead_id": "UNKNOWN_NUMBER",
@@ -3040,5 +3110,36 @@
       "generated_at": "2026-01-07T23:33:18.427Z"
     },
     "last_updated": "2026-01-07T23:33:18.427Z"
+  },
+  {
+    "lead_id": "+918072510784",
+    "channel": "VOICE",
+    "created_at": "2026-01-08T14:05:26.147Z",
+    "last_updated": "2026-01-08T14:05:26.147Z",
+    "events": [
+      {
+        "event_id": "evt_1767881137302",
+        "timestamp": "2026-01-08T14:05:26.147Z",
+        "summary": {
+          "interest_level": "medium",
+          "user_intent": "engaged_fallback",
+          "objections": "unknown",
+          "next_action": "manual_review",
+          "conversation_summary": "Here is a strictly concise summary of the conversation:",
+          "generated_at": "2026-01-08T14:05:36.907Z",
+          "text_summary": "Here is a strictly concise summary of the conversation:"
+        },
+        "attempt_count": 3
+      }
+    ],
+    "final_summary": {
+      "lead_status": "UNKNOWN",
+      "confidence_level": "low",
+      "key_interests": [],
+      "main_objections": [],
+      "recommended_next_step": "manual_review",
+      "generated_at": "2026-01-08T14:05:26.147Z"
+    },
+    "master_summary": "Here is a strictly concise summary of the conversation:"
   }
 ]

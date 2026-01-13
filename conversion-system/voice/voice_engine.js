@@ -28,10 +28,10 @@ async function dialLead(lead) {
     }
 
     if (!lead.phone) {
-        throw new Error(`Lead ${lead.name} has no phone number`);
+        console.log(`      ⚠️ Skipping Call: Lead ${lead.name} has no phone number.`);
+        return null; // Graceful skip
     }
-
-    console.log(`   ☎️ VoiceEngine: Dialing ${lead.name} (${lead.phone})...`);
+    console.log(`\n☎️ INITITATING CALL to ${lead.name} (${lead.phone})...`);
     console.log(`      🔗 Webhook Server: ${SERVER_URL}`);
 
     try {

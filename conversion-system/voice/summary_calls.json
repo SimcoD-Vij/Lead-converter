@@ -502,5 +502,47 @@
     "sid": "CAb2c8d05ea37472e63d38a4044ad9b986",
     "generated_at": "2026-01-08T09:25:39.508Z",
     "summary_text": "Here is a strictly concise summary:"
+  },
+  {
+    "event_id": "evt_1767876096808",
+    "lead_id": "+917604896187",
+    "sid": "CA7ae05b23e06762fb06c9576e9a74f8f2",
+    "generated_at": "2026-01-08T12:41:36.808Z",
+    "summary_text": "User Interest: Product interest - XOptimus Smart Charger, Current sentiment - Warm.\n Final Outcome: The product price is ₹1499 INR (≈ $18 USD) with a potential discount provider.\n Immediate Next Step: The assistant will inquire about the discount provider."
+  },
+  {
+    "event_id": "evt_1767876841801",
+    "lead_id": "+917604896187",
+    "sid": "CAb3b270c1fe43ef4cc75f800d73aa45ba",
+    "generated_at": "2026-01-08T12:54:01.801Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767881137301",
+    "lead_id": "+918072510784",
+    "sid": "CAf9e9ab62ea4241372a9367efefca8903",
+    "generated_at": "2026-01-08T14:05:37.301Z",
+    "summary_text": "Here is a strictly concise summary of the conversation:"
+  },
+  {
+    "event_id": "evt_1767891765870",
+    "lead_id": "+917604896187",
+    "sid": "CAfe99988c12674f4f7e5919f97860c865",
+    "generated_at": "2026-01-08T17:02:45.870Z",
+    "summary_text": "Here is a strictly concise summary:"
+  },
+  {
+    "event_id": "evt_1767891911858",
+    "lead_id": "+917604896187",
+    "sid": "CAb3cce529aeec9288266a71cc3999cd60",
+    "generated_at": "2026-01-08T17:05:11.858Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
+  },
+  {
+    "event_id": "evt_1767936483674",
+    "lead_id": "+917604896187",
+    "sid": "CAa76efb2351786ed96fc4d1eddb5b3287",
+    "generated_at": "2026-01-09T05:28:03.674Z",
+    "summary_text": "Here is a STRICTLY CONCISE summary:"
   }
 ]

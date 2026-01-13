@@ -4,7 +4,8 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 // const { fillTemplate } = require('./templates'); // REMOVED: User deleted templates.js
 const { openMailEvent, logMailInteraction, getOpenMailEvent, summarizeMailEvent } = require('./email_events');
-const { generateResponse } = require('../agent/salesBot');
+const { getMemory, upsertMemory } = require('../agent/memory');
+const { generateResponse, detectIntent } = require('../agent/salesBot');
 
 const LEADS_FILE = path.join(__dirname, '../processed_leads/clean_leads.json');
 const TRACKING_DOMAIN = process.env.TRACKING_DOMAIN || 'http://localhost:5000';
@@ -99,7 +100,8 @@ const sendEmail = async (lead, subjectOrTemplate, bodyContent) => {
             to: lead.email,
             subject: subject,
             text: body,
-            html: htmlBody
+            html: htmlBody,
+            headers: { 'X-Hivericks-Bot': 'true' }
         });
 
         console.log(`      ✅ Email Sent!`);
@@ -126,11 +128,50 @@ const EMAIL_QUEUE_FILE = path.join(__dirname, 'inbound_email_queue.json');
 
 // (Moved to Bottom)
 
+// Helper: Strip Quoted Replies (Regex Optimized)
+const cleanEmailBody = (text) => {
+    if (!text) return "";
+
+    // 1. Regex for "On [Date], [Name] <email> wrote:" (Multi-line friendly)
+    // Matches "On" ... "wrote:" with anything in between.
+    const replyHeaderRegex = /On\s+.+?wrote:/s;
+
+    // 2. Regex for "From: ... Sent: ... Subject:" block
+    const outlookHeaderRegex = /From:\s+.+?Sent:\s+.+?Subject:/s;
+
+    // 3. Regex for separators
+    const separatorRegex = /-----Original Message-----/i;
+
+    let clean = text;
+
+    // Execute Stripping (Split by regex and take first part)
+    if (replyHeaderRegex.test(clean)) clean = clean.split(replyHeaderRegex)[0];
+    if (outlookHeaderRegex.test(clean)) clean = clean.split(outlookHeaderRegex)[0];
+    if (separatorRegex.test(clean)) clean = clean.split(separatorRegex)[0];
+
+    // 4. Remove lines starting with ">" (Quoted lines)
+    clean = clean.split('\n').filter(line => !line.trim().startsWith('>')).join('\n');
+
+    return clean.trim();
+};
+
 // Internal Logic
 const processInboundEmail = async (webhookPayload) => {
     // payload: { sender, subject, body }
-    const { sender, body } = webhookPayload;
+    const { sender, body: rawBody } = webhookPayload;
+
+    // CLEAN THE BODY (Remove Quoted History)
+    const body = cleanEmailBody(rawBody);
+
     console.log(`      📩 From ${sender}`);
+    console.log(`      📝 Cleaned Body: "${body.substring(0, 100).replace(/\n/g, ' ')}..."`);
+
+    // FILTER: Ignore Automated System Emails
+    const IGNORED_SENDERS = ['no-reply', 'noreply', 'mailer-daemon', 'notification', 'alert', 'team@', 'support@'];
+    if (IGNORED_SENDERS.some(s => sender.toLowerCase().includes(s))) {
+        console.log(`      🚫 BLOCKED: Automated Email from ${sender}. ignoring.`);
+        return true;
+    }
     // ... rest of logic
 
 
@@ -144,14 +185,17 @@ const processInboundEmail = async (webhookPayload) => {
             email: sender,
             phone: "",
             name: "Anonymous Mail User",
-            status: "MAIL_ENGAGED",
+            status: "MAIL_RECEIVED", // Initial State
             source: "ANONYMOUS_MAIL",
             attempt_count: 0,
             next_action_due: new Date().toISOString().split('T')[0]
         };
         leads.push(lead);
-        writeJSON(LEADS_FILE, leads);
+    } else {
+        // STATE LOGGING: Mark as Received
+        lead.status = 'MAIL_RECEIVED';
     }
+    writeJSON(LEADS_FILE, leads);
 
     const leadId = lead.phone || lead.email; // Consistent ID
 
@@ -163,20 +207,45 @@ const processInboundEmail = async (webhookPayload) => {
         event = { event_id: eid }; // minimal stub
     }
 
+    // ... imports
+    const { getMemory, upsertMemory } = require('../agent/memory');
+
+    // ...
+
     // C. Log Interaction
     logMailInteraction(event.event_id, 'user', body);
+    await upsertMemory(leadId, { last_user_message: body }); // Sync with Memory
+
+    // 2.5 EARLY ACCEPTANCE CHECK (DISABLED - Handling via AI Conversation)
+    /*
+    const intent = detectIntent(body, 'EMAIL_REPLY');
+    let isHandoff = false;
+    if (intent && intent.type === 'PURCHASE_INTENT') {
+        console.log(`      💰 EARLY ACCEPTANCE DETECTED! Stopping Automation.`);
+        lead.status = 'HUMAN_HANDOFF';
+        writeJSON(LEADS_FILE, leads);
+        isHandoff = true;
+    }
+    */
+    let isHandoff = false;
 
     // D. Generate AI Reply (Intent Aware)
-    // "Replies must be intent-aware, not reactive."
-    // Logic: If user asks question -> Reply. If user says "Unsubscribe" -> Close.
+    // LOAD CONTEXT FIRST
+    const memory = await getMemory(leadId);
 
-    // We use SalesBot in EMAIL_REPLY mode
+    // We use SalesBot in EMAIL_REPLY mode, passing memory
     const aiResponse = await generateResponse({
         userMessage: body,
-        mode: 'EMAIL_REPLY' // We need to add this to salesBot or map to standard
+        memory: memory,
+        mode: 'EMAIL_REPLY'
     });
 
     console.log(`      🤖 AI Suggests: "${aiResponse.substring(0, 50)}..."`);
+
+    // ... sending logic ...
+
+    logMailInteraction(event.event_id, 'assistant', aiResponse);
+    await upsertMemory(leadId, { last_bot_message: aiResponse }); // Sync with Memory
 
     // E. Send Reply?
     // "The system must not auto-respond immediately unless..."
@@ -198,10 +267,19 @@ const processInboundEmail = async (webhookPayload) => {
         console.log(`      🚨 MAIL-TO-CALL ESCALATION DETECTED`);
         // Update lead status
         lead.status = 'MAIL_TO_CALL_REQUESTED';
-        // Orchestrator will pick this up next cycle and trigger Voice
-    } else {
+    } else if (!isHandoff) {
         lead.status = 'MAIL_ENGAGED';
     }
+
+    // G. UPDATE SCORE (NEW)
+    const { calculateScore } = require('../scoring/scoring_engine');
+    // Assume 'WARM' intent for engaged email unless AI says otherwise.
+    // Ideally we parse intent from AI response, but for now we assume positive engagement.
+    const scoreResult = calculateScore(lead, 'WARM', lead.status);
+    lead.score = scoreResult.score;
+    lead.category = scoreResult.category;
+    console.log(`      💯 Score Updated: ${lead.score} (${lead.category})`);
+
     writeJSON(LEADS_FILE, leads);
 
     return true;

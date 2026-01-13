@@ -7,12 +7,11 @@ require('dotenv').config({ path: '../.env' });
 const imaps = require('imap-simple');
 const { simpleParser } = require('mailparser');
 const nodemailer = require('nodemailer');
-const { generateResponse } = require('../ai/ollama_engine');
+const { processInboundEmail } = require('./email_engine');
 
 // ---------------------------------------------------------
 // IMAP CONFIG
 // ---------------------------------------------------------
-
 const config = {
     imap: {
         user: process.env.EMAIL_USER,
@@ -26,128 +25,82 @@ const config = {
 };
 
 // ---------------------------------------------------------
-// HELPER: SEND AI REPLY
+// MONITOR INBOX
 // ---------------------------------------------------------
+let isScanning = false;
 
-const sendReply = async (toEmail, subject, aiBody) => {
-    console.log("      🚀 STEP 4: Initializing SMTP...");
-
-    try {
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
-        console.log(`      🚀 STEP 5: Sending reply to ${toEmail}...`);
-
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: toEmail,
-            subject: `Re: ${subject}`,
-            text: aiBody
-        });
-
-        console.log(`      ✅ STEP 6: Email SENT Successfully!`);
-        return true;
-
-    } catch (e) {
-        console.log(`      ❌ SMTP ERROR: ${e.message}`);
-        return false;
+const monitorInbox = async () => {
+    if (isScanning) {
+        console.log("   🔒 IMAP Scan already in progress.");
+        return;
     }
-};
-
-// ---------------------------------------------------------
-// MAIN: CHECK INBOX & AUTO-REPLY
-// ---------------------------------------------------------
-
-const checkAndReply = async () => {
-    console.log("\n📬 Checking Inbox for AI Auto-Response...");
+    isScanning = true;
+    console.log("\n📬 Checking Inbox for New Emails...");
 
     try {
         const connection = await imaps.connect(config);
         await connection.openBox('INBOX');
 
         const searchCriteria = ['UNSEEN'];
-        const fetchOptions = { bodies: ['HEADER', 'TEXT'], markSeen: false };
+        const fetchOptions = { bodies: [''], markSeen: false };
 
         const messages = await connection.search(searchCriteria, fetchOptions);
 
         if (messages.length === 0) {
-            console.log("   (No new emails)");
+            // console.log("   (No new emails)");
             connection.end();
+            isScanning = false;
             return;
         }
 
         console.log(`   🔎 Found ${messages.length} new message(s). Processing...`);
 
         for (const item of messages) {
-            console.log("\n   --- PROCESSING NEW EMAIL ---");
-
-            // ✅ FIX: Extract HEADER + BODY
-            const headerPart = item.parts.find(p => p.which === 'HEADER');
-            const textPart = item.parts.find(p => p.which === 'TEXT');
-
-            if (!headerPart || !textPart) {
-                console.log("   ⚠️ Skipping: Malformed email parts.");
-                continue;
-            }
-
-            // ✅ FIX: Combine into FULL RAW EMAIL for parser
-            const fullRawEmail =
-                headerPart.body + "\r\n\r\n" + textPart.body;
-
-            console.log("   📝 STEP 1: Parsing email...");
+            const fullRawEmail = item.parts[0].body;
             const mail = await simpleParser(fullRawEmail);
 
             if (!mail.from || !mail.from.value || !mail.from.value[0]) {
-                console.log("   ⚠️ Skipping: No valid sender found.");
+                console.log(`   ⚠️ Skipping Msg #${item.attributes.uid}: No Valid Sender Found in Parser Result.`);
+                continue;
+            }
+
+            if (!mail.from || !mail.from.value || !mail.from.value[0]) {
+                console.log(`   ⚠️ Skipping Msg #${item.attributes.uid}: No Valid Sender`);
                 continue;
             }
 
             const fromAddress = mail.from.value[0].address;
             const subject = mail.subject || "No Subject";
             const bodyText = mail.text ? mail.text.trim() : "";
-
-            // 🛑 Prevent Self-Reply
-            if (fromAddress === process.env.EMAIL_USER) {
-                console.log("   🛑 Skipping: This is my own email.");
+            // 🛑 Loop Protection (Header Based)
+            // If the email has our custom header, it was sent by US (the bot).
+            if (mail.headers && mail.headers.get('x-hivericks-bot') === 'true') {
+                console.log(`   🛑 Skipping Msg #${item.attributes.uid}: Detected X-Hivericks-Bot Header (My Own Reply).`);
                 await connection.addFlags(item.attributes.uid, "\\Seen");
                 continue;
             }
 
-            console.log(`   📩 From: ${fromAddress}`);
-            console.log(`   📄 Content: "${bodyText.substring(0, 80)}..."`);
+            console.log(`   📩 IMAP Ingress: ${fromAddress} | Subject: ${subject}`);
 
-            // 🧠 STEP 2: AI GENERATION
-            console.log("   🧠 STEP 2: Asking Ollama...");
-            const aiReply = await generateResponse(bodyText);
+            // DELEGATE TO ENGINE
+            // This ensures Status Updates, Memory, AI Registry, everything runs standard.
+            await processInboundEmail({
+                sender: fromAddress,
+                subject: subject,
+                body: bodyText
+            });
 
-            console.log(
-                `   💡 STEP 3: AI Generated Answer (Length: ${aiReply.length} chars)`
-            );
-
-            // 📤 STEP 3: SEND EMAIL
-            const sent = await sendReply(fromAddress, subject, aiReply);
-
-            if (sent) {
-                console.log("   📌 Marking email as READ in Gmail...");
-                await connection.addFlags(item.attributes.uid, "\\Seen");
-            }
+            // Mark Seen only after processing
+            await connection.addFlags(item.attributes.uid, "\\Seen");
         }
 
-        console.log("\n🏁 Closing Connection.");
         connection.end();
 
     } catch (error) {
-        console.log("❌ CRITICAL ERROR:", error.message);
+        console.log("   ❌ IMAP ERROR:", error.message);
+    } finally {
+        isScanning = false;
     }
 };
 
-// ---------------------------------------------------------
-// RUN
-// ---------------------------------------------------------
-
-checkAndReply();
+module.exports = { monitorInbox };

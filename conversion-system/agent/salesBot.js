@@ -19,9 +19,9 @@ COMPETITOR COMPARISON:
 - XOptimus: Pays for itself by saving your phone's battery.
 `;
 const FACTS_PATH = path.join(__dirname, "data", "sample_product_facts.txt");
-// if (fs.existsSync(FACTS_PATH)) {
-//   PRODUCT_KNOWLEDGE = fs.readFileSync(FACTS_PATH, "utf8").trim(); 
-// } // DISABLED: Using Hardcoded Truth for Stability
+if (fs.existsSync(FACTS_PATH)) {
+  PRODUCT_KNOWLEDGE = fs.readFileSync(FACTS_PATH, "utf8").trim();
+} // DISABLED: Using Hardcoded Truth for Stability
 
 /* ---------------- THE SALES BRAIN (INTENT-BASED) ---------------- */
 const SALES_IDENTITY = `
@@ -113,10 +113,20 @@ const detectIntent = (msg, mode) => {
     };
   }
 
-  if (m.includes("hang up") || m.includes("bye") || m.includes("end")) {
+  if (m.includes("hang up") || m.includes("bye") || /\bend\b/i.test(m)) {
     return {
       type: "HANGUP_REQUEST",
       instruction: "USER WANTS TO END.\nACTION: Say 'Goodbye'.\nAPPEND: '[HANGUP]'"
+    };
+  }
+
+  // 4. PURCHASE INTENT / EARLY ACCEPTANCE
+  // Detects: "buy", "purchase", "send bank details", "ready to pay"
+  // REMOVED: generic "details" (triggered by "product details")
+  if (m.includes("buy") || m.includes("purchase") || m.includes("ready to pay") || m.includes("price is fine") || (m.includes("details") && (m.includes("bank") || m.includes("pay") || m.includes("account")))) {
+    return {
+      type: "PURCHASE_INTENT",
+      instruction: "USER WANTS TO BUY. \nACTION: Congratulate them. \nTell them a Human Specialist will call them shortly to finalize the order. \nSay: 'Great choice! I have marked your order. A specialist will call you shortly to wrap this up.'"
     };
   }
 
@@ -140,10 +150,10 @@ const CHANNEL_RULES = {
   `,
   EMAIL_REPLY: `
   *** MODE: EMAIL ***
-  - Structured & Persuasive.
-  - CONTEXT RULE: You have access to previous history (SMS/Voice). USE it to be informed, but DO NOT reference the distinct channel (e.g., "As per our WhatsApp chat...").
-  - Pretend it is all one continuous conversation.
-  - STRATEGY: If query is complex, suggest a 'Clarification Call'.
+  - Structured, Persuasive, & Detailed.
+  - LENGTH: Sufficient to explain product specs fully. Do not be artificially brief.
+  - CONTEXT RULE: You have access to previous history (SMS/Voice). USE it to be informed, but DO NOT reference the distinct channel.
+  - STRATEGY: Provide value. If specifications are asked, list them clearly.
   `
 };
 
@@ -162,6 +172,7 @@ function buildContext(memory = {}, mode) {
 
 /* ---------------- LLM CALLER ---------------- */
 async function callLLM(systemPrompt, userMessage, isVoice, jsonMode = false) {
+  console.log("   📝 LLM PROMPT (USER MSG):", JSON.stringify(userMessage));
   const payload = {
     model: MODEL,
     messages: [
@@ -173,7 +184,7 @@ async function callLLM(systemPrompt, userMessage, isVoice, jsonMode = false) {
     options: {
       temperature: 0.6,
       num_ctx: isVoice ? 1024 : 4096,
-      num_predict: isVoice ? 60 : 350,
+      num_predict: isVoice ? 60 : 600,
       stop: ["User:", "Assistant:", "\n\n"]
     }
   };
@@ -258,7 +269,7 @@ async function generateResponse({ userMessage, memory = {}, mode = 'SMS_CHAT' })
   ${SALES_IDENTITY}
 
   PRODUCT INFO (Reference Only):
-  ${PRODUCT_KNOWLEDGE.substring(0, 300)}
+  ${PRODUCT_KNOWLEDGE}
 
   channel_instructions:
   ${channelInstructions}
@@ -287,12 +298,15 @@ async function warmup() {
 
 /* ---------------- SUMMARIZATION ENGINE ---------------- */
 async function generateStructuredSummary(transcript) {
+  console.log("   🔍 DEBUG: Using Robust Parser v2 in generateStructuredSummary");
   const systemPrompt = `
   You are an expert Sales Analyst.
   Analyze the following conversation TRANSCRIPT.
   Return ONLY a raw JSON object summarizing the call.
   
-  STRICT OUTPUT FORMAT:
+  CRITICAL: You must use DOUBLE QUOTES for ALL KEYS and ALL STRINGS. Do not use single quotes. Do not omit quotes.
+  
+  STRICT OUTPUT FORMAT (JSON):
   {
     "interest_level": "high" | "medium" | "low" | "unknown",
     "user_intent": "snake_case_intent_code",
@@ -307,31 +321,63 @@ async function generateStructuredSummary(transcript) {
     const response = await callLLM(systemPrompt, transcript, false, true);
     console.log(`      🤖 RAW SUMMARY RESPONSE: ${response}`);
 
-    // 2. Parse (Should be safe now)
-    // 2. Parse (with Retry/Repair)
+    if (!response || typeof response !== 'string') {
+      throw new Error("Empty or invalid response from LLM");
+    }
+
+    // 2. Parse (with Retry/Repair/Extraction)
     try {
       return JSON.parse(response);
     } catch (parseErr) {
-      console.log("      ⚠️ Invalid JSON. Attempting Auto-Repair...");
-      let cleaner = response;
-      // Repair: Remove bad control characters (newlines in strings break JSON.parse)
-      cleaner = cleaner.replace(/[\n\r\t]+/g, ' ');
+      console.log("      ⚠️ Invalid JSON. Attempting Robust Extraction (Regex Mode)...");
 
-      // Repair: Quote unquoted keys first (Critical for lookahead)
-      cleaner = cleaner.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+      // Strategy: Regex match for each known field
+      const extractField = (key, type = 'string') => {
+        try {
+          const regex = new RegExp(`(?:["']?${key}["']?\\s*:\\s*)([^,]+?)(?:\\s*,\\s*["']?[a-z_]+["']?\\s*:|\\s*})`, 'i');
+          const match = response.match(regex);
+          if (!match) return null;
 
-      // Repair: Quote unquoted valus (Match until next quoted key or end of obj)
-      cleaner = cleaner.replace(/:\s*("?)([\s\S]+?)("?)(\s*(?=,\s*"|\s*}))/g, (match, q1, val, q2, end) => {
-        if (q1 && q2) return match; // Already quoted
+          let val = match[1].trim();
+          // Remove surrounding quotes if present
+          if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.slice(1, -1);
+          }
+          // Remove lingering braces if regex overshot
+          val = val.replace(/}+$/, '').trim();
 
-        const v = val.trim();
-        if (v === 'null' || v === 'true' || v === 'false') return match;
-        if (!isNaN(v)) return match; // primitive number
+          if (type === 'null' && (val === 'null' || val === 'undefined')) return null;
+          return val;
+        } catch (e) { return null; }
+      };
 
-        // Quote it
-        return `: "${v}"${end}`;
-      });
-      return JSON.parse(cleaner);
+      const structured = {
+        interest_level: extractField('interest_level') || "unknown",
+        user_intent: extractField('user_intent') || "manual_review",
+        objections: extractField('objections', 'null'),
+        next_action: extractField('next_action') || "check",
+        conversation_summary: extractField('conversation_summary')
+      };
+
+      // Fallback for summary
+      if (!structured.conversation_summary) {
+        try {
+          const summaryMatch = response.match(/conversation_summary["']?\s*:\s*(["']?[\s\S]*[^}])/i);
+          if (summaryMatch) {
+            let s = summaryMatch[1].trim();
+            s = s.replace(/\s*}$/, '');
+            if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+              s = s.slice(1, -1);
+            }
+            structured.conversation_summary = s;
+          } else {
+            structured.conversation_summary = "Summary extraction failed.";
+          }
+        } catch (e) { structured.conversation_summary = "Extraction Logic Failed"; }
+      }
+
+      console.log("      ✅ Robost Extraction Result:", JSON.stringify(structured));
+      return structured;
     }
   } catch (e) {
     console.error("   ❌ Summary Generation Failed:", e);
@@ -455,8 +501,9 @@ async function generateFeedbackRequest(summaryText, mode = 'SMS') {
   
   CRITICAL OUTPUT RULES:
   - RETURN ONLY THE FINAL MESSAGE TEXT.
-  - DO NOT start with "Here is the email" or "Subject:".
-  - DO NOT include conversational filler.
+  - DO NOT start with "Here is the email", "Here is the message", or "Subject:".
+  - DO NOT include conversational filler or meta-commentary.
+  - START DIRECTLY with the body content (e.g., "Hi [Name], ...").
   - JUST the message body.
   `;
 

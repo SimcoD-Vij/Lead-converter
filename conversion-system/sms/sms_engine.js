@@ -161,15 +161,12 @@ const runSmartSmsBatch = async (forcedLeads = null) => {
                 await upsertMemory(leadId, { last_bot_message: aiBody });
 
                 // F. UPDATE LEAD STATE
-                // Advance timeline to next action (+2 days)
-                lead.attempt_count = (lead.attempt_count || 0) + 1;
-
-                const nextDate = new Date();
-                nextDate.setDate(nextDate.getDate() + 2);
-                lead.next_action_due = nextDate.toISOString().split('T')[0];
+                // Advance timeline logic moved to Orchestrator to prevent double-counting.
+                // We only update status here to mark completion.
+                lead.status = 'SMS_SENT';
                 lead.last_sms_time = new Date().toISOString();
 
-                console.log(`   💾 Lead Updated: Next action due ${lead.next_action_due}`);
+                console.log(`   💾 Lead Status Updated: SMS_SENT`);
                 processedCount++;
 
             } catch (error) {

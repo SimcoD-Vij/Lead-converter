@@ -11,7 +11,7 @@ require('dotenv').config({ path: '../.env' });
 const client = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
 
 // MODULES
-const { generateResponse } = require('../agent/salesBot');
+const { generateResponse, detectIntent } = require('../agent/salesBot');
 const { getMemory, upsertMemory } = require('../agent/memory');
 const { logSmsSession } = require('./sms_engine'); // Shared Logger
 
@@ -70,6 +70,9 @@ const processInboundQueue = async () => {
 // ---------------------------------------------------------
 
 const handleInboundMessage = async (leadId, userMessage) => {
+    // 0. Update Status: SMS_RECEIVED (Audit requirement)
+    updateLeadStatus(leadId, 'SMS_RECEIVED');
+
     // 1. Log to Session History (Unified Log)
     // This logs the raw turn.
     logSmsSession(leadId, 'user', userMessage);
@@ -106,6 +109,18 @@ const handleInboundMessage = async (leadId, userMessage) => {
     windows[leadId] = window;
     writeJSON(ACTIVE_WINDOWS_FILE, windows);
 
+    // 2.5 EARLY ACCEPTANCE CHECK (DISABLED - Handling via AI Conversation)
+    /*
+    const intent = detectIntent(userMessage, 'SMS_CHAT');
+    let isHandoff = false;
+    if (intent && intent.type === 'PURCHASE_INTENT') {
+        console.log(`      💰 EARLY ACCEPTANCE DETECTED! Stopping Automation.`);
+        updateLeadStatus(leadId, 'HUMAN_HANDOFF');
+        isHandoff = true;
+    }
+    */
+    let isHandoff = false;
+
     // 3. Generate AI Response
     // We use 'SMS_CHAT' mode.
     // If it's a new window, we might inject the Context into the System Prompt via Memory?
@@ -114,8 +129,6 @@ const handleInboundMessage = async (leadId, userMessage) => {
     // Let's verify: memory.js looks at `lead.last_call_summary`. YES.
 
     const memory = await getMemory(leadId);
-
-
 
     const aiResponse = await generateResponse({
         userMessage: userMessage,
@@ -131,8 +144,22 @@ const handleInboundMessage = async (leadId, userMessage) => {
     }
 
     // 3.5 Ensure Lead Exists (Scenario 7)
-    // We update status to SMS_ENGAGED if not escalated
-    updateLeadStatus(leadId, 'SMS_ENGAGED');
+    // We update status to SMS_ENGAGED if not escalated (AND NOT HANDOFF)
+    if (!isHandoff) {
+        updateLeadStatus(leadId, 'SMS_ENGAGED');
+
+        // G. UPDATE SCORE (NEW)
+        const { calculateScore } = require('../scoring/scoring_engine');
+        const leads = readJSON(LEADS_FILE);
+        const lIndex = leads.findIndex(l => l.phone === leadId || l.phone === leadId.replace('whatsapp:', ''));
+        if (lIndex !== -1) {
+            const scoreResult = calculateScore(leads[lIndex], 'WARM', leads[lIndex].status);
+            leads[lIndex].score = scoreResult.score;
+            leads[lIndex].category = scoreResult.category;
+            console.log(`      💯 Score Updated: ${scoreResult.score} (${scoreResult.category})`);
+            writeJSON(LEADS_FILE, leads);
+        }
+    }
 
     // 4. Send Reply
     // Use Twilio Client directly

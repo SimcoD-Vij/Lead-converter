@@ -48,11 +48,11 @@ function calculateScore(lead, intent, status) {
     const s = (status || '').toUpperCase();
 
     // High Engagement
-    if (['CALL_CONNECTED', 'SMS_ENGAGED', 'MAIL_ENGAGED', 'CALL_INTERESTED'].includes(s)) {
+    if (['CALL_CONNECTED', 'SMS_ENGAGED', 'MAIL_ENGAGED', 'CALL_INTERESTED', 'HUMAN_HANDOFF'].includes(s)) {
         score += 30;
     }
     // Moderate Engagement
-    else if (['SMS_REPLIED', 'SMS_RECEIVED', 'MAIL_OPENED', 'CALL_TO_SMS_FOLLOWUP'].includes(s)) {
+    else if (['SMS_REPLIED', 'SMS_RECEIVED', 'MAIL_OPENED', 'MAIL_RECEIVED', 'CALL_TO_SMS_FOLLOWUP'].includes(s)) {
         score += 20;
     }
     // Low Engagement (Delivery)

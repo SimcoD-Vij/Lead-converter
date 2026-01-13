@@ -1,19 +1,20 @@
 [
   {
-    "name": "Vijay",
-    "email": "rsvijaypargavan@gmail.com",
+    "name": "Karthick",
     "phone": "+917604896187",
-    "status": "MAIL_COMPLETE",
-    "source": "INBOUND_MAIL",
-    "attempt_count": 5,
-    "last_call_summary": "{\"generated_at\":\"2026-01-08T09:25:28.999Z\"}",
-    "next_action_due": "2026-01-09",
-    "last_updated": "2026-01-08T09:26:12.642Z",
-    "last_call_sid": "CAb2c8d05ea37472e63d38a4044ad9b986",
-    "last_interaction": "2026-01-08T09:25:39.846Z",
-    "score": 0,
-    "category": "COLD",
+    "email": "rsvijaypargavan@gmail.com",
+    "attempt_count": 1,
+    "next_action_due": "2026-01-14",
+    "score": 80,
+    "category": "HOT",
+    "source": "SYSTEM",
+    "status": "MAIL_ENGAGED",
+    "imported_at": "2026-01-08T12:51:16.061Z",
+    "last_sms_time": "2026-01-13T02:36:29.448Z",
+    "last_updated": "2026-01-13T02:36:20.928Z",
+    "last_call_sid": "CAa76efb2351786ed96fc4d1eddb5b3287",
     "post_call_action_pending": false,
-    "last_sms_time": "2026-01-08T09:26:08.435Z"
+    "last_interaction": "2026-01-12T08:25:50.012Z",
+    "last_call_summary": "[MAIL SUMMARY]: \\REQUIRED. A minimum of 2 complete sentences summarizing the conversation naturally\\"
   }
 ]

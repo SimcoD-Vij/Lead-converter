@@ -1,0 +1,47 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Arun, Vijay here from Hivericks regarding XOptimus. Do you have a quick minute?",
+    "timestamp": "2026-01-08T14:04:13.647Z"
+  },
+  {
+    "role": "user",
+    "text": "Yeah.",
+    "timestamp": "2026-01-08T14:04:24.171Z"
+  },
+  {
+    "role": "assistant",
+    "text": "XOptimus Smart Charger is a game-changer for those who want to extend their battery life without breaking the bank. Unlike cheap chargers, it damages your battery over time and can reduce its lifespan by up to 30%.",
+    "timestamp": "2026-01-08T14:04:25.407Z"
+  },
+  {
+    "role": "user",
+    "text": "So why do you call me?",
+    "timestamp": "2026-01-08T14:04:45.517Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Hi, I'm Vijay from Hivericks. I understand we didn't quite connect on the XOptimus Smart Charger earlier. I wanted to follow up and see if you're interested in learning more about it.",
+    "timestamp": "2026-01-08T14:04:46.746Z"
+  },
+  {
+    "role": "user",
+    "text": "Maybe later.",
+    "timestamp": "2026-01-08T14:04:59.650Z"
+  },
+  {
+    "role": "assistant",
+    "text": "I'm sorry to hear that you're not interested in discussing the XOptimus Smart Charger yet. If you change your mind, I'll be here when you're ready. In the meantime, would you like a discount on your next purchase?",
+    "timestamp": "2026-01-08T14:05:01.107Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes.",
+    "timestamp": "2026-01-08T14:05:17.280Z"
+  },
+  {
+    "role": "assistant",
+    "text": "PRODUCT INFO (Reference Only)",
+    "timestamp": "2026-01-08T14:05:18.518Z"
+  }
+]

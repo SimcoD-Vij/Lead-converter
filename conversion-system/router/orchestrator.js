@@ -37,7 +37,8 @@ console.log(`   🌍 Ngrok Public URL: https://oretha-geniculate-addictedly.ngro
 
 // D. SERVICES IMPORTS
 const smsEngine = require('../sms/sms_engine');
-const smsQueueManager = require('../sms/sms_queue_manager'); // NEW QUEUE MANAGER
+const smsQueueManager = require('../sms/sms_queue_manager');
+const { monitorInbox } = require('../email/reply_monitor'); // NEW QUEUE MANAGER
 const { generateResponse, warmup } = require('../agent/salesBot');
 const voiceEngine = require('../voice/voice_engine');
 const emailEngine = require('../email/email_engine');
@@ -97,7 +98,18 @@ const checkStickyChannel = (lead) => {
 };
 
 const determineActions = (lead) => {
-    if (['DO_NOT_CONTACT', 'OPTED_OUT', 'COMPLETED', 'SMS_USER_STOP'].includes(lead.status)) return [];
+    // 0. GLOBAL HALT STATES
+    if (['DO_NOT_CONTACT', 'OPTED_OUT', 'COMPLETED', 'SMS_USER_STOP', 'HUMAN_HANDOFF', 'MAIL_COMPLETE'].includes(lead.status)) return [];
+    if (lead.status.includes('HANDOFF')) return []; // Safety catch-all
+
+    // 1. GRADUATION LOGIC (Attempt > 6 && Score >= 50)
+    // If graduated, we effectively HALT automation here. 
+    // The actual status update to 'HUMAN_HANDOFF' should be handled by a separate maintenance function or we assume the score update triggered it.
+    // For now, let's treat this valid condition as a "Stop Automation" signal.
+    // NOTE: User asked to SET Human Handoff. We'll do that in the main loop 'checkGraduation'.
+    // Here we just respect the consequence.
+    if ((lead.attempt_count || 0) >= 6 && (lead.score || 0) >= 50) return [];
+
     if (['CALL_INITIATED', 'CALL_CONNECTED', 'CALL_IN_PROGRESS'].includes(lead.status)) return [];
 
     const now = new Date();
@@ -112,7 +124,7 @@ const determineActions = (lead) => {
 
     // Escalation Priority
     if (lead.status === 'SMS_TO_CALL_REQUESTED') return ['VOICE'];
-    if (lead.status === 'MAIL_TO_CALL_REQUESTED') return ['VOICE']; // New Mail Escalation
+    if (lead.status === 'MAIL_TO_CALL_REQUESTED') return ['VOICE'];
     if (lead.status === 'SMS_CALL_SCHEDULED') {
         if (lead.scheduled_call_time && new Date() >= new Date(lead.scheduled_call_time)) return ['VOICE'];
         return [];
@@ -120,8 +132,10 @@ const determineActions = (lead) => {
 
     // Timeline Default
     const attempt = lead.attempt_count || 0;
-    const plan = TIMELINE_ACTIONS[attempt] || TIMELINE_ACTIONS[TIMELINE_ACTIONS.length - 1];
-    if (!plan) return [];
+
+    // STRICT TIMELINE: Halt if exhausted (No infinite loop)
+    const plan = TIMELINE_ACTIONS[attempt];
+    if (!plan) return []; // Auto-Halt
 
     // Data Priority
     let finalActions = new Set(plan);
@@ -279,6 +293,22 @@ const processPostCallActions = async () => {
 // 5. MAIN ORCHESTRATOR RUNNER (INTERLEAVED LOOP)
 // ---------------------------------------------------------
 
+// ---------------------------------------------------------
+// 4.6 GRADUATION CHECK (SCORE BASED)
+// ---------------------------------------------------------
+const checkGraduation = (lead) => {
+    // Condition: Attempt >= 6 AND Score >= 50
+    if ((lead.attempt_count || 0) >= 6 && (lead.score || 0) >= 50) {
+        if (lead.status !== 'HUMAN_HANDOFF' && lead.status !== 'COMPLETED') {
+            lead.status = 'HUMAN_HANDOFF';
+            lead.last_updated = new Date().toISOString();
+            console.log(`   🎓 LEAD GRADUATED: ${lead.phone || lead.email} (Score: ${lead.score}) -> HUMAN_HANDOFF`);
+            return true;
+        }
+    }
+    return false;
+};
+
 const runOrchestrator = async () => {
     console.log("\n🎻 ORCHESTRATOR PULSE: Checking State...");
 
@@ -289,13 +319,44 @@ const runOrchestrator = async () => {
 
     if (!fs.existsSync(LEADS_FILE)) return;
     const leads = readJSON(LEADS_FILE);
+    let leadsUpdated = false;
+
+    // TRACKING: Ensure we only increment ONCE per cycle
+    const processedLeadsCycle = new Set();
+
+    const incrementLeadSafe = (lead) => {
+        if (processedLeadsCycle.has(lead.phone)) return; // Already bumped
+
+        // 1. Increment
+        lead.attempt_count = (lead.attempt_count || 0) + 1;
+
+        // 2. Set Next Due (Standard 1 Day Gap)
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        lead.next_action_due = tomorrow.toISOString().split('T')[0];
+        lead.last_updated = new Date().toISOString();
+
+        processedLeadsCycle.add(lead.phone);
+        console.log(`      📈 Attempt Count Incremented -> ${lead.attempt_count} (Next: ${lead.next_action_due})`);
+
+        fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
+    };
 
     // 1. Plan Work
     const batches = { SMS: [], MAIL: [], VOICE: [] };
+
     leads.forEach(lead => {
+        // A. Check Graduation
+        if (checkGraduation(lead)) {
+            leadsUpdated = true;
+            return; // Skip finding actions for this cycle, status is now HANDOFF
+        }
+
         const actions = determineActions(lead);
         if (actions.length > 0) actions.forEach(act => batches[act].push(lead));
     });
+
+    if (leadsUpdated) fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
 
     // ---------------------------------------------------------
     // PHASE 1: SMS (INTERLEAVED)
@@ -313,6 +374,14 @@ const runOrchestrator = async () => {
 
             // B. Process Chunk
             const chunk = batches.SMS.slice(i, i + chunkSize);
+
+            // INCREMENT ATTEMPTS SAFELY
+            chunk.forEach(l => {
+                // Ensure we bump the count if not already done this cycle
+                const cleanLead = leads.find(lead => lead.phone === l.phone);
+                if (cleanLead) incrementLeadSafe(cleanLead);
+            });
+
             // console.log(`      ➡️ Sending Chunk ${i / chunkSize + 1}...`);
             await smsEngine.runSmartSmsBatch(chunk);
 
@@ -329,7 +398,15 @@ const runOrchestrator = async () => {
     // ---------------------------------------------------------
 
     // A. Check Inbound (Priority)
+
+
+    // 4.2 Process Inbound Email Queue (Webhook + IMAP)
     const emailReplies = await emailEngine.processInboundQueue();
+    // NEW: Check IMAP Inbox directly (No Webhook needed)
+    await monitorInbox(); // Will safely skip if already scanning
+
+    // 5. Outbound Processing
+    // ...
 
     // B. Process Outbound
     if (batches.MAIL.length > 0) {
@@ -364,24 +441,13 @@ const runOrchestrator = async () => {
             const sent = await emailEngine.sendEmail(lead, subject, body);
 
             if (sent) {
-                // UPDATE LEAD TO PREVENT LOOP
+                // UPDATE LEAD TO PREVENT LOOP (Now centralized)
                 const freshLeads = readJSON(LEADS_FILE);
                 const lIndex = freshLeads.findIndex(l => l.phone === lead.phone);
+
                 if (lIndex !== -1) {
-                    // 1. Increment Attempt
-                    freshLeads[lIndex].attempt_count = (freshLeads[lIndex].attempt_count || 0) + 1;
-
-                    // 2. Set Next Action to Tomorrow (Simple logic)
-                    // In a real system, TIMELINE_ACTIONS determines delay.
-                    // For now, default 1 day.
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    freshLeads[lIndex].next_action_due = tomorrow.toISOString().split('T')[0];
-                    freshLeads[lIndex].last_updated = new Date().toISOString();
-                    freshLeads[lIndex].status = 'MAIL_COMPLETE'; // Mark step done
-
-                    fs.writeFileSync(LEADS_FILE, JSON.stringify(freshLeads, null, 2));
-                    console.log(`      ✅ Lead Updated: Attempt ${freshLeads[lIndex].attempt_count}, Next: ${freshLeads[lIndex].next_action_due}`);
+                    // Use centralized increment which handles date checks
+                    incrementLeadSafe(freshLeads[lIndex]);
                 }
             }
 
