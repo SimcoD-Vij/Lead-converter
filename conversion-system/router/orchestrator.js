@@ -40,6 +40,9 @@ const smsEngine = require('../sms/sms_engine');
 const smsQueueManager = require('../sms/sms_queue_manager');
 const { monitorInbox } = require('../email/reply_monitor'); // NEW QUEUE MANAGER
 const { generateResponse, warmup } = require('../agent/salesBot');
+// Initialize "Brain" immediately (Starts MCP)
+warmup().catch(e => console.error("💥 Warmup Failed:", e.message));
+
 const voiceEngine = require('../voice/voice_engine');
 const emailEngine = require('../email/email_engine');
 
@@ -116,19 +119,17 @@ const determineActions = (lead) => {
     const offsetd = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
     const today = offsetd.toISOString().split('T')[0];
 
-    if (lead.next_action_due && lead.next_action_due > today) return [];
-
-    // Sticky Priority
-    const sticky = checkStickyChannel(lead);
-    if (sticky) return sticky;
-
-    // Escalation Priority
+    // Escalation Priority (Overrides Date Check)
     if (lead.status === 'SMS_TO_CALL_REQUESTED') return ['VOICE'];
     if (lead.status === 'MAIL_TO_CALL_REQUESTED') return ['VOICE'];
     if (lead.status === 'SMS_CALL_SCHEDULED') {
         if (lead.scheduled_call_time && new Date() >= new Date(lead.scheduled_call_time)) return ['VOICE'];
+        // If scheduled for later, we wait (respect date check), but here we return [] specific to schedule logic
+        // Actually, if scheduled time is not met, we should fall through to date check or return []
         return [];
     }
+
+    if (lead.next_action_due && lead.next_action_due > today) return [];
 
     // Timeline Default
     const attempt = lead.attempt_count || 0;
@@ -309,12 +310,47 @@ const checkGraduation = (lead) => {
     return false;
 };
 
+const processPrioritySmsActions = async () => {
+    if (!fs.existsSync(LEADS_FILE)) return;
+    const leads = readJSON(LEADS_FILE);
+    let hasUpdates = false;
+
+    // Filter leads needing PRIORITY SMS (from MCP)
+    const priorityLeads = leads.filter(l => l.status === 'SMS_SEND_REQUESTED' && l.pending_sms_content);
+
+    if (priorityLeads.length > 0) {
+        console.log(`   📨 PRIORITY SMS: Processing ${priorityLeads.length} requests...`);
+    }
+
+    for (const lead of priorityLeads) {
+        console.log(`      ⚡ Sending Requested SMS to ${lead.phone}...`);
+        const message = lead.pending_sms_content;
+
+        try {
+            await smsEngine.sendSms(lead.phone, message);
+            console.log(`      ✅ Priority SMS Sent.`);
+
+            // RESET STATUS
+            lead.status = 'SMS_SENT';
+            delete lead.pending_sms_content;
+            lead.last_updated = new Date().toISOString();
+            hasUpdates = true;
+
+        } catch (e) {
+            console.error(`      ❌ Priority SMS Failed: ${e.message}`);
+        }
+    }
+
+    if (hasUpdates) fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
+};
+
 const runOrchestrator = async () => {
     console.log("\n🎻 ORCHESTRATOR PULSE: Checking State...");
 
     // 0. Maintenance
     await finalizeSmsSessions();
-    await processPostCallActions(); // NEW: Handle post-call feedback immediately
+    await processPostCallActions();
+    await processPrioritySmsActions(); // NEW: Priority SMS
     await emailEngine.finalizeMailEvents();
 
     if (!fs.existsSync(LEADS_FILE)) return;
@@ -463,8 +499,7 @@ const runOrchestrator = async () => {
         if (false && !isCallTime()) { // FORCE ENABLE: BYPASS TIME CHECK
             console.log(`   ⏳ Skipping VOICE (Outside Window).`);
         } else {
-            // Warmup
-            await warmup();
+            // Warmup done globally at start
             console.log(`   ☎️ Processing ${batches.VOICE.length} Calls...`);
 
             for (const lead of batches.VOICE) {

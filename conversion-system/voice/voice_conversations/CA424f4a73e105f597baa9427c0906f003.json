@@ -1,0 +1,17 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi Karthick, i am from Hivericks. I see we spoke recently. Is now a good time?",
+    "timestamp": "2026-01-13T05:40:41.351Z"
+  },
+  {
+    "role": "user",
+    "text": "I want the details of the product and WhatsApp, send it to WhatsApp.",
+    "timestamp": "2026-01-13T05:40:50.316Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Here's a concise message you can send to Karthick on WhatsApp:",
+    "timestamp": "2026-01-13T05:40:51.784Z"
+  }
+]

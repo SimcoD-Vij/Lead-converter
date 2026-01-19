@@ -1,20 +1,14 @@
 [
   {
-    "name": "Karthick",
-    "phone": "+917604896187",
-    "email": "rsvijaypargavan@gmail.com",
-    "attempt_count": 1,
+    "email": "teamtwilio@team.twilio.com",
+    "phone": "",
+    "name": "Anonymous Mail User",
+    "status": "HUMAN_HANDOFF",
+    "source": "ANONYMOUS_MAIL",
+    "attempt_count": 2,
     "next_action_due": "2026-01-14",
     "score": 80,
     "category": "HOT",
-    "source": "SYSTEM",
-    "status": "MAIL_ENGAGED",
-    "imported_at": "2026-01-08T12:51:16.061Z",
-    "last_sms_time": "2026-01-13T02:36:29.448Z",
-    "last_updated": "2026-01-13T02:36:20.928Z",
-    "last_call_sid": "CAa76efb2351786ed96fc4d1eddb5b3287",
-    "post_call_action_pending": false,
-    "last_interaction": "2026-01-12T08:25:50.012Z",
-    "last_call_summary": "[MAIL SUMMARY]: \\REQUIRED. A minimum of 2 complete sentences summarizing the conversation naturally\\"
+    "last_updated": "2026-01-13T18:30:46.731Z"
   }
 ]

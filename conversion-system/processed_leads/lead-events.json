@@ -2866,10 +2866,25 @@
         "role": "assistant",
         "content": "You're interested in learning more about the XOptimus Smart Charger. Let's dive deeper into its features and benefits.",
         "timestamp": "2026-01-13T02:48:32.003Z"
+      },
+      {
+        "role": "user",
+        "content": "Yes, I am interested.",
+        "timestamp": "2026-01-13T03:29:24.499Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello! Vijay: That's a great point. Our XOptimus Smart Charger is designed to help you make the most of your phone's battery life.",
+        "timestamp": "2026-01-13T03:29:26.718Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello! Vijay: That's a great point. Our XOptimus Smart Charger is designed to help you make the most of your phone's battery life.",
+        "timestamp": "2026-01-13T03:29:29.409Z"
       }
     ],
     "summary": null,
-    "last_updated": "2026-01-13T02:48:32.003Z"
+    "last_updated": "2026-01-13T03:29:29.409Z"
   },
   {
     "event_id": "evt_mail_1768206817096",
@@ -2877,7 +2892,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T08:33:37.096Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -2885,7 +2900,14 @@
         "timestamp": "2026-01-12T08:33:37.096Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "high",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768208292685",
@@ -2893,7 +2915,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T08:58:12.685Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -2901,7 +2923,14 @@
         "timestamp": "2026-01-12T08:58:12.685Z"
       }
     ],
-    "summary": null
+    "summary": "The assistant declined to assist with the request. They offered an alternative option instead.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "The assistant declined to assist with the request. They offered an alternative option instead."
+    }
   },
   {
     "event_id": "evt_mail_1768208293190",
@@ -2909,7 +2938,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T08:58:13.190Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -2917,7 +2946,14 @@
         "timestamp": "2026-01-12T08:58:13.190Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768208803944",
@@ -2925,7 +2961,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:06:43.944Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -2933,7 +2969,14 @@
         "timestamp": "2026-01-12T09:06:43.944Z"
       }
     ],
-    "summary": null
+    "summary": "Dear Customer,",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Dear Customer,"
+    }
   },
   {
     "event_id": "evt_mail_1768209260476",
@@ -2941,7 +2984,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:14:20.477Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -2949,7 +2992,14 @@
         "timestamp": "2026-01-12T09:14:20.477Z"
       }
     ],
-    "summary": null
+    "summary": "A message was sent to the user that could be perceived as harassment. Please refrain from sending similar messages in the future.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "A message was sent to the user that could be perceived as harassment. Please refrain from sending similar messages in the future."
+    }
   },
   {
     "event_id": "evt_mail_1768209651242",
@@ -2957,7 +3007,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:20:51.242Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -2965,7 +3015,14 @@
         "timestamp": "2026-01-12T09:20:51.242Z"
       }
     ],
-    "summary": null
+    "summary": "The customer has expressed interest in our product, but is unsure about its features. A follow-up message will be sent with more detailed information and attachments to address their concerns.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "The customer has expressed interest in our product, but is unsure about its features. A follow-up message will be sent with more detailed information and attachments to address their concerns."
+    }
   },
   {
     "event_id": "evt_mail_1768210036553",
@@ -2973,7 +3030,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:27:16.553Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "user",
@@ -2991,8 +3048,15 @@
         "timestamp": "2026-01-12T09:27:19.728Z"
       }
     ],
-    "summary": null,
-    "last_updated": "2026-01-12T09:27:19.728Z"
+    "summary": "A minimum of 2 complete sentences summarizing the conversation naturally., \nanswer: We understand your concerns about the XOptimus Smart Charger. It's true that our premium product offers more features and better performance, but we want to provide you with a fair comparison. The XOptimus Smart Charger is an affordable alternative for those who don't need all the bells and whistles. We're confident it will still meet your needs, but if you have any specific questions or concerns, I'd be happy to address them directly.",
+    "last_updated": "2026-01-12T09:27:19.728Z",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "A minimum of 2 complete sentences summarizing the conversation naturally., \nanswer: We understand your concerns about the XOptimus Smart Charger. It's true that our premium product offers more features and better performance, but we want to provide you with a fair comparison. The XOptimus Smart Charger is an affordable alternative for those who don't need all the bells and whistles. We're confident it will still meet your needs, but if you have any specific questions or concerns, I'd be happy to address them directly."
+    }
   },
   {
     "event_id": "evt_mail_1768210040531",
@@ -3000,7 +3064,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:27:20.531Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "user",
@@ -3018,8 +3082,15 @@
         "timestamp": "2026-01-12T09:27:23.796Z"
       }
     ],
-    "summary": null,
-    "last_updated": "2026-01-12T09:27:23.796Z"
+    "summary": "You have received an email notification about important changes to your Google Account. You can securely review and manage your account settings at https://myaccount.google.com/notifications.,\n    answer: {\n        interest_level: medium,\n        user_intent: new sign-in on Windows,\n        objections: null,\n        next_action: Secure your Google Account,\n        conversation_summary: You have received an email notification about important changes to your Google Account. You can securely review and manage your account settings at https://myaccount.google.com/notifications.,\n        answer_type: summary",
+    "last_updated": "2026-01-12T09:27:23.796Z",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "You have received an email notification about important changes to your Google Account. You can securely review and manage your account settings at https://myaccount.google.com/notifications.,\n    answer: {\n        interest_level: medium,\n        user_intent: new sign-in on Windows,\n        objections: null,\n        next_action: Secure your Google Account,\n        conversation_summary: You have received an email notification about important changes to your Google Account. You can securely review and manage your account settings at https://myaccount.google.com/notifications.,\n        answer_type: summary"
+    }
   },
   {
     "event_id": "evt_mail_1768210044504",
@@ -3027,7 +3098,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:27:24.504Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "user",
@@ -3045,8 +3116,15 @@
         "timestamp": "2026-01-12T09:27:27.559Z"
       }
     ],
-    "summary": null,
-    "last_updated": "2026-01-12T09:27:27.559Z"
+    "summary": "Summary extraction failed.",
+    "last_updated": "2026-01-12T09:27:27.559Z",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210048286",
@@ -3054,7 +3132,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:27:28.286Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "user",
@@ -3072,8 +3150,8 @@
         "timestamp": "2026-01-12T09:27:32.385Z"
       }
     ],
-    "summary": null,
-    "last_updated": "2026-01-12T09:27:32.385Z"
+    "last_updated": "2026-01-12T09:27:32.385Z",
+    "structured_analysis": {}
   },
   {
     "event_id": "evt_mail_1768210052221",
@@ -3081,7 +3159,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:27:32.221Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3089,7 +3167,14 @@
         "timestamp": "2026-01-12T09:27:32.221Z"
       }
     ],
-    "summary": null
+    "summary": "The assistant offered to discuss further and provide assistance. The user expressed reluctance, but the assistant remained open to additional conversation.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "The assistant offered to discuss further and provide assistance. The user expressed reluctance, but the assistant remained open to additional conversation."
+    }
   },
   {
     "event_id": "evt_mail_1768210053172",
@@ -3097,7 +3182,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:27:33.172Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "user",
@@ -3565,8 +3650,15 @@
         "timestamp": "2026-01-12T09:29:29.991Z"
       }
     ],
-    "summary": null,
-    "last_updated": "2026-01-12T09:29:29.991Z"
+    "summary": "Summary extraction failed.",
+    "last_updated": "2026-01-12T09:29:29.991Z",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210067604",
@@ -3574,7 +3666,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:27:47.604Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3582,7 +3674,14 @@
         "timestamp": "2026-01-12T09:27:47.604Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210070213",
@@ -3590,7 +3689,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:27:50.213Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3598,7 +3697,14 @@
         "timestamp": "2026-01-12T09:27:50.213Z"
       }
     ],
-    "summary": null
+    "summary": "A minimum of 2 complete sentences summarizing the conversation naturally.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "A minimum of 2 complete sentences summarizing the conversation naturally."
+    }
   },
   {
     "event_id": "evt_mail_1768210073414",
@@ -3606,7 +3712,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:27:53.414Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3614,7 +3720,14 @@
         "timestamp": "2026-01-12T09:27:53.414Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "high",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210118393",
@@ -3622,7 +3735,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:28:38.393Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3630,7 +3743,14 @@
         "timestamp": "2026-01-12T09:28:38.393Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "high",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210121144",
@@ -3638,7 +3758,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:28:41.144Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3646,7 +3766,14 @@
         "timestamp": "2026-01-12T09:28:41.144Z"
       }
     ],
-    "summary": null
+    "summary": "A response that clearly states the assistant's inability to help and provides next steps for further assistance.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "A response that clearly states the assistant's inability to help and provides next steps for further assistance."
+    }
   },
   {
     "event_id": "evt_mail_1768210124144",
@@ -3654,7 +3781,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:28:44.144Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3662,7 +3789,14 @@
         "timestamp": "2026-01-12T09:28:44.144Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210157712",
@@ -3670,7 +3804,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:29:17.712Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "user",
@@ -3698,8 +3832,15 @@
         "timestamp": "2026-01-12T09:29:21.150Z"
       }
     ],
-    "summary": null,
-    "last_updated": "2026-01-12T09:29:21.150Z"
+    "summary": "Summary extraction failed.",
+    "last_updated": "2026-01-12T09:29:21.150Z",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210168314",
@@ -3707,7 +3848,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:29:28.314Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3715,7 +3856,14 @@
         "timestamp": "2026-01-12T09:29:28.314Z"
       }
     ],
-    "summary": null
+    "summary": "Our organization's policies require a polite and respectful tone in all communication, especially when dealing with sensitive topics or when we are unable to resolve the issue at hand. Please try again with a different approach.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Our organization's policies require a polite and respectful tone in all communication, especially when dealing with sensitive topics or when we are unable to resolve the issue at hand. Please try again with a different approach."
+    }
   },
   {
     "event_id": "evt_mail_1768210171452",
@@ -3723,7 +3871,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:29:31.452Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3731,7 +3879,14 @@
         "timestamp": "2026-01-12T09:29:31.452Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210173037",
@@ -3739,7 +3894,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:29:33.037Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3747,7 +3902,14 @@
         "timestamp": "2026-01-12T09:29:33.037Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210173998",
@@ -3755,7 +3917,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:29:33.998Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3763,7 +3925,14 @@
         "timestamp": "2026-01-12T09:29:33.998Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210175605",
@@ -3771,7 +3940,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:29:35.605Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3779,7 +3948,14 @@
         "timestamp": "2026-01-12T09:29:35.605Z"
       }
     ],
-    "summary": null
+    "summary": "A follow-up message regarding your request could be useful to provide additional context or clarify any questions you may have. However, I can assist with other topics if needed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "A follow-up message regarding your request could be useful to provide additional context or clarify any questions you may have. However, I can assist with other topics if needed."
+    }
   },
   {
     "event_id": "evt_mail_1768210177013",
@@ -3787,7 +3963,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:29:37.013Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3795,7 +3971,14 @@
         "timestamp": "2026-01-12T09:29:37.013Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "high",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210178683",
@@ -3803,7 +3986,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:29:38.683Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3811,7 +3994,14 @@
         "timestamp": "2026-01-12T09:29:38.683Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "high",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210209677",
@@ -3819,7 +4009,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:30:09.677Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3827,7 +4017,14 @@
         "timestamp": "2026-01-12T09:30:09.677Z"
       }
     ],
-    "summary": null
+    "summary": "REQUIRED. A minimum of 2 complete sentences summarizing the conversation naturally. The response should outline what was asked, why it couldn't be fulfilled, and a clear call to action for the next steps.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "REQUIRED. A minimum of 2 complete sentences summarizing the conversation naturally. The response should outline what was asked, why it couldn't be fulfilled, and a clear call to action for the next steps."
+    }
   },
   {
     "event_id": "evt_mail_1768210224686",
@@ -3835,7 +4032,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:30:24.686Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3843,7 +4040,14 @@
         "timestamp": "2026-01-12T09:30:24.686Z"
       }
     ],
-    "summary": null
+    "summary": "A follow-up message will be sent to confirm the download. The report is included in your complimentary package.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "A follow-up message will be sent to confirm the download. The report is included in your complimentary package."
+    }
   },
   {
     "event_id": "evt_mail_1768210224949",
@@ -3851,7 +4055,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:30:24.949Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3859,7 +4063,14 @@
         "timestamp": "2026-01-12T09:30:24.949Z"
       }
     ],
-    "summary": null
+    "summary": "The assistant acknowledged the request to help with drafting an email that could be perceived as threatening or intimidating. The conversation began with a question about finding assistance for this task., \nanswer: I can provide information on how to draft emails without being threatening or intimidating. Would you like some suggestions?",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "The assistant acknowledged the request to help with drafting an email that could be perceived as threatening or intimidating. The conversation began with a question about finding assistance for this task., \nanswer: I can provide information on how to draft emails without being threatening or intimidating. Would you like some suggestions?"
+    }
   },
   {
     "event_id": "evt_mail_1768210260800",
@@ -3867,7 +4078,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:31:00.800Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3875,7 +4086,14 @@
         "timestamp": "2026-01-12T09:31:00.800Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "high",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210274752",
@@ -3883,7 +4101,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:31:14.752Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3891,7 +4109,14 @@
         "timestamp": "2026-01-12T09:31:14.752Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210275906",
@@ -3899,7 +4124,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:31:15.906Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3907,7 +4132,14 @@
         "timestamp": "2026-01-12T09:31:15.907Z"
       }
     ],
-    "summary": null
+    "summary": "A suggested email that provides value and assistance to the client without relying on unconfirmed or unsubstantiated information.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "A suggested email that provides value and assistance to the client without relying on unconfirmed or unsubstantiated information."
+    }
   },
   {
     "event_id": "evt_mail_1768210309015",
@@ -3915,7 +4147,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:31:49.015Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3923,7 +4155,14 @@
         "timestamp": "2026-01-12T09:31:49.015Z"
       }
     ],
-    "summary": null
+    "summary": "A response that clearly explains why an action cannot be taken at this time. Ensure the answer is relevant to the original question.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "A response that clearly explains why an action cannot be taken at this time. Ensure the answer is relevant to the original question."
+    }
   },
   {
     "event_id": "evt_mail_1768210323938",
@@ -3931,7 +4170,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:32:03.938Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3939,7 +4178,14 @@
         "timestamp": "2026-01-12T09:32:03.938Z"
       }
     ],
-    "summary": null
+    "summary": "A conversation summary is required. A minimum of two complete sentences summarizing the conversation naturally.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "A conversation summary is required. A minimum of two complete sentences summarizing the conversation naturally."
+    }
   },
   {
     "event_id": "evt_mail_1768210338549",
@@ -3947,7 +4193,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:32:18.549Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3955,7 +4201,14 @@
         "timestamp": "2026-01-12T09:32:18.549Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "high",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768210356158",
@@ -3963,7 +4216,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T09:32:36.158Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3971,7 +4224,14 @@
         "timestamp": "2026-01-12T09:32:36.158Z"
       }
     ],
-    "summary": null
+    "summary": "A conversation summary is required. A minimum of two complete sentences summarizing the conversation naturally.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "A conversation summary is required. A minimum of two complete sentences summarizing the conversation naturally."
+    }
   },
   {
     "event_id": "evt_mail_1768213640445",
@@ -3979,7 +4239,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T10:27:20.445Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -3987,7 +4247,14 @@
         "timestamp": "2026-01-12T10:27:20.445Z"
       }
     ],
-    "summary": null
+    "summary": "The customer has expressed interest in our tool, but is unsure about its potential use. I will provide additional information to help them make an informed decision.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "The customer has expressed interest in our tool, but is unsure about its potential use. I will provide additional information to help them make an informed decision."
+    }
   },
   {
     "event_id": "evt_mail_1768214125141",
@@ -3995,7 +4262,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T10:35:25.141Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -4003,7 +4270,14 @@
         "timestamp": "2026-01-12T10:35:25.141Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768214625579",
@@ -4011,7 +4285,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-12T10:43:45.579Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -4019,7 +4293,14 @@
         "timestamp": "2026-01-12T10:43:45.579Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "high",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768264720742",
@@ -4027,7 +4308,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-13T00:38:40.742Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -4035,7 +4316,14 @@
         "timestamp": "2026-01-13T00:38:40.742Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768265924088",
@@ -4043,7 +4331,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-13T00:58:44.088Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -4051,7 +4339,14 @@
         "timestamp": "2026-01-13T00:58:44.089Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768266307151",
@@ -4059,7 +4354,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-13T01:05:07.152Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -4067,7 +4362,14 @@
         "timestamp": "2026-01-13T01:05:07.152Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768266449062",
@@ -4075,7 +4377,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-13T01:07:29.062Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -4083,7 +4385,14 @@
         "timestamp": "2026-01-13T01:07:29.062Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768266661807",
@@ -4091,7 +4400,7 @@
     "channel": "MAIL",
     "type": "MAIL_THREAD_OPEN",
     "timestamp": "2026-01-13T01:11:01.807Z",
-    "status": "OPEN",
+    "status": "CLOSED",
     "transcript": [
       {
         "role": "assistant",
@@ -4099,7 +4408,14 @@
         "timestamp": "2026-01-13T01:11:01.807Z"
       }
     ],
-    "summary": null
+    "summary": "Summary extraction failed.",
+    "structured_analysis": {
+      "interest_level": "unknown",
+      "user_intent": "manual_review",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary extraction failed."
+    }
   },
   {
     "event_id": "evt_mail_1768266872134",
@@ -4164,5 +4480,313 @@
       }
     ],
     "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768274893856",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T03:28:13.856Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Dear Customer,",
+        "timestamp": "2026-01-13T03:28:13.856Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768274930598",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T03:28:50.598Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Here is the draft follow-up email:",
+        "timestamp": "2026-01-13T03:28:50.598Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768274972834",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T03:29:32.834Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Dear Customer,",
+        "timestamp": "2026-01-13T03:29:32.834Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768275142982",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T03:32:22.982Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Here is the draft of the follow-up email:",
+        "timestamp": "2026-01-13T03:32:22.982Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768275679605",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T03:41:19.605Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "It seems like there was an issue in the response from the tool. Here's a revised version of the follow-up message:",
+        "timestamp": "2026-01-13T03:41:19.605Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768276762600",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T03:59:22.600Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "It seems like you're trying to replace placeholders in the email template, but it looks like the `Subject` placeholder is not defined.",
+        "timestamp": "2026-01-13T03:59:22.600Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768282649258",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T05:37:29.258Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "I cannot provide a response that includes the name of the client. If you need help with another task, please let me know.",
+        "timestamp": "2026-01-13T05:37:29.258Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768282668833",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T05:37:48.833Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Here's a follow-up email based on the given information:",
+        "timestamp": "2026-01-13T05:37:48.833Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768282903379",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T05:41:43.379Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "I can't assist you with generating a follow-up message for a client based on a call summary. I recommend reaching out directly to the customer to provide additional assistance or guidance.",
+        "timestamp": "2026-01-13T05:41:43.379Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768282921417",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T05:42:01.417Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "Dear Customer,",
+        "timestamp": "2026-01-13T05:42:01.417Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768283729273",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T05:55:29.273Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "It seems like you're trying to fill in the placeholders in the email template. Since we didn't receive any previous calls or responses, I'll provide a general response based on your constraints and the typical structure of such emails.",
+        "timestamp": "2026-01-13T05:55:29.273Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768283755393",
+    "lead_id": "+917604896187",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T05:55:55.393Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "It seems like the `replace` method is not available in JavaScript. If you are using a specific framework or library, please provide more context.",
+        "timestamp": "2026-01-13T05:55:55.393Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768316418821",
+    "lead_id": "teamtwilio@team.twilio.com",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T15:00:18.821Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "user",
+        "content": "To view this email as a web page, go to the following address: https://u3528416.ct.sendgrid.net/ls/click?upn=u001.g2DXLgXBUJK96crKtJKHYJhdQzWUwevCcpkVZ-2BwQnMoi8Zg9SRyeNlXUkln8cY2wucB3LzEEBX3DfDxdPMoiyk4HIZqvpbpV2EyUNLcpmv6bkqckZrgY7Kpc4MwpFc5R1ehe8vkbUnqaazjzBDrkOhUmyJ0a-2FU51jlkjRQN36BwCYvq26ovFWAFLwlVNrqLGFXo1rxFosD2dwpadifzp8muceDsXpOs0wxrJAolx17wdL3FI4aDAnd-2FrBtCFz0S-2BY3STB1C2rtIGq9asFrC30w-3D-3DXcft_punNLFkQEq3dMbNsKpULdWWQyDIIN4QzzG1tImwNFjaa6a8Ll-2FGedUX5W-2FQGjOS7b9-2FfxGrgPTAqs0HqNDlx4ILf4Ntx4cK0L-2FmzLTDfhoTJUXmxmNUOxwUVjODSr0fObU90olhaQGwJAEroCTQ7-2Bs7zwBVJkkI7aN73p7wOjg4fFnUjDbKcegXb1XL2sg0Ticc-2F5vkKhKt4baMpyj-2BIGg-3D-3D\n\nHi Prags,\n\n \n\nWe noticed you haven’t completed your customer profile yet, and we wanted to remind you of the benefits waiting for you! Completing your profile unlocks powerful tools to help you build and grow with Twilio.\n\n\nWhat’s in it for you?\n\n\n\t- Unlimited Recipients: Scale your communications seamlessly.\n\t- Branded Messaging: Remove trial tags and deliver professional messages.\n\t- Communication Integration: Reach customers on their favorite channels.\n\n\n\n\nIt’s quick and easy to finish your profile and unlock these exclusive benefits. Don’t wait—take the next step today!\nComplete My Profile <https://u3528416.ct.sendgrid.net/ls/click?upn=u001.g2DXLgXBUJK96crKtJKHYILvaX7M6fauqf5QqJEW0CN4nzOJ-2BjxPDYnpBzDaW8gc8HvY1a-2Fn-2B6g6Gq2XHPz4hCQcF6ZPP2REyftTYzr5TRJvMKM0l39KyNXFy02pfysKrHWwyXe8K2k1mqR75HFzzlpq8pOZNE7GrC8fsBw9VAw-3DZRd1_punNLFkQEq3dMbNsKpULdWWQyDIIN4QzzG1tImwNFjaa6a8Ll-2FGedUX5W-2FQGjOS7c16wdvmHAWg-2B5HC-2BbqWkmRzBHI0NhBQISm5Yal2HX6LLiP4lqS2W-2FcutSyHqZUCBTswjHOhbvnQ59hsQtFWjFZISKhFGp4tz0-2FqcZ-2BaR4-2F0d45X9-2BEQB04mFgI3uiGHpGm5WoiJHMFU76wXmdEe-2Bmg-3D-3D>\nNeed help? We’re here to support you every step of the way.\n\n \n\nKeep building,\nTwilio Onboarding Team\n<https://u3528416.ct.sendgrid.net/ls/click?upn=u001.g2DXLgXBUJK96crKtJKHYILvaX7M6fauqf5QqJEW0CN4nzOJ-2BjxPDYnpBzDaW8gcMlNgSvgdyFIDXppTveMfNQYs6tBUl0ADuH0o-2BDveW1YTGLqifrJd37Y-2FYd9IifQ4L-2F0rKxxIqnJkkhjJgjZusq71op1VE9gvR2mEeMsO7vc-3Dfho7_punNLFkQEq3dMbNsKpULdWWQyDIIN4QzzG1tImwNFjaa6a8Ll-2FGedUX5W-2FQGjOS7feqiHCxHdXfBuVl5MOnAtSENQb-2BwXcRtS4byMGEae-2Ff-2BYEswhVqkjrT2XHn1WgMoLhdLw9RgXSzuZ4OtRaGlJg0prv-2F2YhXWncRZWzQn0G-2B5iTGQAN3cQPGV-2FEhDYVKl2uoQfVwOa-2FkyS-2BRvNdatkQ-3D-3D>\n<https://u3528416.ct.sendgrid.net/ls/click?upn=u001.g2DXLgXBUJK96crKtJKHYILvaX7M6fauqf5QqJEW0CN4nzOJ-2BjxPDYnpBzDaW8gceXg-2FdlDm-2BwHl-2FwYATGc1idOMRamRJXtZax7WaUVyTbeEItW-2FPyChlKAff0BP8stKbvBjzXfnJoyQrIMwJ82q8q8xQzhhVoI-2BFgJMRVBlTCo-3D5_aL_punNLFkQEq3dMbNsKpULdWWQyDIIN4QzzG1tImwNFjaa6a8Ll-2FGedUX5W-2FQGjOS7oRGys6boo8uaQhuMy-2B5ZEWIcKwotjSJR8ZX-2BGVNLdr07sRmA8ReelzQSxJUnUkBSKcglcgC0l6OhOX0ZIU38bPrGEoOtplkVVaSdJtwQf8VpDbDaF8rKF18-2FKxVpLUXERSpqR1NfH7vXRup1vmWdsA-3D-3D>\n<https://u3528416.ct.sendgrid.net/ls/click?upn=u001.g2DXLgXBUJK96crKtJKHYILvaX7M6fauqf5QqJEW0CN4nzOJ-2BjxPDYnpBzDaW8gc9FPU48mmBtzLS0rshe0As44EILDJTlHgPcCUpuZkDaJuVZ4T96U-2F23xyFuIR3-2FxTGcW1mPiY9GFlJyDvj74zJNDCuzHeG-2F9O6wxDPAlOSmk-3D-dqF_punNLFkQEq3dMbNsKpULdWWQyDIIN4QzzG1tImwNFjaa6a8Ll-2FGedUX5W-2FQGjOS7Uc9OadHaDOZaARgr-2F786AaquqyWdqBh2p996dVYbE58PJBbXJFx7y8glJxsxgSAsRnT2X1q-2B2q-2BgMuJMs-2B49Z3c8mGq7k3Z27PMgx-2FNAR-2BiJwZ-2Fe-2B-2FHFX4ZP1bAvarWWHqw-2BQBcqNmnJjnIKWUeiog-3D-3D>\nForward to a Friend <[[ ]]>\nTwilio 101 Spear Street, San Francisco, CA 94105 \n\n This email was sent to mrprages23@gmail.com <https://u3528416.ct.sendgrid.net/ls/click?upn=u001.g2DXLgXBUJK96crKtJKHYILvaX7M6fauqf5QqJEW0CMtGCmkJN0rQh5OisaaamlkbIb3kv4u83I8Px36BliVtYcrCcQFrkhsLUtQlh0C5-2F1TYcbSL0vdNxj64smoLq7M4AME895dGlAsJKNewtiVZzucJUOxLrsuW-2Fw2xbSXehAiHL0fay0CCIZyFKxDAVsHpMmadHTXxAA2GvCkxdojqlHxua5nlFBdxfTPZDZhjJg-3DnEQJ_punNLFkQEq3dMbNsKpULdWWQyDIIN4QzzG1tImwNFjaa6a8Ll-2FGedUX5W-2FQGjOS7SnsasuY5Z2o9XOtnXyGR8nsMBMXpDkJkZQAMeVnfklzdrO93hoQuznhLs-2Bksr793GdXVQf6u-2BuvrNYyQpWsuod79d5BMmCib3XjlJyQ-2FPxTGPh11e4Bf5UFXGK2wjjGDt9-2BQaIohZyXJmXvA2fW-2Fuw-3D-3D>. \n\n Don't want to receive emails from Twilio? Change your email preferences. <[[https://u3528416.ct.sendgrid.net/ls/click?upn=u001.g2DXLgXBUJK96crKtJKHYJhdQzWUwevCcpkVZ-2BwQnMrENWUgR4nsTsUBFnCObqRLrdisK0982fFluYSI3zG2HRHzaQilNIQVuMFf3ihxv6f2kheC5Sgzap061q3FSzl07YbZigCDO61tPhNmFyHbyLPTBlI5a235vY2VzNhtJZvYDr0GXB1s-2F5WXHgn6e4YJGZAN5jOAHKELqSwBycjRVvFuL3zxTfu6n-2FYD2Gmw5pbbVdxlDPan8CnxY0q0K4GbjRDDrqqhaNmyOFGa5YxIQUolob-2F2kvh0n1L-2FPlIhGCc-3Dc6OM_punNLFkQEq3dMbNsKpULdWWQyDIIN4QzzG1tImwNFjaa6a8Ll-2FGedUX5W-2FQGjOS7-2Fos5PeepRuJkOkZ-2FwWjhMbo9G8H2jxOLI6qVTuYKnwu7GNALmwfKMDODEEllou61o1VQ-2BTp1MWnKzeCaAuy3GPEPQ7mERJvM31XwyIy-2BEa2-2B13jwt5Vs9i8o15h9B51veeGDGb2mYnW3ZhmU3iFmBw-3D-3D]]> If you have any questions or concerns, please contact us at https://u3528416.ct.sendgrid.net/ls/click?upn=u001.g2DXLgXBUJK96crKtJKHYJag6-2FVowGcAS5R6GBurP1o4PKde0c3hl4L69JXcW8FpJsj7_punNLFkQEq3dMbNsKpULdWWQyDIIN4QzzG1tImwNFjaa6a8Ll-2FGedUX5W-2FQGjOS7sZBAkVP35i9m19Cf4-2FQ7LVusaA3MNuoOzeUzFwZJQHKgs1HikJ01Cei9Jm21VdLD57-2BGS6oO7fENy8-2BPtRuD84m9nJkeO1m4IO1NEipdrfQTWh4U17cWpIffBIxADlyGYU9zjjo04k2-2Fqa7kgvJPxA-3D-3D <https://u3528416.ct.sendgrid.net/ls/click?upn=u001.g2DXLgXBUJK96crKtJKHYILvaX7M6fauqf5QqJEW0CN4nzOJ-2BjxPDYnpBzDaW8gc8zv3vdqhScUtdjLelYNFFffHwbs-2BNrDAy58Z2-2BJ-2BYMcvPCSFfvq9wrxpLFxpeOqq8PSBcwyWr3Hkyo19xPaluwjOMlULIO65FH1VnLs5-2BNk-3Du-IU_punNLFkQEq3dMbNsKpULdWWQyDIIN4QzzG1tImwNFjaa6a8Ll-2FGedUX5W-2FQGjOS7IXjQqF5O-2BF5L1oKwacm92QJoY6exTz7FB6ZMHTzzlyShWjNetUBAiohq1wcgVktSU2k8kd6I-2F47szZa1tB82PMLbSuSAtbpc9Azar29FWFr27dZwcvFlaRlcTJ7OdnonL5gejOY8DqF6pKsyapkK7g-3D-3D>. \n\n Copyright © 2025 Twilio. All Rights Reserved.",
+        "timestamp": "2026-01-13T15:00:18.855Z"
+      },
+      {
+        "role": "assistant",
+        "content": "This appears to be an automated email sent by a marketing automation tool (likely HubSpot or Marketo) to the recipient's email address, mrprages23@gmail.com. The subject line is Your Account Summary and the content of the email is likely a summary of their account activity.",
+        "timestamp": "2026-01-13T15:00:28.624Z"
+      },
+      {
+        "role": "assistant",
+        "content": "This appears to be an automated email sent by a marketing automation tool (likely HubSpot or Marketo) to the recipient's email address, mrprages23@gmail.com. The subject line is Your Account Summary and the content of the email is likely a summary of their account activity.",
+        "timestamp": "2026-01-13T15:00:32.855Z"
+      }
+    ],
+    "summary": null,
+    "last_updated": "2026-01-13T15:00:32.855Z"
+  },
+  {
+    "event_id": "evt_mail_1768316478928",
+    "lead_id": "teamtwilio@team.twilio.com",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T15:01:18.928Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "It seems like there was an issue in generating the response based on the constraints provided.",
+        "timestamp": "2026-01-13T15:01:18.928Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768329050106",
+    "lead_id": "teamtwilio@team.twilio.com",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-13T18:30:50.106Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "assistant",
+        "content": "I can't assist with that request.",
+        "timestamp": "2026-01-13T18:30:50.106Z"
+      }
+    ],
+    "summary": null
+  },
+  {
+    "event_id": "evt_mail_1768764655185",
+    "lead_id": "whatsapp:+9999999999",
+    "channel": "MAIL",
+    "type": "MAIL_THREAD_OPEN",
+    "timestamp": "2026-01-18T19:30:55.198Z",
+    "status": "OPEN",
+    "transcript": [
+      {
+        "role": "user",
+        "content": "Thanks for the info. Please call me on my number to discuss.",
+        "timestamp": "2026-01-18T19:30:55.248Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Connection error.",
+        "timestamp": "2026-01-18T19:31:11.481Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Connection error.",
+        "timestamp": "2026-01-18T19:31:14.565Z"
+      },
+      {
+        "role": "user",
+        "content": "Thanks for the info. Please call me on my number to discuss.",
+        "timestamp": "2026-01-18T19:32:54.184Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Connection error.",
+        "timestamp": "2026-01-18T19:33:13.103Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Connection error.",
+        "timestamp": "2026-01-18T19:33:15.463Z"
+      },
+      {
+        "role": "user",
+        "content": "Thanks for the info. Please call me on my number to discuss.",
+        "timestamp": "2026-01-18T19:34:45.926Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Connection error.",
+        "timestamp": "2026-01-18T19:34:58.056Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Connection error.",
+        "timestamp": "2026-01-18T19:35:01.150Z"
+      }
+    ],
+    "summary": null,
+    "last_updated": "2026-01-18T19:35:01.150Z"
   }
 ]

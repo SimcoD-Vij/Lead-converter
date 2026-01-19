@@ -237,7 +237,8 @@ const processInboundEmail = async (webhookPayload) => {
     const aiResponse = await generateResponse({
         userMessage: body,
         memory: memory,
-        mode: 'EMAIL_REPLY'
+        mode: 'EMAIL_REPLY',
+        leadContext: lead
     });
 
     console.log(`      🤖 AI Suggests: "${aiResponse.substring(0, 50)}..."`);

@@ -3,8 +3,10 @@ const fs = require("fs");
 const path = require("path");
 const { OLLAMA_URL, MODEL } = require("./config");
 const { sanitize } = require("./utils");
+const { initializeMCP, getMCPTools, executeMCPTool } = require("./mcp_manager");
+const { logSystem } = require("../utils/logger");
+const events = require("events");
 
-/* ---------------- CONFIG & DATA ---------------- */
 /* ---------------- CONFIG & DATA ---------------- */
 let PRODUCT_KNOWLEDGE = `
 PRODUCT: XOptimus Smart Charger (Wall Adapter)
@@ -21,7 +23,7 @@ COMPETITOR COMPARISON:
 const FACTS_PATH = path.join(__dirname, "data", "sample_product_facts.txt");
 if (fs.existsSync(FACTS_PATH)) {
   PRODUCT_KNOWLEDGE = fs.readFileSync(FACTS_PATH, "utf8").trim();
-} // DISABLED: Using Hardcoded Truth for Stability
+}
 
 /* ---------------- THE SALES BRAIN (INTENT-BASED) ---------------- */
 const SALES_IDENTITY = `
@@ -41,96 +43,30 @@ STYLE:
 `;
 
 /* ---------------- HYBRID ROUTER (CODE-LEVEL LOGIC) ---------------- */
-// Fast, Regex-based intent detection to guide the AI
+// Keeping Regex as fallback and for tactical moves (Pivot/Disarm)
 const detectIntent = (msg, mode) => {
   const m = msg.toLowerCase();
   const isVoice = mode === 'VOICE_CALL';
 
-  // 1. COMPLEXITY / SCHEDULE REQUEST
-  // VOID in Voice Call unless specific "schedule later" phrasing
   if (!isVoice && ((m.includes("call") && (m.includes("schedule") || m.includes("discuss") || m.includes("later"))) || m.includes("number"))) {
-    return {
-      type: "SCHEDULE_REQUEST",
-      instruction: "USER WANTS TO DISCUSS ON CALL.\nACTION: Agree enthusiastically. Ask for their preferred time for a 'Clarification Call'. Do NOT pitch product details in text."
-    };
+    return { type: "SCHEDULE_REQUEST", instruction: "User wants to schedule. Use schedule_call tool if avail." };
   }
-
-  // 2. IMMEDIATE CALL (Escalation) -> ONLY FOR TEXT CHANNELS
   if (!isVoice && m.includes("call") && (m.includes("now") || m.includes("immediately") || m.includes("ready"))) {
-    return {
-      type: "IMMEDIATE_CALL",
-      instruction: "USER WANTS CALL NOW.\nACTION: Say 'Available now! Calling you in 10 seconds...'."
-    };
+    return { type: "IMMEDIATE_CALL", instruction: "User wants immediate call. Use trigger_voice_call tool." };
   }
-
-  // 3. ALREADY ON CALL (Voice Specific Loop Breaker)
   if (isVoice && (m.includes("already on") || (m.includes("on") && m.includes("call")))) {
-    return {
-      type: "ALREADY_ON_CALL",
-      instruction: "USER REMINDING THEY ARE ALREADY ON THE CALL.\nACTION: Acknowledge 'Yes, I am listening' and answer their previous question immediately."
-    };
+    return { type: "ALREADY_ON_CALL", instruction: "Acknowledge call state." };
   }
-
-  if (m.includes("cheaper") || m.includes("lower") || (m.includes("website") && m.includes("price")) || m.includes("other") || m.includes("amazon")) {
-    return {
-      type: "COMPETITOR_OBJECTION",
-      instruction: "USER COMPARING WITH CHEAP COMPETITORS.\nACTION: ARGUE VALUE via COURTROOM LOGIC.\n1. Admit they are cheaper.\n2. Argue: 'Cheap chargers lack surge protection and degrade battery health by 20% in a year.'\n3. Ask: 'Is saving ₹500 worth risking your ₹1 Lakh phone?'"
-    };
+  if (m.includes("cheaper") || m.includes("lower") || m.includes("amazon")) {
+    return { type: "COMPETITOR_OBJECTION", instruction: "Use Courtroom Logic to destroy competitor argument." };
   }
-
-  if (m.includes("expensive") || m.includes("high") || (m.includes("price") && m.includes("too"))) {
-    return {
-      type: "PRICE_OBJECTION",
-      instruction: "USER OBJECTING TO PRICE.\nACTION: VALIDATE & PIVOT.\n1. Acknowledge briefly ('It is premium, yes.').\n2. Mention long-term battery savings (₹50k value in phone life).\n3. Re-state price ₹1499 is an investment, not a cost."
-    };
+  if (m.includes("expensive") || m.includes("too")) {
+    return { type: "PRICE_OBJECTION", instruction: "Pivot to battery savings." };
   }
-
-  if (m.includes("usd") || m.includes("dollar") || m.includes("$") || m.includes("convert")) {
-    return {
-      type: "PRICE_CURRENCY_CONVERSION",
-      instruction: "USER WANTS USD PRICE. \nOVERRIDE DEFAULT PRICE. \nDO NOT QUOTE INR ONLY.\nACTION: Say 'The price is approx $18 USD (₹1499 INR).'"
-    };
+  if (m.includes("buy") || m.includes("purchase")) {
+    return { type: "PURCHASE_INTENT", instruction: "Use escalate_to_human tool to pass to specialist." };
   }
-
-  if (m.includes("price") && (m.includes("what") || m.includes("tell") || m.includes("give"))) {
-    return {
-      type: "PRICE_QUESTION",
-      instruction: "USER ASKING PRICE.\nACTION: Answer ₹1499. Then ask: 'Should we discuss how it fits your usage?'"
-    };
-  }
-
-  if (m.includes("who are you") || m.includes("call me") || m.includes("waited") || m.includes("random") || m.includes("what?") || m.includes("throwing")) {
-    return {
-      type: "CONFUSION",
-      instruction: "USER IS CONFUSED.\nACTION: DE-ESCALATE.\n1. 'Apologies, I am Vijay from Hivericks.'\n2. 'Is this a good time?'"
-    };
-  }
-
-  if (m.includes("not interested") || m.includes("busy") || m.includes("don't want")) {
-    return {
-      type: "DISINTEREST",
-      instruction: "USER NOT INTERESTED.\nACTION: Say: 'No problem. Have a great day.'\nAPPEND: '[HANGUP]'" // Signal for system
-    };
-  }
-
-  if (m.includes("hang up") || m.includes("bye") || /\bend\b/i.test(m)) {
-    return {
-      type: "HANGUP_REQUEST",
-      instruction: "USER WANTS TO END.\nACTION: Say 'Goodbye'.\nAPPEND: '[HANGUP]'"
-    };
-  }
-
-  // 4. PURCHASE INTENT / EARLY ACCEPTANCE
-  // Detects: "buy", "purchase", "send bank details", "ready to pay"
-  // REMOVED: generic "details" (triggered by "product details")
-  if (m.includes("buy") || m.includes("purchase") || m.includes("ready to pay") || m.includes("price is fine") || (m.includes("details") && (m.includes("bank") || m.includes("pay") || m.includes("account")))) {
-    return {
-      type: "PURCHASE_INTENT",
-      instruction: "USER WANTS TO BUY. \nACTION: Congratulate them. \nTell them a Human Specialist will call them shortly to finalize the order. \nSay: 'Great choice! I have marked your order. A specialist will call you shortly to wrap this up.'"
-    };
-  }
-
-  return null; // Default: Proceed with normal flow
+  return null;
 };
 
 /* ---------------- CHANNEL MODES ---------------- */
@@ -139,21 +75,18 @@ const CHANNEL_RULES = {
   *** MODE: VOICE CALL (SPEED CRITICAL) ***
   - LENGTH: MAX 1 sentence (approx 15 words).
   - STYLE: Fast, casual, punchy.
-  - LOGIC: LOGIC-FIRST. If challenged, hit back with facts. Do not be submissive.
-  - CONTEXT: YOU ARE CURRENTLY ON THE PHONE WITH THE USER. DO NOT SUGGEST A CALL.
+  - CONTEXT: YOU ARE CURRENTLY ON THE PHONE WITH THE USER.
   `,
   SMS_CHAT: `
   *** MODE: WHATSAPP/SMS ***
   - LENGTH: Short text (under 160 chars).
   - STYLE: Professional but friendly.
-  - STRATEGY: If query is complex, suggest a 'Clarification Call'.
+  - STRATEGY: Use Tools to Schedule/Call if requested.
   `,
   EMAIL_REPLY: `
   *** MODE: EMAIL ***
   - Structured, Persuasive, & Detailed.
-  - LENGTH: Sufficient to explain product specs fully. Do not be artificially brief.
-  - CONTEXT RULE: You have access to previous history (SMS/Voice). USE it to be informed, but DO NOT reference the distinct channel.
-  - STRATEGY: Provide value. If specifications are asked, list them clearly.
+  - LENGTH: Sufficient to explain product specs fully.
   `
 };
 
@@ -165,14 +98,16 @@ function buildContext(memory = {}, mode) {
     .map(m => `${m.type}: ${m.content}`)
     .filter(line => !line.includes('system:') && !line.includes('CALL START') && !line.includes('CALL END'))
     .join("\n");
-
-  if (!recentHistory) return "Conversation Start.";
-  return `\nRECENT CONVERSATION:\n${recentHistory}`;
+  return recentHistory ? `\nRECENT CONVERSATION:\n${recentHistory}` : "Conversation Start.";
 }
 
-/* ---------------- LLM CALLER ---------------- */
+/* ---------------- LLM CALLER (MCP ENABLED) ---------------- */
 async function callLLM(systemPrompt, userMessage, isVoice, jsonMode = false) {
   console.log("   📝 LLM PROMPT (USER MSG):", JSON.stringify(userMessage));
+
+  const tools = getMCPTools();
+  console.log(`   🐛 DEBUG: Tools Available for LLM: ${tools.length}`);
+
   const payload = {
     model: MODEL,
     messages: [
@@ -181,121 +116,126 @@ async function callLLM(systemPrompt, userMessage, isVoice, jsonMode = false) {
     ],
     stream: false,
     format: jsonMode ? "json" : undefined,
+    // Provide Tools
+    tools: tools.length > 0 ? tools : undefined,
     options: {
       temperature: 0.6,
-      num_ctx: isVoice ? 1024 : 4096,
+      num_ctx: isVoice ? 2048 : 4096,
       num_predict: isVoice ? 60 : 600,
       stop: ["User:", "Assistant:", "\n\n"]
     }
   };
 
-  // CRITICAL: Reduced timeout for voice calls - must be LESS than outer timeout (3s)
-  // Set to 2.5s to ensure it fails before the Promise.race timeout in call_server.js
-  const timeoutMs = isVoice ? 10000 : 30000;
-
-  // #region agent log
-  const llmRequestStart = Date.now();
-  fetch('http://127.0.0.1:7242/ingest/9a7cfcbb-92ab-4e23-8e2c-dd5be07531c4', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'salesBot.js:139', message: 'OLLAMA_REQUEST_START', data: { isVoice, timeoutMs, model: MODEL, requestStart: llmRequestStart }, timestamp: llmRequestStart, sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) }).catch(() => { });
-  // #endregion
+  const timeoutMs = isVoice ? 20000 : 30000;
 
   try {
     const start = Date.now();
     const res = await axios.post(OLLAMA_URL, payload, { timeout: timeoutMs });
     const duration = Date.now() - start;
-
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/9a7cfcbb-92ab-4e23-8e2c-dd5be07531c4', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'salesBot.js:143', message: 'OLLAMA_REQUEST_COMPLETE', data: { duration, isVoice, responseReceived: !!res.data }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) }).catch(() => { });
-    // #endregion
-
     if (isVoice) console.log(`   ⚡ AI Speed: ${duration}ms`);
-    let text = String(res.data?.message?.content || "I didn't catch that.");
-    return text.replace(/<\|.*?\|>/g, "").replace(/\*/g, "").replace(/"/g, "").trim();
-  } catch (err) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/9a7cfcbb-92ab-4e23-8e2c-dd5be07531c4', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'salesBot.js:147', message: 'OLLAMA_REQUEST_ERROR', data: { error: err.message, isVoice, timeout: err.code === 'ECONNABORTED' }, timestamp: Date.now(), sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) }).catch(() => { });
-    // #endregion
 
+    const message = res.data?.message;
+    if (!message) return "I didn't catch that.";
+
+    // TOOL CALL HANDLING
+    if (message.tool_calls && message.tool_calls.length > 0) {
+      console.log(`   🛠️  AI Wants to use Tools: ${message.tool_calls.length}`);
+      for (const tool of message.tool_calls) {
+        try {
+          const result = await executeMCPTool(tool.function.name, tool.function.arguments);
+          payload.messages.push(message);
+          payload.messages.push({ role: "tool", content: result, name: tool.function.name });
+        } catch (toolErr) {
+          console.error(`      ❌ Tool Execution Failed: ${toolErr.message}`);
+          payload.messages.push({ role: "tool", content: `Error: ${toolErr.message}`, name: tool.function.name });
+        }
+      }
+      // Re-prompt after tool execution
+      console.log("   🔄 Re-prompting AI with Tool Results...");
+      const finalRes = await axios.post(OLLAMA_URL, payload, { timeout: timeoutMs });
+      let finalContent = finalRes.data?.message?.content || "Action completed.";
+      return finalContent.replace(/<\|.*?\|>/g, "").replace(/\*/g, "").replace(/"/g, "").trim();
+
+    } else {
+      return String(message.content || "I didn't catch that.").replace(/<\|.*?\|>/g, "").replace(/\*/g, "").replace(/"/g, "").trim();
+    }
+  } catch (err) {
     console.error("   ❌ LLM Error:", err.message);
     return isVoice ? "I'm having trouble hearing you." : "Connection error.";
   }
 }
 
-/* ---------------- SYSTEM LOGGING ---------------- */
-const LOG_FILE = path.join(__dirname, 'sales_bot_logs.json');
-
-const logSystemInteraction = (input, output, context) => {
-  const logs = fs.existsSync(LOG_FILE) ? JSON.parse(fs.readFileSync(LOG_FILE, 'utf8')) : [];
-  logs.push({
-    type: 'SYSTEM_HANDSHAKE',
-    timestamp: new Date().toISOString(),
-    input,
-    output,
-    context
-  });
-  fs.writeFileSync(LOG_FILE, JSON.stringify(logs, null, 2));
-};
-
 /* ---------------- MAIN EXPORT ---------------- */
-async function generateResponse({ userMessage, memory = {}, mode = 'SMS_CHAT' }) {
-
-  // 1. SYSTEM HANDSHAKE (PRE-WARM)
+async function generateResponse({ userMessage, memory = {}, mode = 'SMS_CHAT', leadContext = {} }) {
   if (userMessage === "SYSTEM_PREWARM_CONTEXT") {
     await callLLM("SYSTEM WARMUP", "Hello", true);
-    console.log("   🤖 SalesBot: Model Forced into Memory.");
     return "I AM READY";
   }
 
   const channelInstructions = CHANNEL_RULES[mode] || CHANNEL_RULES.SMS_CHAT;
   const isVoice = mode === 'VOICE_CALL';
-
-  // 2. DETECT INTENT (The "Router" Logic)
   const detectedIntent = detectIntent(userMessage, mode);
 
   let dynamicInstruction = "";
   if (detectedIntent) {
-    console.log(`   🧭 ROUTER: Detected Intent [${detectedIntent.type}] -> Injecting Override.`);
-    dynamicInstruction = `
-      *** CRITICAL OVERRIDE INSTRUCTIONS ***
-      ${detectedIntent.instruction}
-      **************************************
-      `;
+    console.log(`   🧭 ROUTER: Detected Intent [${detectedIntent.type}]`);
+    dynamicInstruction = `*** INTENT HINT: ${detectedIntent.instruction} ***`;
   }
 
-  // 3. CONSTRUCT THE "BRAIN" PROMPT
-  // Inject Summary Context into System Prompt (Background Knowledge)
   const backgroundContext = memory.summaryContext ? `\nPREVIOUS INTERACTION SUMMARY:\n${memory.summaryContext}\n` : "";
+  const userContext = leadContext.phone ? `USER_CONTEXT:\nName: ${leadContext.name || 'Unknown'}\nPhone: ${leadContext.phone}` : "";
 
   const systemPrompt = `
   ${SALES_IDENTITY}
+  ${userContext}
+  
+  *** TOOL USAGE RULES(CRITICAL) ***
+    1. When using tools (send_sms_message, trigger_voice_call, etc.), ONLY use the exact phone number listed in USER_CONTEXT.
+  2. NEVER pass descriptions(e.g. "the user") as the phone number. 
+  3. If USER_CONTEXT.phone is missing, ASK the user for it first.
+  4. To send SMS: Call send_sms_message("${leadContext.phone || 'ASK_USER'}", "Your message here").
 
-  PRODUCT INFO (Reference Only):
+  PRODUCT INFO:
   ${PRODUCT_KNOWLEDGE}
-
-  channel_instructions:
+  TECHNICAL KNOWLEDGE:
+  - You have access to a Documentation Library via the 'query-docs' tool.
+  - IF the user asks a technical question NOT in the Product Info(e.g.voltage ranges, specific protocols, installation deep - dives), USE 'query-docs'.
+  - DO NOT hallucinate technical specs.
+    channel_instructions:
   ${channelInstructions}
-
   ${backgroundContext}
-
   context:
   ${buildContext(memory, mode)}
-
   ${dynamicInstruction}
   `;
 
-  console.log(`   🧠 Vijay Thinking (${mode})...`);
-
-  // 4. EXECUTE
+  console.log(`   🧠 Vijay Thinking(${mode})...`);
   return await callLLM(systemPrompt, userMessage, isVoice);
 }
 
-/* ---------------- WARMUP UTILITY ---------------- */
+/* ---------------- UTILITIES ---------------- */
 async function warmup() {
   console.log("   🔥 System: Warming up SalesBot...");
-  // Force load with a dummy request
-  await callLLM("SYSTEM_WARMUP", "Hello", true);
-  console.log("   ✅ System: SalesBot Warm.");
+
+  // INIT MCP
+  try {
+    await initializeMCP();
+  } catch (e) {
+    console.warn("   ⚠️ MCP Init Failed (Is Ollama Running?):", e.message);
+  }
+
+  // FORCE MODEL LOAD
+  try {
+    await axios.get(OLLAMA_URL.replace('/api/chat', '/api/tags'), { timeout: 5000 });
+    console.log("   ✅ Ollama connection verified.");
+    await callLLM("SYSTEM WARMUP", "Hello", true);
+    console.log("   ✅ System: SalesBot Warm.");
+  } catch (e) {
+    console.error("   ❌ Ollama/LLM Startup Failed:", e.message);
+  }
 }
 
+// Keep existing Summarization functions mostly as is, they don't need Tools usually.
 /* ---------------- SUMMARIZATION ENGINE ---------------- */
 async function generateStructuredSummary(transcript) {
   console.log("   🔍 DEBUG: Using Robust Parser v2 in generateStructuredSummary");
@@ -303,23 +243,23 @@ async function generateStructuredSummary(transcript) {
   You are an expert Sales Analyst.
   Analyze the following conversation TRANSCRIPT.
   Return ONLY a raw JSON object summarizing the call.
+
+    CRITICAL: You must use DOUBLE QUOTES for ALL KEYS and ALL STRINGS.Do not use single quotes.Do not omit quotes.
   
-  CRITICAL: You must use DOUBLE QUOTES for ALL KEYS and ALL STRINGS. Do not use single quotes. Do not omit quotes.
-  
-  STRICT OUTPUT FORMAT (JSON):
+  STRICT OUTPUT FORMAT(JSON):
   {
     "interest_level": "high" | "medium" | "low" | "unknown",
-    "user_intent": "snake_case_intent_code",
-    "objections": "key objections or null",
-    "next_action": "recommended next step",
-    "conversation_summary": "REQUIRED. A minimum of 2 complete sentences summarizing the conversation naturally."
+      "user_intent": "snake_case_intent_code",
+        "objections": "key objections or null",
+          "next_action": "recommended next step",
+            "conversation_summary": "REQUIRED. A minimum of 2 complete sentences summarizing the conversation naturally."
   }
   `;
 
   try {
     // 1. Call LLM with JSON Mode
     const response = await callLLM(systemPrompt, transcript, false, true);
-    console.log(`      🤖 RAW SUMMARY RESPONSE: ${response}`);
+    console.log(`      🤖 RAW SUMMARY RESPONSE: ${response} `);
 
     if (!response || typeof response !== 'string') {
       throw new Error("Empty or invalid response from LLM");
@@ -334,7 +274,7 @@ async function generateStructuredSummary(transcript) {
       // Strategy: Regex match for each known field
       const extractField = (key, type = 'string') => {
         try {
-          const regex = new RegExp(`(?:["']?${key}["']?\\s*:\\s*)([^,]+?)(?:\\s*,\\s*["']?[a-z_]+["']?\\s*:|\\s*})`, 'i');
+          const regex = new RegExp(`(?: ["']?${key}["']?\\s*:\\s*)([^,]+?)(?:\\s*,\\s*["'] ? [a - z_] + ["']?\\s*:|\\s*})`, 'i');
           const match = response.match(regex);
           if (!match) return null;
 
@@ -391,46 +331,6 @@ async function generateStructuredSummary(transcript) {
   }
 }
 
-async function warmup() {
-  // Enhanced warmup: Use actual voice call configuration to properly load model
-  console.log("   🔥 System: Warming up SalesBot with voice call configuration...");
-
-  // Check Ollama connection first
-  try {
-    await axios.get(OLLAMA_URL.replace('/api/chat', '/api/tags'), { timeout: 30000 });
-    console.log("   ✅ Ollama connection verified.");
-  } catch (connErr) {
-    console.error("   ❌ WARNING: Cannot connect to Ollama. Is it running?", connErr.message);
-    console.log("   ⚠️ Warmup skipped. First call may be slow.");
-    return; // Don't fail startup if Ollama is not ready
-  }
-
-  // Warm up with a realistic voice call scenario to ensure full context is loaded
-  const warmupPrompt = "Hi, I'm interested in learning more.";
-  try {
-    const response = await generateResponse({
-      userMessage: warmupPrompt,
-      memory: { history: [], summaryContext: null },
-      mode: "VOICE_CALL"
-    });
-    if (response && response.length > 0) {
-      console.log("   ✅ System: SalesBot warm with voice configuration.");
-    } else {
-      throw new Error("Empty response from warmup");
-    }
-  } catch (e) {
-    // Fallback to simple warmup if full warmup fails
-    console.log(`   ⚠️ Full warmup failed (${e.message}), trying simple warmup...`);
-    try {
-      await callLLM("SYSTEM WARMUP", "Hello", true);
-      console.log("   ✅ System: SalesBot warm (simple mode).");
-    } catch (simpleErr) {
-      console.error("   ❌ Simple warmup also failed:", simpleErr.message);
-      console.log("   ⚠️ Model may not be loaded. First call will be slower.");
-    }
-  }
-}
-
 async function generateTextSummary(transcript) {
   const prompt = `
   You are an expert Sales Analyst.
@@ -445,7 +345,7 @@ async function generateTextSummary(transcript) {
 
   try {
     const response = await callLLM(prompt, transcript, false, false);
-    return response.trim().replace(/^"|"$/g, ''); // Clean quotes if any
+    return response.trim().replace(/^"|"$/g, '');
   } catch (e) {
     console.error("   ❌ Text Summary Failed:", e);
     return "Summary unavailable.";
@@ -508,7 +408,6 @@ async function generateFeedbackRequest(summaryText, mode = 'SMS') {
   `;
 
   try {
-    // Pass strictly: System (Rules) -> User (Content to process)
     return await callLLM(systemPrompt, `SUMMARY TO PROCESS:\n"${summaryText}"`, false, false);
   } catch (e) {
     return isEmail ? "Thank you for speaking with us. Please let us know if you have further questions." : "Thanks for the call! Let us know if you have any questions.";
@@ -524,4 +423,3 @@ module.exports = {
   generateFinalSummary,
   generateFeedbackRequest
 };
-

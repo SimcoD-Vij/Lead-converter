@@ -403,14 +403,20 @@ async function processCallCompletion(sid, leadPhone, convo, timestamp = null) {
 
             const scoreResult = calculateScore(leadContextForScore, leadIntent, updateStatus);
             finalScore = scoreResult.score;
+            finalCategory = scoreResult.category;
 
-            // Explicitly force penalties if the engine didn't catch it fully 
-            // (Engine logic depends on intent string, but we want mathematical certainty)
+            // Explicitly force penalties
             if (sentimentPenalty < 0) {
                 finalScore = Math.max(0, finalScore + sentimentPenalty);
-                scoreResult.category = 'COLD'; // Force cold
+                scoreResult.category = 'COLD';
             }
-            finalCategory = scoreResult.category;
+
+            // CRITICAL FIX: Do NOT overwrite Action Pending Statuses
+            const PROTECTED_STATUSES = ['SMS_SEND_REQUESTED', 'SMS_TO_CALL_REQUESTED', 'HUMAN_HANDOFF', 'SCHEDULE_CALL_REQUESTED'];
+            if (PROTECTED_STATUSES.includes(leadContextForScore.status)) {
+                console.log(`   🛡️  Keeping Protected Status: ${leadContextForScore.status} (Ignoring ${updateStatus})`);
+                updateStatus = leadContextForScore.status; // Keep existing
+            }
         }
 
         updateLeadStatus(leadPhone, updateStatus, JSON.stringify(finalSummary), finalScore, finalCategory, sid);
@@ -611,14 +617,26 @@ app.post('/voice/input', async (req, res) => {
         // Ah, line 595 calls logTurn which writes to file?
         // Let's verify logTurn. Assuming it writes.
         // If not, we should push it.
+        // Lookup Lead for Context (Tools need Phone)
+        let leadContext = {};
+        try {
+            const leads = readJSON(LEADS_FILE, []);
+            const found = leads.find(l => l.last_call_sid === callSid);
+            if (found) leadContext = found;
+        } catch (e) { }
+
         const memory = {
             history: convo, // Pass full history
-            lead: {}, // We might need lead context but simplified for now
-            summaryContext: null // TODO: pass summary context if available
+            summaryContext: null
         };
 
         console.log(`   ⚡ ASYNC: Playing filler ("${filler}") & Loading LLM...`);
-        const llmPromise = generateResponse({ userMessage: userSpeech, memory, mode: 'VOICE_CALL' });
+        const llmPromise = generateResponse({
+            userMessage: userSpeech,
+            memory,
+            mode: 'VOICE_CALL',
+            leadContext: leadContext
+        });
         pendingLLMRequests.set(callSid, llmPromise);
 
         const deferredTwiml = new twilio.twiml.VoiceResponse();
