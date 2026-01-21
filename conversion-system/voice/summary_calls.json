@@ -565,5 +565,131 @@
     "sid": "CA3d068f780565d5f875c5c995b492230e",
     "generated_at": "2026-01-13T05:55:00.654Z",
     "summary_text": "STRICTLY CONCISE SUMMARY \n- The user is interested in purchasing XOptimus Smart Charger (Wall Adapter) from Hivericks, indicating they are warm towards the product.\n- Due to security concerns, the assistant cannot provide WhatsApp details and instead offers assistance."
+  },
+  {
+    "event_id": "evt_1768819232675",
+    "lead_id": "+917604896187",
+    "sid": "CAbc8872cb7ba3a04e214de93c7eb1c3dc",
+    "generated_at": "2026-01-19T10:40:32.675Z",
+    "summary_text": "SUMMARY:\n- User's specific product interest: XOptimus\n- Current sentiment: Warm (User inquires about the product)\n- Final outcome and next step: The user would like to schedule a demo with Vijay."
+  },
+  {
+    "event_id": "evt_1768819537059",
+    "lead_id": "+917604896187",
+    "sid": "CAc6970652e9659ffadd8d43b1bda76076",
+    "generated_at": "2026-01-19T10:45:37.060Z",
+    "summary_text": "SUMMARY:\n- User's product interest: XOptimus\n- Current sentiment: Warm (Interest and curiosity)"
+  },
+  {
+    "event_id": "evt_1768820866790",
+    "lead_id": "+917604896187",
+    "sid": "CA331b3bef659d9fdc56775633658515ab",
+    "generated_at": "2026-01-19T11:07:46.790Z",
+    "summary_text": "SUMMARY:\nUser has expressed interest in the product XOptimus; current sentiment is HOT (likely due to the mention of XOptimus and Vijay's professional introduction). Final outcome is a call, and immediate next step is for the user to provide more information about their project or requirements."
+  },
+  {
+    "event_id": "evt_1768821072341",
+    "lead_id": "+917604896187",
+    "sid": "CAcf01f6b26a8054bf3ebc5d966110aa71",
+    "generated_at": "2026-01-19T11:11:12.341Z",
+    "summary_text": "SUMMARY \nUser's specific product interest: XOptimus\nCurrent sentiment: Warm (User inquired about the product)"
+  },
+  {
+    "event_id": "evt_1768821238483",
+    "lead_id": "+917604896187",
+    "sid": "CA06674927fac2f06746d4259166b7f795",
+    "generated_at": "2026-01-19T11:13:58.483Z",
+    "summary_text": "SUMMARY \n- User's specific product interest: XOptimus\n- User's current sentiment: Hot (Interest)\n- Final outcome of the call: Request for XOptimus demo and sales consultation\n- Immediate next step: Schedule a meeting with Vijay to discuss further."
+  },
+  {
+    "event_id": "evt_1768821381404",
+    "lead_id": "+917604896187",
+    "sid": "CA7a9f83242a0377efc47d0adc6046c5e5",
+    "generated_at": "2026-01-19T11:16:21.404Z",
+    "summary_text": "User Sentiment: Warm\nFinal Outcome: Sales Quote Requested (next step: Provide sales quote)\nSummary: The user is interested in learning more about XOptimus and has requested a sales quote for their specific product interest."
+  },
+  {
+    "event_id": "evt_1768821732262",
+    "lead_id": "+917604896187",
+    "sid": "CA8bea0ac79fb381b31e238ea7ce1cb4b3",
+    "generated_at": "2026-01-19T11:22:12.262Z",
+    "summary_text": "Summary: \n- User's specific product interest: XOptimus\n- Current sentiment: Hot (positive)\n- Final outcome of the call: The user is interested in learning more about XOptimus.\n- Immediate next step: Vijay will provide additional information and schedule a follow-up call to discuss further."
+  },
+  {
+    "event_id": "evt_1768821880477",
+    "lead_id": "+917604896187",
+    "sid": "CAbb0d067e59f72eee87cc55fac98b5db8",
+    "generated_at": "2026-01-19T11:24:40.477Z",
+    "summary_text": "Summary: The user has expressed interest in XOptimus and is seeking information about it.\nOutcome: The call will conclude with an explanation of the benefits of XOptimus for the user's specific needs.\nNext Step: Vijay will provide a detailed overview of XOptimus' features and how they can improve the user's current situation."
+  },
+  {
+    "event_id": "evt_1768887983562",
+    "lead_id": "+917604896187",
+    "sid": "CAa6b4048a969d5d7efd5e80df93313a2f",
+    "generated_at": "2026-01-20T05:46:23.562Z",
+    "summary_text": "USER: Yes, I'm interested in learning more about XOptimus. What makes it unique compared to other similar products? \nSentence 1: The user's current sentiment is HOT (positive interest and curiosity).\nSentence 2: The final outcome of the call is to provide a detailed product comparison between Hivericks and XOptimus, followed by an immediate next step for the user to schedule a demo."
+  },
+  {
+    "event_id": "evt_1768962608055",
+    "lead_id": "+917604896187",
+    "sid": "CA9942f8e070bf38450ab5c543327be86d",
+    "generated_at": "2026-01-21T02:30:08.055Z",
+    "summary_text": "CONCISE SUMMARY"
+  },
+  {
+    "event_id": "evt_1768962750946",
+    "lead_id": "+917604896187",
+    "sid": "CAf2c18b0543722887ebfc068dce86b9c6",
+    "generated_at": "2026-01-21T02:32:30.946Z",
+    "summary_text": "Summary:\nUser has expressed interest in XOptimus and their current sentiment is Warm."
+  },
+  {
+    "event_id": "evt_1768962812238",
+    "lead_id": "+917604896187",
+    "sid": "CA1156b83740ab1e0dc1f0954a9f4ec982",
+    "generated_at": "2026-01-21T02:33:32.238Z",
+    "summary_text": "SUMMARY:\n- User's specific product interest: XOptimus\n- Current sentiment: Warm (User has shown interest in the product)"
+  },
+  {
+    "event_id": "evt_1768962930882",
+    "lead_id": "+917604896187",
+    "sid": "CA7bbdda915d1454a2e575eb0040276c79",
+    "generated_at": "2026-01-21T02:35:30.882Z",
+    "summary_text": "SUMMARY:\n- User interest: Product review and recommendation for XOptimus.\n- User sentiment: Warm (interested in product features).\n- Final outcome: Discussion about the product's capabilities and pricing.\n- Next step: Request to schedule a demo call with Vijay."
+  },
+  {
+    "event_id": "evt_1768963000186",
+    "lead_id": "+917604896187",
+    "sid": "CA2e36e14bf94d07f22852a4bb6e51df6d",
+    "generated_at": "2026-01-21T02:36:40.186Z",
+    "summary_text": "Summary: The user has expressed interest in XOptimus, indicating they are looking for information about the product."
+  },
+  {
+    "event_id": "evt_1768963106769",
+    "lead_id": "+917604896187",
+    "sid": "CAdc364580e487ddc76b66cd031817913c",
+    "generated_at": "2026-01-21T02:38:26.769Z",
+    "summary_text": "SUMMARY \n- User's specific product interest: XOptimus (a smart home automation system)\n- Current sentiment: Hot (the user seems interested and engaged)"
+  },
+  {
+    "event_id": "evt_1768963169975",
+    "lead_id": "+917604896187",
+    "sid": "CAa592a8f5f84598762f07ff30a91785cd",
+    "generated_at": "2026-01-21T02:39:29.975Z",
+    "summary_text": "SUMMARY:\n- User's specific product interest: XOptimus (implied to be an AI-powered optimization tool)\n- Current sentiment: Warm (User has shown interest in the product and is willing to engage with Vijay)"
+  },
+  {
+    "event_id": "evt_1768963847376",
+    "lead_id": "+917604896187",
+    "sid": "CA8f716de24e69b965e1ffa31317408e29",
+    "generated_at": "2026-01-21T02:50:47.376Z",
+    "summary_text": "Summary:"
+  },
+  {
+    "event_id": "evt_1768963958138",
+    "lead_id": "+917604896187",
+    "sid": "CAe1ce0f88effdf661428ab91f95f51f41",
+    "generated_at": "2026-01-21T02:52:38.138Z",
+    "summary_text": "User interest: Hot\nUser sentiment: Warm\nFinal outcome of call: The user expressed satisfaction with the provided information about the product.\nImmediate next step: The user inquired about the price, which will be confirmed by Vijay via phone or email."
   }
 ]

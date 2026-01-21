@@ -1,14 +1,20 @@
 [
   {
-    "email": "teamtwilio@team.twilio.com",
-    "phone": "",
-    "name": "Anonymous Mail User",
-    "status": "HUMAN_HANDOFF",
-    "source": "ANONYMOUS_MAIL",
-    "attempt_count": 2,
-    "next_action_due": "2026-01-14",
+    "name": "Vijay R",
+    "phone": "+917604896187",
+    "email": "rsvijaypargavan@gmail.com",
+    "attempt_count": 4,
+    "next_action_due": "2026-01-22",
     "score": 80,
     "category": "HOT",
-    "last_updated": "2026-01-13T18:30:46.731Z"
+    "source": "SYSTEM",
+    "status": "SMS_SENT",
+    "imported_at": "2026-01-19T06:55:08.743Z",
+    "last_call_summary": "{\"lead_status\":\"UNKNOWN\",\"confidence_level\":\"low\",\"key_interests\":[],\"main_objections\":[],\"recommended_next_step\":\"manual_review\",\"generated_at\":\"2026-01-21T02:52:25.947Z\"}",
+    "last_updated": "2026-01-21T02:53:07.718Z",
+    "last_call_sid": "CAe1ce0f88effdf661428ab91f95f51f41",
+    "post_call_action_pending": false,
+    "last_interaction": "2026-01-21T02:52:38.525Z",
+    "last_sms_time": "2026-01-21T02:53:11.312Z"
   }
 ]

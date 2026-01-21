@@ -6,6 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawn, fork } = require('child_process');
+const axios = require('axios');
 
 console.log("\n🚀 MASTER ORCHESTRATOR: Initializing Unified System...");
 
@@ -102,7 +103,7 @@ const checkStickyChannel = (lead) => {
 
 const determineActions = (lead) => {
     // 0. GLOBAL HALT STATES
-    if (['DO_NOT_CONTACT', 'OPTED_OUT', 'COMPLETED', 'SMS_USER_STOP', 'HUMAN_HANDOFF', 'MAIL_COMPLETE'].includes(lead.status)) return [];
+    if (['DO_NOT_CONTACT', 'OPTED_OUT', 'COMPLETED', 'SMS_USER_STOP', 'HUMAN_HANDOFF'].includes(lead.status)) return [];
     if (lead.status.includes('HANDOFF')) return []; // Safety catch-all
 
     // 1. GRADUATION LOGIC (Attempt > 6 && Score >= 50)
@@ -114,6 +115,10 @@ const determineActions = (lead) => {
     if ((lead.attempt_count || 0) >= 6 && (lead.score || 0) >= 50) return [];
 
     if (['CALL_INITIATED', 'CALL_CONNECTED', 'CALL_IN_PROGRESS'].includes(lead.status)) return [];
+
+    // 1.5 STICKY CHANNEL (Prefer engaged channel)
+    const sticky = checkStickyChannel(lead);
+    if (sticky) return sticky;
 
     const now = new Date();
     const offsetd = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
@@ -507,13 +512,55 @@ const runOrchestrator = async () => {
                 const queued = await smsQueueManager.processInboundQueue();
                 if (queued > 0) console.log(`      ⚡ Voice Paused for SMS Queue.`);
 
-                // B. Dial
-                console.log(`      📞 Dialing ${lead.phone}...`);
-                const attemptBefore = lead.attempt_count || 0;
+                // B. PRE-CALL WARMUP (Zero Latency)
+                console.log(`      🔥 Warming up context for ${lead.phone}...`);
+                const { generateOpening } = require('../agent/salesBot');
 
-                const sid = await voiceEngine.dialLead(lead);
+                // 1. Generate Opening Text
+                let openingText = "Hi, this is Vijay from Hivericks.";
+                try {
+                    openingText = await generateOpening(lead);
+                    console.log(`      🗣️  Opening Line: "${openingText}"`);
+                } catch (e) {
+                    console.warn(`      ⚠️ Opening Gen Failed: ${e.message}`);
+                }
 
-                // C. Wait & Block (Exclusive Port Usage)
+                // 2. Audio Generation (Voice Clone)
+                let openingFile = null;
+                try {
+                    // Check if server is up
+                    const ttsUrl = 'http://localhost:8020/tts';
+                    /* 
+                       Note: api_server.py returns a STREAM. 
+                       We pipe it to a file directly.
+                    */
+                    console.log(`      🎙️  Generating Audio via Streaming Engine...`);
+                    const filename = `tts_${Date.now()}.mp3`;
+                    const outputPath = path.join(__dirname, '../voice/public/audio', filename);
+
+                    const writer = fs.createWriteStream(outputPath);
+                    const res = await axios.post(ttsUrl, { text: openingText, speed: 1.3 }, { responseType: 'stream' });
+
+                    res.data.pipe(writer);
+
+                    await new Promise((resolve, reject) => {
+                        writer.on('finish', resolve);
+                        writer.on('error', reject);
+                    });
+
+                    openingFile = filename;
+                    console.log(`      ✅ Audio Streamed & Saved: ${openingFile}`);
+                } catch (e) {
+                    console.warn(`      ⚠️ TTS Gen Failed (Fallback to Greeting): ${e.message}`);
+                }
+
+                // C. Dial (Pass Null to use 'greeting.wav')
+                console.log(`      📞 Dialing ${lead.phone}... (Using Standard Greeting)`);
+
+                // 3. DIAL 
+                const sid = await voiceEngine.dialLead(lead, openingFile);
+
+                // D. Wait & Block (Exclusive Port Usage)
                 if (sid) {
                     await waitForCallCompletion(lead.phone, sid);
 
@@ -545,12 +592,28 @@ const runOrchestrator = async () => {
 const waitForCallCompletion = async (phone, sid) => {
     // Poll logs until status is terminal
     const START = Date.now();
+    let loops = 0;
+
+    const smsQueuePath = path.join(__dirname, '../sms/inbound_sms_queue.json');
+    const emailQueuePath = path.join(__dirname, '../email/inbound_email_queue.json');
+
     while (Date.now() - START < 600000) { // 10 min max
         const leads = readJSON(LEADS_FILE);
         const l = leads.find(le => le.phone === phone);
         if (l && ['CALL_COMPLETED', 'CALL_BUSY', 'CALL_NO_ANSWER', 'CALL_DROPPED'].includes(l.status)) {
             return;
         }
+
+        // Observability: Log Queue Status every 10s
+        loops++;
+        if (loops % 10 === 0) {
+            const smsQ = readJSON(smsQueuePath);
+            const mailQ = readJSON(emailQueuePath);
+            if (smsQ.length > 0 || mailQ.length > 0) {
+                console.log(`      ⏳ Call In Progress... Buffering [SMS: ${smsQ.length} | Mail: ${mailQ.length}]`);
+            }
+        }
+
         await new Promise(r => setTimeout(r, 1000));
     }
     console.log("      ⚠️ Call Timeout (Logic).");

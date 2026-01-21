@@ -1,0 +1,27 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?",
+    "timestamp": "2026-01-21T02:49:50.392Z"
+  },
+  {
+    "role": "user",
+    "text": "Hello, hello. I am capable of hearing you",
+    "timestamp": "2026-01-21T02:49:58.098Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Vijay: Ah, finally! You're here. Yes, we can definitely help with that XOptimus Smart Charger. How can I assist you today? Do you have any questions about the product or would you like to know more about it?",
+    "timestamp": "2026-01-21T02:50:06.271Z"
+  },
+  {
+    "role": "user",
+    "text": "Well, what about the another voice?",
+    "timestamp": "2026-01-21T02:50:22.632Z"
+  },
+  {
+    "role": "assistant",
+    "text": "VOICE CALL",
+    "timestamp": "2026-01-21T02:50:25.407Z"
+  }
+]

@@ -991,9 +991,247 @@
           "text_summary": "STRICTLY CONCISE SUMMARY \n- The user is interested in purchasing XOptimus Smart Charger (Wall Adapter) from Hivericks, indicating they are warm towards the product.\n- Due to security concerns, the assistant cannot provide WhatsApp details and instead offers assistance."
         },
         "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1768819232678",
+        "timestamp": "2026-01-19T10:40:27.204Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "SUMMARY:\n- User's specific product interest: XOptimus\n- Current sentiment: Warm (User inquires about the product)\n- Final outcome and next step: The user would like to schedule a demo with Vijay.",
+          "generated_at": "2026-01-19T10:40:31.810Z",
+          "text_summary": "SUMMARY:\n- User's specific product interest: XOptimus\n- Current sentiment: Warm (User inquires about the product)\n- Final outcome and next step: The user would like to schedule a demo with Vijay."
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1768820866792",
+        "timestamp": "2026-01-19T11:07:39.629Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "SUMMARY:\nUser has expressed interest in the product XOptimus; current sentiment is HOT (likely due to the mention of XOptimus and Vijay's professional introduction). Final outcome is a call, and immediate next step is for the user to provide more information about their project or requirements.",
+          "generated_at": "2026-01-19T11:07:45.719Z",
+          "text_summary": "SUMMARY:\nUser has expressed interest in the product XOptimus; current sentiment is HOT (likely due to the mention of XOptimus and Vijay's professional introduction). Final outcome is a call, and immediate next step is for the user to provide more information about their project or requirements."
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1768821072342",
+        "timestamp": "2026-01-19T11:11:05.388Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "SUMMARY \nUser's specific product interest: XOptimus\nCurrent sentiment: Warm (User inquired about the product)",
+          "generated_at": "2026-01-19T11:11:11.755Z",
+          "text_summary": "SUMMARY \nUser's specific product interest: XOptimus\nCurrent sentiment: Warm (User inquired about the product)"
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1768821238485",
+        "timestamp": "2026-01-19T11:13:51.703Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "SUMMARY \n- User's specific product interest: XOptimus\n- User's current sentiment: Hot (Interest)\n- Final outcome of the call: Request for XOptimus demo and sales consultation\n- Immediate next step: Schedule a meeting with Vijay to discuss further.",
+          "generated_at": "2026-01-19T11:13:57.476Z",
+          "text_summary": "SUMMARY \n- User's specific product interest: XOptimus\n- User's current sentiment: Hot (Interest)\n- Final outcome of the call: Request for XOptimus demo and sales consultation\n- Immediate next step: Schedule a meeting with Vijay to discuss further."
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1768821381406",
+        "timestamp": "2026-01-19T11:16:14.495Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "User Sentiment: Warm\nFinal Outcome: Sales Quote Requested (next step: Provide sales quote)\nSummary: The user is interested in learning more about XOptimus and has requested a sales quote for their specific product interest.",
+          "generated_at": "2026-01-19T11:16:20.491Z",
+          "text_summary": "User Sentiment: Warm\nFinal Outcome: Sales Quote Requested (next step: Provide sales quote)\nSummary: The user is interested in learning more about XOptimus and has requested a sales quote for their specific product interest."
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1768821732264",
+        "timestamp": "2026-01-19T11:22:05.458Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "Summary: \n- User's specific product interest: XOptimus\n- Current sentiment: Hot (positive)\n- Final outcome of the call: The user is interested in learning more about XOptimus.\n- Immediate next step: Vijay will provide additional information and schedule a follow-up call to discuss further.",
+          "generated_at": "2026-01-19T11:22:11.146Z",
+          "text_summary": "Summary: \n- User's specific product interest: XOptimus\n- Current sentiment: Hot (positive)\n- Final outcome of the call: The user is interested in learning more about XOptimus.\n- Immediate next step: Vijay will provide additional information and schedule a follow-up call to discuss further."
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1768821880479",
+        "timestamp": "2026-01-19T11:24:26.116Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "Summary: The user has expressed interest in XOptimus and is seeking information about it.\nOutcome: The call will conclude with an explanation of the benefits of XOptimus for the user's specific needs.\nNext Step: Vijay will provide a detailed overview of XOptimus' features and how they can improve the user's current situation.",
+          "generated_at": "2026-01-19T11:24:39.332Z",
+          "text_summary": "Summary: The user has expressed interest in XOptimus and is seeking information about it.\nOutcome: The call will conclude with an explanation of the benefits of XOptimus for the user's specific needs.\nNext Step: Vijay will provide a detailed overview of XOptimus' features and how they can improve the user's current situation."
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1768887983566",
+        "timestamp": "2026-01-20T05:46:15.872Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "USER: Yes, I'm interested in learning more about XOptimus. What makes it unique compared to other similar products? \nSentence 1: The user's current sentiment is HOT (positive interest and curiosity).\nSentence 2: The final outcome of the call is to provide a detailed product comparison between Hivericks and XOptimus, followed by an immediate next step for the user to schedule a demo.",
+          "generated_at": "2026-01-20T05:46:22.219Z",
+          "text_summary": "USER: Yes, I'm interested in learning more about XOptimus. What makes it unique compared to other similar products? \nSentence 1: The user's current sentiment is HOT (positive interest and curiosity).\nSentence 2: The final outcome of the call is to provide a detailed product comparison between Hivericks and XOptimus, followed by an immediate next step for the user to schedule a demo."
+        },
+        "attempt_count": 5
+      },
+      {
+        "event_id": "evt_1768962608080",
+        "timestamp": "2026-01-21T02:30:00.024Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "CONCISE SUMMARY",
+          "generated_at": "2026-01-21T02:30:07.684Z",
+          "text_summary": "CONCISE SUMMARY"
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1768962750964",
+        "timestamp": "2026-01-21T02:32:25.630Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "Summary:\nUser has expressed interest in XOptimus and their current sentiment is Warm.",
+          "generated_at": "2026-01-21T02:32:30.452Z",
+          "text_summary": "Summary:\nUser has expressed interest in XOptimus and their current sentiment is Warm."
+        },
+        "attempt_count": 4
+      },
+      {
+        "event_id": "evt_1768962812264",
+        "timestamp": "2026-01-21T02:33:26.224Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "SUMMARY:\n- User's specific product interest: XOptimus\n- Current sentiment: Warm (User has shown interest in the product)",
+          "generated_at": "2026-01-21T02:33:31.644Z",
+          "text_summary": "SUMMARY:\n- User's specific product interest: XOptimus\n- Current sentiment: Warm (User has shown interest in the product)"
+        },
+        "attempt_count": 5
+      },
+      {
+        "event_id": "evt_1768962930903",
+        "timestamp": "2026-01-21T02:35:24.089Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "SUMMARY:\n- User interest: Product review and recommendation for XOptimus.\n- User sentiment: Warm (interested in product features).\n- Final outcome: Discussion about the product's capabilities and pricing.\n- Next step: Request to schedule a demo call with Vijay.",
+          "generated_at": "2026-01-21T02:35:29.952Z",
+          "text_summary": "SUMMARY:\n- User interest: Product review and recommendation for XOptimus.\n- User sentiment: Warm (interested in product features).\n- Final outcome: Discussion about the product's capabilities and pricing.\n- Next step: Request to schedule a demo call with Vijay."
+        },
+        "attempt_count": 2
+      },
+      {
+        "event_id": "evt_1768963000206",
+        "timestamp": "2026-01-21T02:36:33.079Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "Summary: The user has expressed interest in XOptimus, indicating they are looking for information about the product.",
+          "generated_at": "2026-01-21T02:36:39.628Z",
+          "text_summary": "Summary: The user has expressed interest in XOptimus, indicating they are looking for information about the product."
+        },
+        "attempt_count": 3
+      },
+      {
+        "event_id": "evt_1768963106790",
+        "timestamp": "2026-01-21T02:38:20.579Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "SUMMARY \n- User's specific product interest: XOptimus (a smart home automation system)\n- Current sentiment: Hot (the user seems interested and engaged)",
+          "generated_at": "2026-01-21T02:38:26.118Z",
+          "text_summary": "SUMMARY \n- User's specific product interest: XOptimus (a smart home automation system)\n- Current sentiment: Hot (the user seems interested and engaged)"
+        },
+        "attempt_count": 4
+      },
+      {
+        "event_id": "evt_1768963170002",
+        "timestamp": "2026-01-21T02:39:22.768Z",
+        "summary": {
+          "interest_level": "low",
+          "user_intent": "short_call_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "SUMMARY:\n- User's specific product interest: XOptimus (implied to be an AI-powered optimization tool)\n- Current sentiment: Warm (User has shown interest in the product and is willing to engage with Vijay)",
+          "generated_at": "2026-01-21T02:39:29.100Z",
+          "text_summary": "SUMMARY:\n- User's specific product interest: XOptimus (implied to be an AI-powered optimization tool)\n- Current sentiment: Warm (User has shown interest in the product and is willing to engage with Vijay)"
+        },
+        "attempt_count": 5
+      },
+      {
+        "event_id": "evt_1768963847401",
+        "timestamp": "2026-01-21T02:50:34.327Z",
+        "summary": {
+          "interest_level": "medium",
+          "user_intent": "engaged_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "Summary:",
+          "generated_at": "2026-01-21T02:50:47.115Z",
+          "text_summary": "Summary:"
+        },
+        "attempt_count": 2
+      },
+      {
+        "event_id": "evt_1768963958160",
+        "timestamp": "2026-01-21T02:52:25.947Z",
+        "summary": {
+          "interest_level": "medium",
+          "user_intent": "engaged_fallback",
+          "objections": null,
+          "next_action": "check",
+          "conversation_summary": "User interest: Hot\nUser sentiment: Warm\nFinal outcome of call: The user expressed satisfaction with the provided information about the product.\nImmediate next step: The user inquired about the price, which will be confirmed by Vijay via phone or email.",
+          "generated_at": "2026-01-21T02:52:37.260Z",
+          "text_summary": "User interest: Hot\nUser sentiment: Warm\nFinal outcome of call: The user expressed satisfaction with the provided information about the product.\nImmediate next step: The user inquired about the price, which will be confirmed by Vijay via phone or email."
+        },
+        "attempt_count": 3
       }
     ],
-    "master_summary": "STRICTLY CONCISE SUMMARY \n- The user is interested in purchasing XOptimus Smart Charger (Wall Adapter) from Hivericks, indicating they are warm towards the product.\n- Due to security concerns, the assistant cannot provide WhatsApp details and instead offers assistance.",
+    "master_summary": "User interest: Hot\nUser sentiment: Warm\nFinal outcome of call: The user expressed satisfaction with the provided information about the product.\nImmediate next step: The user inquired about the price, which will be confirmed by Vijay via phone or email.",
     "last_processed_time": "2026-01-06T16:21:59.692Z",
     "final_summary": {
       "lead_status": "UNKNOWN",
@@ -1001,9 +1239,9 @@
       "key_interests": [],
       "main_objections": [],
       "recommended_next_step": "manual_review",
-      "generated_at": "2026-01-13T05:54:47.945Z"
+      "generated_at": "2026-01-21T02:52:25.947Z"
     },
-    "last_updated": "2026-01-13T05:54:47.945Z"
+    "last_updated": "2026-01-21T02:52:25.947Z"
   },
   {
     "lead_id": "UNKNOWN_NUMBER",
