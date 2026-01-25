@@ -82,12 +82,12 @@ const isCallTime = () => {
 // ---------------------------------------------------------
 
 const TIMELINE_ACTIONS = [
-    ['SMS', 'MAIL'],        // Day 1
-    ['SMS', 'MAIL'],        // Day 2
-    ['VOICE'],              // Day 3
-    ['SMS', 'MAIL'],        // Day 5
-    ['VOICE'],              // Day 7
-    ['SMS', 'MAIL'],        // Day 10
+    ['SMS', 'MAIL'],        // Attempt 0 (Day 1)
+    ['SMS', 'MAIL'],        // Attempt 1 (Day 2)
+    ['VOICE', 'MAIL'],      // Attempt 2 (Day 3) - Added MAIL here to catch leads
+    ['SMS', 'MAIL'],        // Attempt 3 (Day 5)
+    ['VOICE'],              // Attempt 4 (Day 7)
+    ['SMS', 'MAIL'],        // Attempt 5 (Day 10)
     ['VOICE'],              // Day 14
     ['SMS', 'MAIL'],        // Attempt 7
     ['VOICE'],              // Attempt 8
@@ -453,7 +453,7 @@ const runOrchestrator = async () => {
 
             // DYNAMIC CONTENT GENERATION (Replcaing Templates)
             // Context: Use last call summary or just general "Follow up"
-            let summaryText = "our previous attempts to reach you";
+            let summaryText = "";
             if (lead.last_call_summary) {
                 try {
                     const s = JSON.parse(lead.last_call_summary);
@@ -461,18 +461,44 @@ const runOrchestrator = async () => {
                 } catch (e) { }
             }
 
-            console.log(`      ✨ Generating Dynamic Email for ${lead.email}...`);
-            const fullMsg = await generateFeedbackRequest(summaryText, 'EMAIL');
+            // MNC-GRADE GENERATION & VALIDATION LOOP
+            const { validateEmailContent } = require('../utils/emailValidator');
+            let fullMsg = "";
+            let isValid = false;
+            let attempts = 0;
+            const MAX_ATTEMPTS = 2;
 
-            // Parse Subject
+            while (!isValid && attempts < MAX_ATTEMPTS) {
+                attempts++;
+                if (attempts > 1) console.log(`      ⚠️ Retry ${attempts}/${MAX_ATTEMPTS}: Regenerating Email due to validation failure...`);
+
+                fullMsg = await generateFeedbackRequest(summaryText, 'EMAIL', lead.name, lead.attempt_count || 0);
+
+                const validation = validateEmailContent(fullMsg.trim());
+                if (validation.valid) {
+                    isValid = true;
+                } else {
+                    console.warn(`      ❌ Validation Failed (Attempt ${attempts}): ${validation.reason}`);
+                }
+            }
+
+            if (!isValid) {
+                console.error("      ⛔ EMAIL GENERATION ABORTED: Failed validation after retries.");
+                // Skip sending, log error, maybe flag lead for manual review
+                continue;
+            }
+
+            // Parse Subject (Safe now because validation guaranteed "Subject:" exists)
             let subject = "Follow up from Hivericks";
             let body = fullMsg;
 
-            const subjectMatch = fullMsg.match(/SUBJECT:\s*(.+)(\r?\n|$)/i);
+            const subjectMatch = fullMsg.match(/^Subject:\s*(.+)(\r?\n|$)/i);
             if (subjectMatch) {
                 subject = subjectMatch[1].trim();
                 body = fullMsg.replace(subjectMatch[0], '').trim();
             }
+
+            console.log("      ✅ FINAL_EMAIL_APPROVED");
 
             const sent = await emailEngine.sendEmail(lead, subject, body);
 

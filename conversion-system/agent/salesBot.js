@@ -102,7 +102,7 @@ function buildContext(memory = {}, mode) {
 }
 
 /* ---------------- LLM CALLER (MCP ENABLED) ---------------- */
-async function callLLM(systemPrompt, userMessage, isVoice, jsonMode = false) {
+async function callLLM(systemPrompt, userMessage, isVoice, jsonMode = false, enableTools = true) {
   console.log("   📝 LLM PROMPT (USER MSG):", JSON.stringify(userMessage));
 
   const tools = getMCPTools();
@@ -117,12 +117,12 @@ async function callLLM(systemPrompt, userMessage, isVoice, jsonMode = false) {
     stream: false,
     format: jsonMode ? "json" : undefined,
     // Provide Tools
-    tools: tools.length > 0 ? tools : undefined,
+    tools: (tools.length > 0 && enableTools) ? tools : undefined,
     options: {
       temperature: 0.6,
       num_ctx: isVoice ? 2048 : 4096,
       num_predict: isVoice ? 60 : 600,
-      stop: ["User:", "Assistant:", "\n\n"]
+      stop: ["User:", "Assistant:"]
     }
   };
 
@@ -238,27 +238,40 @@ async function warmup() {
 // Keep existing Summarization functions mostly as is, they don't need Tools usually.
 /* ---------------- SUMMARIZATION ENGINE ---------------- */
 async function generateStructuredSummary(transcript) {
-  console.log("   🔍 DEBUG: Using Robust Parser v2 in generateStructuredSummary");
+  console.log("   🔍 DEBUG: Using Robust Parser v3 (Surgical) in generateStructuredSummary");
   const systemPrompt = `
-  You are an expert Sales Analyst.
-  Analyze the following conversation TRANSCRIPT.
-  Return ONLY a raw JSON object summarizing the call.
+You are a Senior Sales Intelligence Engine.
 
-    CRITICAL: You must use DOUBLE QUOTES for ALL KEYS and ALL STRINGS.Do not use single quotes.Do not omit quotes.
-  
-  STRICT OUTPUT FORMAT(JSON):
-  {
-    "interest_level": "high" | "medium" | "low" | "unknown",
-      "user_intent": "snake_case_intent_code",
-        "objections": "key objections or null",
-          "next_action": "recommended next step",
-            "conversation_summary": "REQUIRED. A minimum of 2 complete sentences summarizing the conversation naturally."
-  }
+INPUT: A raw call transcript.
+OUTPUT: ONLY a valid JSON object. No prose. No explanations.
+
+RULES:
+- Be factual, not polite.
+- Infer intent conservatively.
+- If information is missing, use null or "unknown".
+- Do NOT exceed requested length limits.
+
+RETURN THIS EXACT JSON STRUCTURE:
+{
+  "interest_level": "high" | "medium" | "low" | "unknown",
+  "user_intent": "snake_case_sales_intent",
+  "objections": "short phrase or null",
+  "next_action": "single concrete action",
+  "conversation_summary": "Max 35 words. Exactly 2 sentences. No filler."
+}
+
+DEFINITIONS:
+- interest_level:
+  high = explicit buying signals or urgency
+  medium = curiosity or evaluation
+  low = vague interest or disengaged
+- user_intent examples:
+  request_pricing, request_demo, comparison, follow_up_later, not_interested
   `;
 
   try {
     // 1. Call LLM with JSON Mode
-    const response = await callLLM(systemPrompt, transcript, false, true);
+    const response = await callLLM(systemPrompt, transcript, false, true, false);
     console.log(`      🤖 RAW SUMMARY RESPONSE: ${response} `);
 
     if (!response || typeof response !== 'string') {
@@ -333,19 +346,35 @@ async function generateStructuredSummary(transcript) {
 
 async function generateTextSummary(transcript) {
   const prompt = `
-  You are an expert Sales Analyst.
-  Read the following conversation transcript between an ASSISTANT and a USER.
-  
-  TASK:
-  Write a STRICTLY CONCISE summary (Max 2 sentences).
-  - Sentence 1: Clearly state the user's specific product interest and current sentiment (Hot/Warm/Cold).
-  - Sentence 2: State the final outcome of the call and the immediate next step.
-  - No fluff. No meta-context (e.g., "The user contacted..."). Jump straight to facts.
+You generate SALES-READY summaries for internal teams.
+
+INPUT: Assistant–User call transcript.
+
+OUTPUT RULES:
+- EXACTLY 2 sentences.
+- Max 25 words total.
+- No greetings. No background. No meta language.
+- Start immediately with the user's intent.
+
+FORMAT:
+Sentence 1: User interest + sentiment (Hot/Warm/Cold).
+Sentence 2: Call outcome + next step.
+
+EXAMPLES:
+"Interested in enterprise CRM pricing, Warm. Requested demo link; follow-up scheduled tomorrow."
+"Evaluated basic plan features, Cold. No commitment; re-engage next quarter."
+
+TRANSCRIPT:
+${transcript}
   `;
 
   try {
-    const response = await callLLM(prompt, transcript, false, false);
-    return response.trim().replace(/^"|"$/g, '');
+    const response = await callLLM(prompt, transcript, false, false, false);
+    // STRICT CLEANING: Remove "Here is...", quotes, and leading newlines
+    let clean = response.trim().replace(/^"|"$/g, '');
+    clean = clean.replace(/^Here is (the|a) (summary|generated).*/i, '').trim();
+    if (clean.includes(":")) clean = clean.split(":").pop().trim(); // Remove "Summary:" label if present
+    return clean;
   } catch (e) {
     console.error("   ❌ Text Summary Failed:", e);
     return "Summary unavailable.";
@@ -354,64 +383,182 @@ async function generateTextSummary(transcript) {
 
 async function generateFinalSummary(allSummaries) {
   const prompt = `
-  Analyze this timeline of interaction summaries:
-  ${JSON.stringify(allSummaries)}
+You are aggregating a sales lead history.
 
-  Generate a MASTER SUMMARY of the lead's journey so far.
-  - Current status?
-  - Main objections?
-  - Next recommended step?
-  RETURN JSON: { "lead_status": "...", "confidence_level": "...", "key_interests": [], "main_objections": [], "recommended_next_step": "..." }
+INPUT: Chronological interaction summaries (JSON array).
+
+TASK:
+Condense the entire history into a single decision snapshot.
+Focus on CURRENT state only.
+
+OUTPUT: ONLY valid JSON.
+
+RETURN THIS STRUCTURE:
+{
+  "lead_status": "new" | "engaged" | "qualified" | "stalled" | "lost",
+  "confidence_level": "high" | "medium" | "low",
+  "key_interests": ["concise noun phrases"],
+  "main_objections": ["concise noun phrases"],
+  "recommended_next_step": "single concrete action"
+}
+
+RULES:
+- Do NOT repeat old details unless still relevant.
+- Max 5 words per array item.
+- If uncertain, downgrade confidence.
+
+INPUT DATA:
+${JSON.stringify(allSummaries)}
   `;
 
   try {
-    const response = await callLLM(prompt, "History Analysis", false, true);
+    const response = await callLLM(prompt, "History Analysis", false, true, false);
     return JSON.parse(response);
   } catch (e) {
     return { lead_status: "UNKNOWN", confidence_level: "low", key_interests: [], main_objections: [], recommended_next_step: "manual_review" };
   }
 }
 
-async function generateFeedbackRequest(summaryText, mode = 'SMS') {
+async function generateFeedbackRequest(summaryText, mode = 'SMS', leadName = "Customer", attemptCount = 0) {
   const isEmail = mode === 'EMAIL';
 
+  // Dynamic Context & Example
+  let contextType = "GENERAL FOLLOW-UP";
+  let contextInstruction = "Write a professional follow-up based on the previous interaction.";
+  let dynamicExample = "";
+
+  if (!summaryText || summaryText.includes("previous attempts")) {
+    if (attemptCount <= 2) {
+      contextType = "INITIAL OUTREACH (COLD)";
+      contextInstruction = "This is a FIRST-TIME introductions. You are reaching out to a new prospect. Introduce XOptimus charging solutions. DO NOT say 'follow up' or 'previous conversation'.";
+      dynamicExample = `
+### REFERENCE EXAMPLE (COLD / INTRO) ###
+Subject: Optimizing your EV Fleet costs
+Dear [Prospect Name],
+
+We noticed your company is expanding its logistics fleet and wanted to introduce XOptimus.
+
+Our smart charging technology typically reduces battery degradation by 15% and cuts energy costs. Are you open to a brief chat about your current charging infrastructure?
+
+Best regards,
+Vijay
+Hivericks Team
+### END EXAMPLE ###`;
+    } else {
+      contextType = "PERSISTENT FOLLOW-UP";
+      contextInstruction = "We have tried to reach this lead multiple times. politely ask if they are still interested.";
+      dynamicExample = `
+### REFERENCE EXAMPLE (FOLLOW-UP) ###
+Subject: Re: Our previous discussion on EV Chargers
+Dear [Client Name],
+
+I am writing to follow up on my previous note. We are still holding the bulk pricing quote for you.
+
+Do you have any questions I can answer before you make a decision?
+
+Best regards,
+Vijay
+Hivericks Team
+### END EXAMPLE ###`;
+    }
+  } else {
+    // WARM LEAD WITH SUMMARY
+    contextType = "CONTEXTUAL REPLY";
+    contextInstruction = "Reply to the specific points in the summary. Handle objections or provide requested info.";
+    dynamicExample = `
+### REFERENCE EXAMPLE (CONTEXTUAL) ###
+Subject: XOptimus Specs and Pricing
+Dear [Client Name],
+
+Thank you for the call earlier.
+
+Regarding your question about heat management: Yes, our chargers use active thermal regulation to keep battery temps under 40°C.
+
+I have attached the spec sheet below. Let me know if this works for your team.
+
+Best regards,
+Vijay
+Hivericks Team
+### END EXAMPLE ###`;
+  }
+
   const systemPrompt = `
-  You are an expert Sales Communication AI.
-  Your task is to draft a follow-up message for a client based on a call summary.
-  
-  MODE: ${isEmail ? 'FORMAL EMAIL' : 'SMS/WHATSAPP'}
-  
-  ${isEmail ? `
-  EMAIL STRUCTURE:
-  1. Subject: Summary of Discussion
-  2. Salutation: "Dear Customer,"
-  3. Body:
-     - "As per our discussion regarding [Key Topic]..."
-     - Recap value.
-  4. Closing: "Best Regards, Vijay, Senior Consultant, Hivericks."
-  
-  CONSTRAINTS:
-  - Do NOT include placeholders like [Subject]. Fill them based on summary.
-  - Tone: Professional, Consultant-like.
-  ` : `
-  SMS STRUCTURE:
-  - Max 25 words.
-  - Casual but professional.
-  `}
-  
-  CRITICAL OUTPUT RULES:
-  - RETURN ONLY THE FINAL MESSAGE TEXT.
-  - DO NOT start with "Here is the email", "Here is the message", or "Subject:".
-  - DO NOT include conversational filler or meta-commentary.
-  - START DIRECTLY with the body content (e.g., "Hi [Name], ...").
-  - JUST the message body.
+You are a B2B Sales Operations Assistant writing client-facing messages.
+
+TO: ${leadName}
+CONTEXT_TYPE: ${contextType}
+INSTRUCTION: ${contextInstruction}
+
+PRODUCT CONTEXT:
+${PRODUCT_KNOWLEDGE}
+
+${dynamicExample}
+MODE: ${isEmail ? 'FORMAL EMAIL' : 'SMS / WHATSAPP'}
+
+ABSOLUTE RULES:
+- DO NOT mention systems, templates, platforms, tools, or technical limitations.
+- DO NOT explain what you are doing.
+- DO NOT include placeholders or commentary.
+- Output ONLY the final message content.
+- CRITICAL: You MUST include a "Subject:" line for emails.
+- CRITICAL: You MUST include a salutation like "Dear <Name>," or "Hi <Name>," immediately after the Subject.
+- CRITICAL: DO NOT start with "Here is...", "Subject: ...", or repeat the user command. Start directly with the "Subject:".
+If sufficient details are unavailable, write a neutral professional follow-up requesting clarification.
+DO NOT explain limitations or tools.
+
+${isEmail ? `
+EMAIL REQUIREMENTS:
+- Tone: Professional, formal, concise.
+- Audience: Business client.
+- Grammar must be corporate-grade.
+
+### STYLE GUIDE (STRICT TEMPLATE) ###
+Subject: <Write a subject relevant to the context>
+
+Dear <Lead Name>,
+
+<Opening: Polite and context-aware (Intro or Follow-up)>
+
+<Body: Value proposition or specific question>
+
+<Closing: Professional sign-off>
+Best regards,
+Vijay
+Hivericks Team
+
+### END STYLE GUIDE ###
+
+EMAIL FORMAT (STRICT):
+Dear <Customer>,
+
+<2–3 short paragraphs>
+- Paragraph 1: Polite opening + reference to discussion.
+- Paragraph 2: Value recap or outcome from the call.
+- Paragraph 3: Clear next step or action request.
+
+Closing line (professional):
+"Kind regards,"
+
+<Company / Team Name>
+` : `
+SMS REQUIREMENTS:
+- Tone: Polite, concise, professional.
+- Max 2 sentences.
+- No emojis.
+- No greetings beyond one short line.
+`}
+
+INPUT SUMMARY:
+"${summaryText}"
   `;
 
-  try {
-    return await callLLM(systemPrompt, `SUMMARY TO PROCESS:\n"${summaryText}"`, false, false);
-  } catch (e) {
-    return isEmail ? "Thank you for speaking with us. Please let us know if you have further questions." : "Thanks for the call! Let us know if you have any questions.";
-  }
+  return await callLLM(
+    systemPrompt,
+    `SYSTEM_COMMAND: GENERATE_BODY_ONLY`,
+    false,
+    false,
+    false
+  );
 }
 
 module.exports = {

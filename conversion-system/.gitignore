@@ -1,0 +1,12 @@
+node_modules/
+context7-server/
+.env
+*.log
+verification_output.txt
+processed_leads/
+voice/voice_conversations/
+sms/sms_history.json
+system_state.json
+brain/
+.system_generated/
+.gemini/
