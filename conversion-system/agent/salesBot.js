@@ -198,8 +198,8 @@ async function generateResponse({ userMessage, memory = {}, mode = 'SMS_CHAT', l
   PRODUCT INFO:
   ${PRODUCT_KNOWLEDGE}
   TECHNICAL KNOWLEDGE:
-  - You have access to a Documentation Library via the 'query-docs' tool.
-  - IF the user asks a technical question NOT in the Product Info(e.g.voltage ranges, specific protocols, installation deep - dives), USE 'query-docs'.
+  - You have access to a Documentation Library via the 'resolve-library-id' tool.
+  - IF the user asks a technical question NOT in the Product Info, USE 'resolve-library-id' with arguments: { "libraryName": "xoptimus-docs", "query": "user question" }.
   - DO NOT hallucinate technical specs.
     channel_instructions:
   ${channelInstructions}
@@ -561,6 +561,35 @@ INPUT SUMMARY:
   );
 }
 
+async function generateOpening(lead) {
+  const systemPrompt = `
+  You are Vijay, a Senior Consultant at Hivericks.
+  Your goal is to start a Voice Call with a lead.
+  
+  TASK:
+  Generate a single, short, friendly opening sentence.
+  - Mention their name if known.
+  - State the purpose: Following up on their interest in XOptimus.
+  - End with a simple hook like "Do you have a minute?"
+  
+  CONTEXT:
+  Name: ${lead.name || 'there'}
+  Source: ${lead.source || 'Website'}
+  
+  OUTPUT RULES:
+  - Max 20 words.
+  - Natural, spoken style.
+  - NO "Subject:", NO quotes.
+  - IMPORTANT: DO NOT USE ANY TOOLS. JUST GENERATE TEXT.
+  `;
+
+  try {
+    return await callLLM(systemPrompt, "Generate Opening", false, false);
+  } catch (e) {
+    return `Hi ${lead.name || 'there'}, this is Vijay from Hivericks regarding the XOptimus charger. Do you have a minute?`;
+  }
+}
+
 module.exports = {
   detectIntent,
   generateResponse,
@@ -568,5 +597,6 @@ module.exports = {
   generateStructuredSummary,
   generateTextSummary,
   generateFinalSummary,
-  generateFeedbackRequest
+  generateFeedbackRequest,
+  generateOpening
 };

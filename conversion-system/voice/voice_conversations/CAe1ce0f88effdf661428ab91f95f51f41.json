@@ -1,0 +1,27 @@
+[
+  {
+    "role": "assistant",
+    "text": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?",
+    "timestamp": "2026-01-21T02:51:31.181Z"
+  },
+  {
+    "role": "user",
+    "text": "Hello, hello. Yeah, is it Audible?",
+    "timestamp": "2026-01-21T02:51:39.897Z"
+  },
+  {
+    "role": "assistant",
+    "text": "No, Vijay R, I'm afraid not. You mentioned earlier that you're interested in the XOptimus Smart Charger (Wall Adapter). The product name is actually XOptimus Smart Charger and it's from Hivericks Technologies Pvt Ltd, Chennai.",
+    "timestamp": "2026-01-21T02:51:47.809Z"
+  },
+  {
+    "role": "user",
+    "text": "Yes, I want to know the price but the voice is not the same as my clothes.",
+    "timestamp": "2026-01-21T02:52:13.375Z"
+  },
+  {
+    "role": "assistant",
+    "text": "Your XOptimus Smart Charger (Wall Adapter) is priced at ₹1499. It's a great value for its performance and features, considering the technology used.",
+    "timestamp": "2026-01-21T02:52:16.757Z"
+  }
+]

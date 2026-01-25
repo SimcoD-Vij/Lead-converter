@@ -47,6 +47,9 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// SERVE STATIC AUDIO (Generated + Pre-recorded)
+app.use('/audio', express.static(path.join(__dirname, 'public/audio')));
+
 const PORT = 3000;
 const pendingLLMRequests = new Map(); // Store active LLM promises by CallSid
 
@@ -63,7 +66,10 @@ app.post('/voice/deferred-response', async (req, res) => {
             console.error(`   ❌ No pending promise found for ${callSid}`);
             // Fallback: Just ask to repeat
             const twiml = new twilio.twiml.VoiceResponse();
-            twiml.gather({ input: 'speech', action: '/voice/input' }).say(VOICE_CONFIG, "I didn't catch that. Could you say it again?");
+            // twiml.gather({ input: 'speech', action: '/voice/input' }).say(VOICE_CONFIG, "I didn't catch that. Could you say it again?");
+            const gather = twiml.gather({ input: 'speech', action: '/voice/input' });
+            const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
+            gather.play(`${SERVER_URL}/audio/error_repeat.wav`);
             return res.type('text/xml').send(twiml.toString());
         }
 
@@ -97,7 +103,18 @@ app.post('/voice/deferred-response', async (req, res) => {
             action: '/voice/input',
             method: 'POST'
         });
-        gather.say(VOICE_CONFIG, cleanResponse);
+
+
+        // OLD: gather.say(VOICE_CONFIG, cleanResponse);
+        // NEW: Play Generated Audio
+        const audioFilename = await generateSpeech(cleanResponse);
+        if (audioFilename) {
+            const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
+            gather.play(`${SERVER_URL}/audio/${audioFilename}`);
+        } else {
+            // Fallback if TTS fails (Unlikely if server acts up, but safety)
+            gather.say({ voice: 'Polly.Matthew-Neural' }, cleanResponse);
+        }
 
         if (shouldHangup) twiml.hangup();
 
@@ -108,7 +125,10 @@ app.post('/voice/deferred-response', async (req, res) => {
         pendingLLMRequests.delete(callSid);
 
         const twiml = new twilio.twiml.VoiceResponse();
-        twiml.gather({ input: 'speech', action: '/voice/input' }).say(VOICE_CONFIG, "I apologize, I lost my train of thought. What were you saying?");
+        // twiml.gather({ input: 'speech', action: '/voice/input' }).say(VOICE_CONFIG, "I apologize, I lost my train of thought. What were you saying?");
+        const gather = twiml.gather({ input: 'speech', action: '/voice/input' });
+        const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
+        gather.play(`${SERVER_URL}/audio/error_lost_thought.wav`);
         res.type('text/xml').send(twiml.toString());
     }
 });
@@ -130,9 +150,40 @@ if (!fs.existsSync(CALL_LOGS_FILE)) fs.writeFileSync(CALL_LOGS_FILE, '[]');
 // VOICE CONFIGURATION
 // ---------------------------------------------------------
 const VOICE_CONFIG = {
-    voice: 'Polly.Matthew-Neural', // High-quality AI voice
-    language: 'en-US'
+    // voice: 'Polly.Matthew-Neural', // OLD
+    // language: 'en-US'
+    // NEW: We don't use Twilio Say for main content anymore, we use Play.
 };
+
+// SERVE STATIC AUDIO
+app.use('/audio', express.static(path.join(__dirname, 'public/audio')));
+
+// TTS HELPER
+// TTS HELPER (Streaming Engine)
+async function generateSpeech(text) {
+    try {
+        const filename = `tts_${Date.now()}.mp3`;
+        const outputPath = path.join(__dirname, 'public/audio', filename);
+        const writer = fs.createWriteStream(outputPath);
+
+        const response = await axios.post('http://localhost:8020/tts',
+            { text, speed: 1.3 },
+            { responseType: 'stream' }
+        );
+
+        response.data.pipe(writer);
+
+        await new Promise((resolve, reject) => {
+            writer.on('finish', resolve);
+            writer.on('error', reject);
+        });
+
+        return filename;
+    } catch (e) {
+        console.error("❌ TTS Streaming Failed:", e.message);
+        return null;
+    }
+}
 
 
 // ---------------------------------------------------------
@@ -465,18 +516,22 @@ const getOpening = (ctx) => {
     return "Hi, this is Vijay from Hivericks Technologies. I missed a call from this number, or maybe you inquired about our XOptimus chargers?";
 };
 
-const getFiller = (text) => {
-    if (!text) return "One moment...";
-    const t = text.toLowerCase();
-    if (t.includes('price') || t.includes('cost') || t.includes('how much')) return "Let me check that price for you.";
-    if (t.includes('warranty') || t.includes('guarantee')) return "One moment, let me verify the warranty terms.";
-    if (t.includes('feature') || t.includes('spec') || t.includes('what is')) return "Just pulling up the product details.";
+// NEW FILLER LOGIC (Audio Files)
+const getFillerAudio = (text) => {
+    // 1. Greeting Check (If this is the very first turn, handled separately, but just in case)
+    if (!text) return "filler_moment.wav";
 
+    const t = text.toLowerCase();
+
+    // 2. Contextual Fillers
+    if (t.includes('price') || t.includes('cost') || t.includes('how much')) return "filler_check.wav"; // "Let me check that..."
+    if (t.includes('warranty') || t.includes('guarantee')) return "filler_check.wav";
+    if (t.includes('feature') || t.includes('spec') || t.includes('what is')) return "filler_thinking.wav"; // "Let me see..."
+
+    // 3. Random Generic
     const fillers = [
-        "Let me see...",
-        "One moment...",
-        "Just a second...",
-        "Thinking..."
+        "filler_moment.wav", // "One moment please"
+        "filler_thinking.wav" // "Let me see..."
     ];
     return fillers[Math.floor(Math.random() * fillers.length)];
 };
@@ -497,41 +552,52 @@ app.post('/voice', async (req, res) => {
 
     console.log(`\n📞 NEW CALL (${direction}): ${leadPhone} [SID: ${callSid}]`);
 
-    // 1. Identify Lead
-    const context = getLeadContext(leadPhone);
-    console.log(`   👤 Context: ${context.type} (${context.name})`);
+    try {
+        // 1. Identify Lead
+        const context = getLeadContext(leadPhone);
+        console.log(`   👤 Context: ${context.type} (${context.name})`);
 
-    // 2. Pre-Warm / Initialize Log
-    writeJSON(convoFile(callSid), []); // Init empty log
-    updateLeadStatus(leadPhone, 'CALL_CONNECTED', null, null, null, callSid);
+        // 2. Pre-Warm / Initialize Log
+        writeJSON(convoFile(callSid), []); // Init empty log
+        updateLeadStatus(leadPhone, 'CALL_CONNECTED', null, null, null, callSid);
 
-    // 3. Generate Opening
-    const openingText = getOpening(context);
-    console.log(`\n\x1b[32m🤖 AI GREETING: "${openingText}"\x1b[0m\n`);
+        // 3. Play Greeting (Dynamic or Pre-recorded)
+        const openingParam = req.query.opening || req.body.opening;
+        const greetingAudio = openingParam || "greeting.wav";
 
-    // FIX: Log opening IMMEDIATELY so Re-Greeting doesn't happen
-    const initialTurn = { role: 'assistant', text: openingText, timestamp: new Date().toISOString() };
-    const convo = []; // New convo
-    convo.push(initialTurn);
+        // 4. Resolve SERVER_URL (Critical for Twilio)
+        // Ensure we prioritize the Env var (Ngrok) over localhost
+        const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
+        console.log(`      🔗 SERVER_URL: ${SERVER_URL}`);
 
-    // 4. Inject History into SalesBot Memory (If existing)
-    // NOTE: We now pass this as 'summaryContext' to generateResponse, so we don't pollute the transcript.
-    // if (context.summary) {
-    //     convo.push({ type: 'system', content: `CONTEXT SUMMARY: ${context.summary}` });
-    // }
-    writeJSON(convoFile(callSid), convo);
+        console.log(`\n\x1b[32m🤖 AI GREETING: [Playing ${greetingAudio}]\x1b[0m\n`);
 
-    const twiml = new twilio.twiml.VoiceResponse();
-    // ENABLE BARGE-IN: Nest Say inside Gather
-    const gather = twiml.gather({
-        input: 'speech',
-        speechTimeout: 'auto',
-        action: '/voice/input',
-        method: 'POST'
-    });
-    gather.say(VOICE_CONFIG, openingText);
+        const openingText = "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?";
+        const initialTurn = { role: 'assistant', text: openingText, timestamp: new Date().toISOString() };
+        writeJSON(convoFile(callSid), [initialTurn]);
 
-    res.type('text/xml').send(twiml.toString());
+        const twiml = new twilio.twiml.VoiceResponse();
+        const gather = twiml.gather({
+            input: 'speech',
+            speechTimeout: 'auto',
+            action: '/voice/input',
+            method: 'POST'
+        });
+
+        // Decode in case it was URL encoded
+        const decodedAudio = decodeURIComponent(greetingAudio);
+        const audioUrl = `${SERVER_URL}/audio/${decodedAudio}`;
+
+        console.log(`      🔊 Audio URL: ${audioUrl}`);
+        gather.play(audioUrl);
+
+        res.type('text/xml').send(twiml.toString());
+    } catch (e) {
+        console.error("❌ ERROR in /voice handler:", e);
+        const twiml = new twilio.twiml.VoiceResponse();
+        twiml.say("System error connecting call.");
+        res.type('text/xml').send(twiml.toString());
+    }
 });
 
 // ---------------------------------------------------------
@@ -570,7 +636,9 @@ app.post('/voice/input', async (req, res) => {
 
             if (silenceCount >= 3) { // Increased from 2 to 3
                 const twiml = new twilio.twiml.VoiceResponse();
-                twiml.say(VOICE_CONFIG, "I am having trouble hearing you. I will disconnect now. Feel free to call back.");
+                // twiml.say(VOICE_CONFIG, "I am having trouble hearing you. I will disconnect now. Feel free to call back.");
+                const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
+                twiml.play(`${SERVER_URL}/audio/error_timeout.wav`);
                 twiml.hangup();
                 logTurn(callSid, 'assistant', "TIMEOUT_HANGUP");
                 return res.type('text/xml').send(twiml.toString());
@@ -605,7 +673,9 @@ app.post('/voice/input', async (req, res) => {
         // ...
 
         // C. Calculate Filler
-        const filler = getFiller(userSpeech);
+        // C. Calculate Filler (Audio File)
+        const fillerAudio = getFillerAudio(userSpeech);
+        console.log(`   💭 FILLER SELECTED: ${fillerAudio}`);
 
         // D. Trigger LLM (Parallel)
         // We must start the LLM generation NOW so it runs while the filler plays.
@@ -630,7 +700,7 @@ app.post('/voice/input', async (req, res) => {
             summaryContext: null
         };
 
-        console.log(`   ⚡ ASYNC: Playing filler ("${filler}") & Loading LLM...`);
+        console.log(`   ⚡ ASYNC: Playing filler ("${fillerAudio}") & Loading LLM...`);
         const llmPromise = generateResponse({
             userMessage: userSpeech,
             memory,
@@ -640,7 +710,17 @@ app.post('/voice/input', async (req, res) => {
         pendingLLMRequests.set(callSid, llmPromise);
 
         const deferredTwiml = new twilio.twiml.VoiceResponse();
-        deferredTwiml.say(VOICE_CONFIG, filler);
+
+        // NEW AUDIO FILLER
+        // const fillerAudio = getFillerAudio(userSpeech); // Defined above
+        // Assuming filler logic now returns filename (e.g. "filler_moment.wav")
+        // We need URL again.
+        // HACK: We need SERVER_URL globally.
+        // Let's grab it from process.env if available, or just assume relative might fail if not careful.
+        // Ideally we pass it in.
+        const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
+        deferredTwiml.play(`${SERVER_URL}/audio/${fillerAudio}`);
+
         deferredTwiml.redirect({ method: 'POST' }, '/voice/deferred-response');
 
         // Log Timing (Partial)
@@ -660,7 +740,9 @@ app.post('/voice/input', async (req, res) => {
             action: '/voice/input',
             method: 'POST'
         });
-        gather.say(VOICE_CONFIG, "I apologize, I'm having a technical issue. Could you repeat that?");
+        // gather.say(VOICE_CONFIG, "I apologize, I'm having a technical issue. Could you repeat that?");
+        const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
+        gather.play(`${SERVER_URL}/audio/error_tech_issue.wav`);
 
         res.type('text/xml').send(errorTwiml.toString());
     }

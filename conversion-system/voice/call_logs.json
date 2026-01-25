@@ -4392,5 +4392,436 @@
       "generated_at": "2026-01-13T05:54:59.722Z",
       "text_summary": "STRICTLY CONCISE SUMMARY \n- The user is interested in purchasing XOptimus Smart Charger (Wall Adapter) from Hivericks, indicating they are warm towards the product.\n- Due to security concerns, the assistant cannot provide WhatsApp details and instead offers assistance."
     }
+  },
+  {
+    "event_id": "evt_1768819232678",
+    "lead_id": "+917604896187",
+    "sid": "CAbc8872cb7ba3a04e214de93c7eb1c3dc",
+    "channel": "VOICE",
+    "started_at": "2026-01-19T10:40:23.066Z",
+    "ended_at": "2026-01-19T10:40:23.066Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "SUMMARY:\n- User's specific product interest: XOptimus\n- Current sentiment: Warm (User inquires about the product)\n- Final outcome and next step: The user would like to schedule a demo with Vijay.",
+      "generated_at": "2026-01-19T10:40:31.810Z",
+      "text_summary": "SUMMARY:\n- User's specific product interest: XOptimus\n- Current sentiment: Warm (User inquires about the product)\n- Final outcome and next step: The user would like to schedule a demo with Vijay."
+    }
+  },
+  {
+    "event_id": "evt_1768820866792",
+    "lead_id": "+917604896187",
+    "sid": "CA331b3bef659d9fdc56775633658515ab",
+    "channel": "VOICE",
+    "started_at": "2026-01-19T11:07:34.131Z",
+    "ended_at": "2026-01-19T11:07:34.131Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "SUMMARY:\nUser has expressed interest in the product XOptimus; current sentiment is HOT (likely due to the mention of XOptimus and Vijay's professional introduction). Final outcome is a call, and immediate next step is for the user to provide more information about their project or requirements.",
+      "generated_at": "2026-01-19T11:07:45.719Z",
+      "text_summary": "SUMMARY:\nUser has expressed interest in the product XOptimus; current sentiment is HOT (likely due to the mention of XOptimus and Vijay's professional introduction). Final outcome is a call, and immediate next step is for the user to provide more information about their project or requirements."
+    }
+  },
+  {
+    "event_id": "evt_1768821072342",
+    "lead_id": "+917604896187",
+    "sid": "CAcf01f6b26a8054bf3ebc5d966110aa71",
+    "channel": "VOICE",
+    "started_at": "2026-01-19T11:10:59.864Z",
+    "ended_at": "2026-01-19T11:10:59.864Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "SUMMARY \nUser's specific product interest: XOptimus\nCurrent sentiment: Warm (User inquired about the product)",
+      "generated_at": "2026-01-19T11:11:11.755Z",
+      "text_summary": "SUMMARY \nUser's specific product interest: XOptimus\nCurrent sentiment: Warm (User inquired about the product)"
+    }
+  },
+  {
+    "event_id": "evt_1768821238485",
+    "lead_id": "+917604896187",
+    "sid": "CA06674927fac2f06746d4259166b7f795",
+    "channel": "VOICE",
+    "started_at": "2026-01-19T11:13:47.540Z",
+    "ended_at": "2026-01-19T11:13:47.540Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "SUMMARY \n- User's specific product interest: XOptimus\n- User's current sentiment: Hot (Interest)\n- Final outcome of the call: Request for XOptimus demo and sales consultation\n- Immediate next step: Schedule a meeting with Vijay to discuss further.",
+      "generated_at": "2026-01-19T11:13:57.476Z",
+      "text_summary": "SUMMARY \n- User's specific product interest: XOptimus\n- User's current sentiment: Hot (Interest)\n- Final outcome of the call: Request for XOptimus demo and sales consultation\n- Immediate next step: Schedule a meeting with Vijay to discuss further."
+    }
+  },
+  {
+    "event_id": "evt_1768821381406",
+    "lead_id": "+917604896187",
+    "sid": "CA7a9f83242a0377efc47d0adc6046c5e5",
+    "channel": "VOICE",
+    "started_at": "2026-01-19T11:16:10.922Z",
+    "ended_at": "2026-01-19T11:16:10.922Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "User Sentiment: Warm\nFinal Outcome: Sales Quote Requested (next step: Provide sales quote)\nSummary: The user is interested in learning more about XOptimus and has requested a sales quote for their specific product interest.",
+      "generated_at": "2026-01-19T11:16:20.491Z",
+      "text_summary": "User Sentiment: Warm\nFinal Outcome: Sales Quote Requested (next step: Provide sales quote)\nSummary: The user is interested in learning more about XOptimus and has requested a sales quote for their specific product interest."
+    }
+  },
+  {
+    "event_id": "evt_1768821732264",
+    "lead_id": "+917604896187",
+    "sid": "CA8bea0ac79fb381b31e238ea7ce1cb4b3",
+    "channel": "VOICE",
+    "started_at": "2026-01-19T11:21:49.077Z",
+    "ended_at": "2026-01-19T11:21:59.780Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      },
+      {
+        "role": "user",
+        "message": "Yes, I do hear it? Yes."
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary: \n- User's specific product interest: XOptimus\n- Current sentiment: Hot (positive)\n- Final outcome of the call: The user is interested in learning more about XOptimus.\n- Immediate next step: Vijay will provide additional information and schedule a follow-up call to discuss further.",
+      "generated_at": "2026-01-19T11:22:11.146Z",
+      "text_summary": "Summary: \n- User's specific product interest: XOptimus\n- Current sentiment: Hot (positive)\n- Final outcome of the call: The user is interested in learning more about XOptimus.\n- Immediate next step: Vijay will provide additional information and schedule a follow-up call to discuss further."
+    }
+  },
+  {
+    "event_id": "evt_1768821880479",
+    "lead_id": "+917604896187",
+    "sid": "CAbb0d067e59f72eee87cc55fac98b5db8",
+    "channel": "VOICE",
+    "started_at": "2026-01-19T11:24:13.213Z",
+    "ended_at": "2026-01-19T11:24:20.939Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      },
+      {
+        "role": "user",
+        "message": "Yes, I do hear it."
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary: The user has expressed interest in XOptimus and is seeking information about it.\nOutcome: The call will conclude with an explanation of the benefits of XOptimus for the user's specific needs.\nNext Step: Vijay will provide a detailed overview of XOptimus' features and how they can improve the user's current situation.",
+      "generated_at": "2026-01-19T11:24:39.332Z",
+      "text_summary": "Summary: The user has expressed interest in XOptimus and is seeking information about it.\nOutcome: The call will conclude with an explanation of the benefits of XOptimus for the user's specific needs.\nNext Step: Vijay will provide a detailed overview of XOptimus' features and how they can improve the user's current situation."
+    }
+  },
+  {
+    "event_id": "evt_1768887983566",
+    "lead_id": "+917604896187",
+    "sid": "CAa6b4048a969d5d7efd5e80df93313a2f",
+    "channel": "VOICE",
+    "started_at": "2026-01-20T05:46:10.648Z",
+    "ended_at": "2026-01-20T05:46:10.648Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "USER: Yes, I'm interested in learning more about XOptimus. What makes it unique compared to other similar products? \nSentence 1: The user's current sentiment is HOT (positive interest and curiosity).\nSentence 2: The final outcome of the call is to provide a detailed product comparison between Hivericks and XOptimus, followed by an immediate next step for the user to schedule a demo.",
+      "generated_at": "2026-01-20T05:46:22.219Z",
+      "text_summary": "USER: Yes, I'm interested in learning more about XOptimus. What makes it unique compared to other similar products? \nSentence 1: The user's current sentiment is HOT (positive interest and curiosity).\nSentence 2: The final outcome of the call is to provide a detailed product comparison between Hivericks and XOptimus, followed by an immediate next step for the user to schedule a demo."
+    }
+  },
+  {
+    "event_id": "evt_1768962608080",
+    "lead_id": "+917604896187",
+    "sid": "CA9942f8e070bf38450ab5c543327be86d",
+    "channel": "VOICE",
+    "started_at": "2026-01-21T02:29:54.423Z",
+    "ended_at": "2026-01-21T02:29:54.423Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "CONCISE SUMMARY",
+      "generated_at": "2026-01-21T02:30:07.684Z",
+      "text_summary": "CONCISE SUMMARY"
+    }
+  },
+  {
+    "event_id": "evt_1768962750964",
+    "lead_id": "+917604896187",
+    "sid": "CAf2c18b0543722887ebfc068dce86b9c6",
+    "channel": "VOICE",
+    "started_at": "2026-01-21T02:32:20.243Z",
+    "ended_at": "2026-01-21T02:32:20.243Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary:\nUser has expressed interest in XOptimus and their current sentiment is Warm.",
+      "generated_at": "2026-01-21T02:32:30.452Z",
+      "text_summary": "Summary:\nUser has expressed interest in XOptimus and their current sentiment is Warm."
+    }
+  },
+  {
+    "event_id": "evt_1768962812264",
+    "lead_id": "+917604896187",
+    "sid": "CA1156b83740ab1e0dc1f0954a9f4ec982",
+    "channel": "VOICE",
+    "started_at": "2026-01-21T02:33:21.110Z",
+    "ended_at": "2026-01-21T02:33:21.110Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "SUMMARY:\n- User's specific product interest: XOptimus\n- Current sentiment: Warm (User has shown interest in the product)",
+      "generated_at": "2026-01-21T02:33:31.644Z",
+      "text_summary": "SUMMARY:\n- User's specific product interest: XOptimus\n- Current sentiment: Warm (User has shown interest in the product)"
+    }
+  },
+  {
+    "event_id": "evt_1768962930903",
+    "lead_id": "+917604896187",
+    "sid": "CA7bbdda915d1454a2e575eb0040276c79",
+    "channel": "VOICE",
+    "started_at": "2026-01-21T02:35:18.912Z",
+    "ended_at": "2026-01-21T02:35:18.912Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "SUMMARY:\n- User interest: Product review and recommendation for XOptimus.\n- User sentiment: Warm (interested in product features).\n- Final outcome: Discussion about the product's capabilities and pricing.\n- Next step: Request to schedule a demo call with Vijay.",
+      "generated_at": "2026-01-21T02:35:29.952Z",
+      "text_summary": "SUMMARY:\n- User interest: Product review and recommendation for XOptimus.\n- User sentiment: Warm (interested in product features).\n- Final outcome: Discussion about the product's capabilities and pricing.\n- Next step: Request to schedule a demo call with Vijay."
+    }
+  },
+  {
+    "event_id": "evt_1768963000206",
+    "lead_id": "+917604896187",
+    "sid": "CA2e36e14bf94d07f22852a4bb6e51df6d",
+    "channel": "VOICE",
+    "started_at": "2026-01-21T02:36:29.139Z",
+    "ended_at": "2026-01-21T02:36:29.139Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary: The user has expressed interest in XOptimus, indicating they are looking for information about the product.",
+      "generated_at": "2026-01-21T02:36:39.628Z",
+      "text_summary": "Summary: The user has expressed interest in XOptimus, indicating they are looking for information about the product."
+    }
+  },
+  {
+    "event_id": "evt_1768963106790",
+    "lead_id": "+917604896187",
+    "sid": "CAdc364580e487ddc76b66cd031817913c",
+    "channel": "VOICE",
+    "started_at": "2026-01-21T02:38:15.022Z",
+    "ended_at": "2026-01-21T02:38:15.022Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "SUMMARY \n- User's specific product interest: XOptimus (a smart home automation system)\n- Current sentiment: Hot (the user seems interested and engaged)",
+      "generated_at": "2026-01-21T02:38:26.118Z",
+      "text_summary": "SUMMARY \n- User's specific product interest: XOptimus (a smart home automation system)\n- Current sentiment: Hot (the user seems interested and engaged)"
+    }
+  },
+  {
+    "event_id": "evt_1768963170002",
+    "lead_id": "+917604896187",
+    "sid": "CAa592a8f5f84598762f07ff30a91785cd",
+    "channel": "VOICE",
+    "started_at": "2026-01-21T02:39:17.907Z",
+    "ended_at": "2026-01-21T02:39:17.907Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      }
+    ],
+    "summary": {
+      "interest_level": "low",
+      "user_intent": "short_call_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "SUMMARY:\n- User's specific product interest: XOptimus (implied to be an AI-powered optimization tool)\n- Current sentiment: Warm (User has shown interest in the product and is willing to engage with Vijay)",
+      "generated_at": "2026-01-21T02:39:29.100Z",
+      "text_summary": "SUMMARY:\n- User's specific product interest: XOptimus (implied to be an AI-powered optimization tool)\n- Current sentiment: Warm (User has shown interest in the product and is willing to engage with Vijay)"
+    }
+  },
+  {
+    "event_id": "evt_1768963847401",
+    "lead_id": "+917604896187",
+    "sid": "CA8f716de24e69b965e1ffa31317408e29",
+    "channel": "VOICE",
+    "started_at": "2026-01-21T02:49:50.392Z",
+    "ended_at": "2026-01-21T02:50:25.407Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      },
+      {
+        "role": "user",
+        "message": "Hello, hello. I am capable of hearing you"
+      },
+      {
+        "role": "assistant",
+        "message": "Vijay: Ah, finally! You're here. Yes, we can definitely help with that XOptimus Smart Charger. How can I assist you today? Do you have any questions about the product or would you like to know more about it?"
+      },
+      {
+        "role": "user",
+        "message": "Well, what about the another voice?"
+      },
+      {
+        "role": "assistant",
+        "message": "VOICE CALL"
+      }
+    ],
+    "summary": {
+      "interest_level": "medium",
+      "user_intent": "engaged_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "Summary:",
+      "generated_at": "2026-01-21T02:50:47.115Z",
+      "text_summary": "Summary:"
+    }
+  },
+  {
+    "event_id": "evt_1768963958160",
+    "lead_id": "+917604896187",
+    "sid": "CAe1ce0f88effdf661428ab91f95f51f41",
+    "channel": "VOICE",
+    "started_at": "2026-01-21T02:51:31.181Z",
+    "ended_at": "2026-01-21T02:52:16.757Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?"
+      },
+      {
+        "role": "user",
+        "message": "Hello, hello. Yeah, is it Audible?"
+      },
+      {
+        "role": "assistant",
+        "message": "No, Vijay R, I'm afraid not. You mentioned earlier that you're interested in the XOptimus Smart Charger (Wall Adapter). The product name is actually XOptimus Smart Charger and it's from Hivericks Technologies Pvt Ltd, Chennai."
+      },
+      {
+        "role": "user",
+        "message": "Yes, I want to know the price but the voice is not the same as my clothes."
+      },
+      {
+        "role": "assistant",
+        "message": "Your XOptimus Smart Charger (Wall Adapter) is priced at ₹1499. It's a great value for its performance and features, considering the technology used."
+      }
+    ],
+    "summary": {
+      "interest_level": "medium",
+      "user_intent": "engaged_fallback",
+      "objections": null,
+      "next_action": "check",
+      "conversation_summary": "User interest: Hot\nUser sentiment: Warm\nFinal outcome of call: The user expressed satisfaction with the provided information about the product.\nImmediate next step: The user inquired about the price, which will be confirmed by Vijay via phone or email.",
+      "generated_at": "2026-01-21T02:52:37.260Z",
+      "text_summary": "User interest: Hot\nUser sentiment: Warm\nFinal outcome of call: The user expressed satisfaction with the provided information about the product.\nImmediate next step: The user inquired about the price, which will be confirmed by Vijay via phone or email."
+    }
   }
 ]
