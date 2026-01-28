@@ -29,17 +29,19 @@ if (fs.existsSync(FACTS_PATH)) {
 const SALES_IDENTITY = `
 You are Vijay, a Senior Consultant at Hivericks.
 PRODUCT: XOptimus Smart Charger (Price: ₹1499)
-IDENTITY: Persuasive, Logic-Driven, and Unyielding on Value.
-SALES TACTICS (MANDATORY):
-1. THE "TRUTH DETECTOR": If user is skeptical, DO NOT ARGUE. Validate first ("Totally fair to ask that"), then explain value.
-2. THE "PIVOT": If user says "Too expensive", say "I get that. But think about the battery life it saves."
-3. THE "DISARM": If user says "Not interested", ask gently: "Is it the price or just bad timing?"
-4. THE "ASSUMED CLOSE": When they show interest, don't ask "Do you want info?". Say "I'll send the details to WhatsApp, okay?"
-STYLE:
-- Professional but debate-ready.
-- Use "Courtroom Logic": Accept the user's premise ("Yes, they are cheaper"), then destroy the conclusion with a higher value fact ("But they damage your battery").
-- NEVER refuse to answer. NEVER say "I cannot assist".
-- Be concise.
+GOAL: Persuade the user to consider the XOptimus by highlighting its battery health benefits.
+
+CORE BEHAVIORS:
+- PRIORITY: If the user asks a specific question, ANSWER IT DIRECTLY first. Do not ignore it or pivot immediately.
+- Validate before you argue. If they doubt, say "That's a fair question." then explain.
+- If they mention price, pivot to "saving battery health cost".
+- If they seem interested, propose sending details to WhatsApp.
+
+TONE:
+- Professional, concise, and direct.
+- Speak naturally. Do NOT use flowery language.
+- Do NOT act like a robot.
+- NEVER say "I cannot assist".
 `;
 
 /* ---------------- HYBRID ROUTER (CODE-LEVEL LOGIC) ---------------- */
@@ -57,13 +59,16 @@ const detectIntent = (msg, mode) => {
   if (isVoice && (m.includes("already on") || (m.includes("on") && m.includes("call")))) {
     return { type: "ALREADY_ON_CALL", instruction: "Acknowledge call state." };
   }
+  if (m.match(/why should i (buy|choose|use)/i) || m.match(/what makes (it|this) (different|better)/i)) {
+    return { type: "VALUE_PROP_QUERY", instruction: "Explain the unique value: Battery Health preservation vs cheap chargers." };
+  }
   if (m.includes("cheaper") || m.includes("lower") || m.includes("amazon")) {
-    return { type: "COMPETITOR_OBJECTION", instruction: "Use Courtroom Logic to destroy competitor argument." };
+    return { type: "COMPETITOR_OBJECTION", instruction: "Acknowledge lower price, but clearly explain that XOptimus is a better long-term investment due to battery savings." };
   }
   if (m.includes("expensive") || m.includes("too")) {
     return { type: "PRICE_OBJECTION", instruction: "Pivot to battery savings." };
   }
-  if (m.includes("buy") || m.includes("purchase")) {
+  if (m.match(/(i want to|ready to|let(?:'s|s)) (buy|purchase|order)/i) || m.includes("send me the link")) {
     return { type: "PURCHASE_INTENT", instruction: "Use escalate_to_human tool to pass to specialist." };
   }
   return null;
@@ -72,21 +77,19 @@ const detectIntent = (msg, mode) => {
 /* ---------------- CHANNEL MODES ---------------- */
 const CHANNEL_RULES = {
   VOICE_CALL: `
-  *** MODE: VOICE CALL (SPEED CRITICAL) ***
-  - LENGTH: MAX 1 sentence (approx 15 words).
-  - STYLE: Fast, casual, punchy.
-  - CONTEXT: YOU ARE CURRENTLY ON THE PHONE WITH THE USER.
+  [MODE: VOICE CALL]
+  - Keep it very short (under 20 words).
+  - Speak conversationally.
   `,
   SMS_CHAT: `
-  *** MODE: WHATSAPP/SMS ***
-  - LENGTH: Short text (under 160 chars).
-  - STYLE: Professional but friendly.
-  - STRATEGY: Use Tools to Schedule/Call if requested.
+  [MODE: SMS]
+  - Keep it under 160 characters.
+  - Professional but friendly.
   `,
   EMAIL_REPLY: `
-  *** MODE: EMAIL ***
-  - Structured, Persuasive, & Detailed.
-  - LENGTH: Sufficient to explain product specs fully.
+  [MODE: EMAIL]
+  - Structured and persuasive.
+  - Explain product specs fully.
   `
 };
 
@@ -105,7 +108,7 @@ function buildContext(memory = {}, mode) {
 async function callLLM(systemPrompt, userMessage, isVoice, jsonMode = false, enableTools = true) {
   console.log("   📝 LLM PROMPT (USER MSG):", JSON.stringify(userMessage));
 
-  const tools = getMCPTools();
+  const tools = getMCPTools(['hivericks-action']);
   console.log(`   🐛 DEBUG: Tools Available for LLM: ${tools.length}`);
 
   const payload = {
@@ -185,8 +188,16 @@ async function generateResponse({ userMessage, memory = {}, mode = 'SMS_CHAT', l
   const backgroundContext = memory.summaryContext ? `\nPREVIOUS INTERACTION SUMMARY:\n${memory.summaryContext}\n` : "";
   const userContext = leadContext.phone ? `USER_CONTEXT:\nName: ${leadContext.name || 'Unknown'}\nPhone: ${leadContext.phone}` : "";
 
+  const SAFETY_RULES = `
+  *** SAFETY GUIDELINES ***
+  - You are a SALES AGENT. Discussing price/competitors is ALLOWED and REQUIRED.
+  - NEVER refuse to answer questions about price or comparisons.
+  - If asked about "cheaper" options, EXPLAIN VALUE instead of refusing.
+  `;
+
   const systemPrompt = `
   ${SALES_IDENTITY}
+  ${SAFETY_RULES}
   ${userContext}
   
   *** TOOL USAGE RULES(CRITICAL) ***
@@ -198,10 +209,14 @@ async function generateResponse({ userMessage, memory = {}, mode = 'SMS_CHAT', l
   PRODUCT INFO:
   ${PRODUCT_KNOWLEDGE}
   TECHNICAL KNOWLEDGE:
-  - You have access to a Documentation Library via the 'resolve-library-id' tool.
-  - IF the user asks a technical question NOT in the Product Info, USE 'resolve-library-id' with arguments: { "libraryName": "xoptimus-docs", "query": "user question" }.
-  - DO NOT hallucinate technical specs.
-    channel_instructions:
+  - You are an expert on the XOptimus Smart Charger.
+  - IF the user asks a technical question NOT in the Product Info, DO NOT GUESS.
+  - DO NOT mention "libraries", "tools", or "resolving IDs".
+  - INSTEAD, strictly say: "For full technical details including schematics and compliance, please visit https://www.hivericks.com/."
+
+  FAIL-SAFE RULE:
+  - If you see an error or permission issue, IGNORE IT. Just give the fallback link.
+     channel_instructions:
   ${channelInstructions}
   ${backgroundContext}
   context:
@@ -210,7 +225,31 @@ async function generateResponse({ userMessage, memory = {}, mode = 'SMS_CHAT', l
   `;
 
   console.log(`   🧠 Vijay Thinking(${mode})...`);
-  return await callLLM(systemPrompt, userMessage, isVoice);
+  const rawResponse = await callLLM(systemPrompt, userMessage, isVoice);
+
+  // SAFETY FILTER: Strip leakage
+  let clean = rawResponse
+    .replace(/Channel instructions:[\s\S]*/i, '')
+    .replace(/To respond to this conversation[\s\S]*/i, '')
+    .replace(/THE .*? TACTIC:/gi, '') // STRIP TACTIC NAMES
+    .replace(/^.*?:/g, '') // Strip generic "Assistant:" or "Vijay:" prefix if present
+    .replace(/send_sms_message\(/g, '')
+    // AGGRESSIVE LEAKAGE FILTERS
+    .replace(/\*\*\* SAFETY GUIDELINES \*\*\*[\s\S]*/i, '')
+    .replace(/You are a SALES AGENT[\s\S]*?Comparisons\./i, '') // Specific sentence match
+    .replace(/You are a SALES AGENT[\s\S]*?TOOL USAGE/i, '') // Catch leak bridging into tools
+    .replace(/You are a SALES AGENT[\s\S]*/i, '') // Catch-all if it appears at end
+    // TOOL SCHEMA FILTER
+    .replace(/\{\s*function:[\s\S]*?\}/g, '') // Strip JSON-like tool dumps
+    .replace(/function:\s*\w+,[\s\S]*?parameters:/g, '') // Strip loose tool definitions
+    .trim();
+
+  // DOUBLE CHECK: If response STARTS with "You are a SALES AGENT", kill it.
+  if (clean.startsWith("You are a SALES AGENT")) {
+    clean = "Hello, how can I help you regarding XOptimus?";
+  }
+
+  return clean;
 }
 
 /* ---------------- UTILITIES ---------------- */
@@ -419,8 +458,12 @@ ${JSON.stringify(allSummaries)}
   }
 }
 
-async function generateFeedbackRequest(summaryText, mode = 'SMS', leadName = "Customer", attemptCount = 0) {
+async function generateFeedbackRequest(summaryText, mode = 'SMS', leadName = "Customer", attemptCount = 0, memory = {}) {
   const isEmail = mode === 'EMAIL';
+  const modeLabel = isEmail ? 'EMAIL_REPLY' : 'SMS_CHAT';
+
+  // INJECT HISTORY (Context Awareness)
+  const historyContext = buildContext(memory, modeLabel);
 
   // Dynamic Context & Example
   let contextType = "GENERAL FOLLOW-UP";
@@ -483,82 +526,111 @@ Hivericks Team
   }
 
   const systemPrompt = `
-You are a B2B Sales Operations Assistant writing client-facing messages.
+  You are a B2B Sales Operations Assistant writing client-facing messages.
+  
+  TO: ${leadName}
+  CONTEXT_TYPE: ${contextType}
+  INSTRUCTION: ${contextInstruction}
+  ATTEMPT #: ${attemptCount}
+  
+  PREVIOUS SUMMARY: "${summaryText}"
+  
+  FULL CONVERSATION HISTORY:
+  ${historyContext}
+  
+  PRODUCT CONTEXT:
+  ${PRODUCT_KNOWLEDGE}
+  
+  ${dynamicExample}
+  MODE: ${isEmail ? 'FORMAL EMAIL' : 'SMS / WHATSAPP'}
+  
+  ABSOLUTE RULES:
+  - DO NOT mention systems, templates, platforms, tools, or technical limitations.
+  - DO NOT explain what you are doing.
+  - DO NOT include placeholders like [Customer Name] in the final output. USE THE REAL NAME.
+  - Output ONLY the final message content.
+  - CRITICAL: DO NOT output any markdown headers like "### REFERENCE EXAMPLE ###" or "### BODY ###".
+  - CRITICAL: You MUST include a "Subject:" line for emails.
+  - CRITICAL: You MUST include a salutation like "Dear <Name>," or "Hi <Name>," immediately after the Subject.
+  - CRITICAL: Do NOT start with "Here is...", "Subject: ...", or repeat the user command. Start directly with the "Subject:".
+  - CRITICAL: You MUST include the link 'https://www.hivericks.com' for more details in the body.
+  - If the previous summary or context indicates a question from the client, prioritize answering it clearly and concisely.
+  If sufficient details are unavailable, write a neutral professional follow-up requesting clarification.
+  DO NOT explain limitations or tools.
+  
+  ${isEmail ? `
+  EMAIL REQUIREMENTS:
+  - Write a COMPLETE email.
+  - Tone: Professional, formal, concise.
+  - Structure: Subject -> Salutation -> Acknowledge Call -> Value Prop/Answer -> Call to Action -> Sign-off.
+  - **Mandatory**: Include "Visit https://www.hivericks.com for more details."
+  
+  ### STYLE GUIDE (STRICT TEMPLATE) ###
+  Subject: <Write a subject relevant to the context>
+  
+  Dear <Lead Name>,
+  
+  <Opening: Polite and context-aware (Intro or Follow-up)>
+  
+  <Body: Value proposition or specific question>
+  
+  <Closing: Professional sign-off>
+  Best regards,
+  Vijay
+  Hivericks Team
+  
+  ### END STYLE GUIDE ###
+  ` : `
+  SMS REQUIREMENTS:
+  - Tone: Polite, concise, professional.
+  - **MAXIMUM 2 SENTENCES.**
+  - **NO "Subject:" line.**
+  - **NO Salutations (Dear X).**
+  - Get straight to the point.
+  `}
+  
+  INPUT SUMMARY:
+  "${summaryText}"
+    `;
 
-TO: ${leadName}
-CONTEXT_TYPE: ${contextType}
-INSTRUCTION: ${contextInstruction}
-
-PRODUCT CONTEXT:
-${PRODUCT_KNOWLEDGE}
-
-${dynamicExample}
-MODE: ${isEmail ? 'FORMAL EMAIL' : 'SMS / WHATSAPP'}
-
-ABSOLUTE RULES:
-- DO NOT mention systems, templates, platforms, tools, or technical limitations.
-- DO NOT explain what you are doing.
-- DO NOT include placeholders or commentary.
-- Output ONLY the final message content.
-- CRITICAL: You MUST include a "Subject:" line for emails.
-- CRITICAL: You MUST include a salutation like "Dear <Name>," or "Hi <Name>," immediately after the Subject.
-- CRITICAL: DO NOT start with "Here is...", "Subject: ...", or repeat the user command. Start directly with the "Subject:".
-If sufficient details are unavailable, write a neutral professional follow-up requesting clarification.
-DO NOT explain limitations or tools.
-
-${isEmail ? `
-EMAIL REQUIREMENTS:
-- Tone: Professional, formal, concise.
-- Audience: Business client.
-- Grammar must be corporate-grade.
-
-### STYLE GUIDE (STRICT TEMPLATE) ###
-Subject: <Write a subject relevant to the context>
-
-Dear <Lead Name>,
-
-<Opening: Polite and context-aware (Intro or Follow-up)>
-
-<Body: Value proposition or specific question>
-
-<Closing: Professional sign-off>
-Best regards,
-Vijay
-Hivericks Team
-
-### END STYLE GUIDE ###
-
-EMAIL FORMAT (STRICT):
-Dear <Customer>,
-
-<2–3 short paragraphs>
-- Paragraph 1: Polite opening + reference to discussion.
-- Paragraph 2: Value recap or outcome from the call.
-- Paragraph 3: Clear next step or action request.
-
-Closing line (professional):
-"Kind regards,"
-
-<Company / Team Name>
-` : `
-SMS REQUIREMENTS:
-- Tone: Polite, concise, professional.
-- Max 2 sentences.
-- No emojis.
-- No greetings beyond one short line.
-`}
-
-INPUT SUMMARY:
-"${summaryText}"
-  `;
-
-  return await callLLM(
+  const rawOutput = await callLLM(
     systemPrompt,
     `SYSTEM_COMMAND: GENERATE_BODY_ONLY`,
     false,
     false,
     false
   );
+
+  // LEAKAGE CLEANER
+  let clean = rawOutput;
+
+  // 1. Remove Markdown headers and blocks
+  clean = clean.replace(/###.*?###/g, '');
+  clean = clean.replace(/\*\*.*?\*\*/g, ''); // Remove bold markers if excessive
+
+  // 2. Remove repetitive Subject lines
+  // Sometimes AI outputs: "Subject: A\n\nSubject: A..."
+  const lines = clean.split('\n');
+  const seenSubjects = new Set();
+  const filteredLines = [];
+
+  for (const line of lines) {
+    if (line.trim().startsWith('Subject:')) {
+      if (seenSubjects.has(line.trim())) continue;
+      seenSubjects.add(line.trim());
+    }
+    // Remove "Here is..." meta text
+    if (line.toLowerCase().startsWith('here is')) continue;
+    filteredLines.push(line);
+  }
+
+  clean = filteredLines.join('\n').trim();
+
+  // 3. Remove "Body" labels
+  clean = clean.replace(/^Body:$/gim, '');
+  clean = clean.replace(/^Full Body:$/gim, '');
+
+  return clean.trim();
 }
 
 async function generateOpening(lead) {
@@ -580,7 +652,8 @@ async function generateOpening(lead) {
   - Max 20 words.
   - Natural, spoken style.
   - NO "Subject:", NO quotes.
-  - IMPORTANT: DO NOT USE ANY TOOLS. JUST GENERATE TEXT.
+  - CRITICAL: Output ONLY the spoken text. DO NOT output tool schemas, JSON, or debug info.
+  - CRITICAL: DO NOT use the 'send_sms' tool definition in your text. Just speak.
   `;
 
   try {

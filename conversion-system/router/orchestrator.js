@@ -31,10 +31,11 @@ console.log(`🔌 INFRASTRUCTURE: Launching Unified Gateway (Port 8080)...`);
 const gatewayProcess = spawn('node', [gatewayPath], { stdio: 'inherit', shell: true });
 
 // C. NGROK (Public Tunnel -> Port 8080)
-console.log(`🔌 INFRASTRUCTURE: Launching Ngrok Tunnel (Port 8080)...`);
-const ngrokCmd = `npx ngrok http 8080 --domain=oretha-geniculate-addictedly.ngrok-free.dev`;
+// C. NGROK (Public Tunnel -> Port 3000)
+console.log(`🔌 INFRASTRUCTURE: Launching Ngrok Tunnel (Port 3000)...`);
+const ngrokCmd = `npx ngrok http 3000 --domain=oretha-geniculate-addictedly.ngrok-free.dev`;
 const ngrokProcess = spawn(ngrokCmd, { stdio: 'ignore', shell: true, detached: true });
-console.log(`   🌍 Ngrok Public URL: https://oretha-geniculate-addictedly.ngrok-free.dev`);
+console.log(`   🌍 Ngrok Public URL: https://oretha-geniculate-addictedly.ngrok-free.dev (Target: 3000)`);
 
 // D. SERVICES IMPORTS
 const smsEngine = require('../sms/sms_engine');
@@ -46,6 +47,7 @@ warmup().catch(e => console.error("💥 Warmup Failed:", e.message));
 
 const voiceEngine = require('../voice/voice_engine');
 const emailEngine = require('../email/email_engine');
+const crm = require('../agent/crm_connector'); // CRM Integration
 
 // D. CONFIGURATION
 const LEADS_FILE = path.join(__dirname, '../processed_leads/clean_leads.json');
@@ -82,10 +84,14 @@ const isCallTime = () => {
 // 3. LOGIC ENGINE (PLANNING)
 // ---------------------------------------------------------
 
+// ---------------------------------------------------------
+// 3. LOGIC ENGINE (PLANNING)
+// ---------------------------------------------------------
+
 const TIMELINE_ACTIONS = [
     ['SMS', 'MAIL'],        // Attempt 0 (Day 1)
     ['SMS', 'MAIL'],        // Attempt 1 (Day 2)
-    ['VOICE', 'MAIL'],      // Attempt 2 (Day 3) - Added MAIL here to catch leads
+    ['VOICE'],              // Attempt 2 (Day 3) - STRICT VOICE ONLY (Rule 1)
     ['SMS', 'MAIL'],        // Attempt 3 (Day 5)
     ['VOICE'],              // Attempt 4 (Day 7)
     ['SMS', 'MAIL'],        // Attempt 5 (Day 10)
@@ -104,51 +110,82 @@ const checkStickyChannel = (lead) => {
 const determineActions = (lead) => {
     // 0. GLOBAL HALT STATES
     if (['DO_NOT_CONTACT', 'OPTED_OUT', 'COMPLETED', 'SMS_USER_STOP', 'HUMAN_HANDOFF'].includes(lead.status)) return [];
-    if (lead.status.includes('HANDOFF')) return []; // Safety catch-all
 
-    // 1. GRADUATION LOGIC (Attempt > 6 && Score >= 50)
-    // If graduated, we effectively HALT automation here. 
-    // The actual status update to 'HUMAN_HANDOFF' should be handled by a separate maintenance function or we assume the score update triggered it.
-    // For now, let's treat this valid condition as a "Stop Automation" signal.
-    // NOTE: User asked to SET Human Handoff. We'll do that in the main loop 'checkGraduation'.
-    // Here we just respect the consequence.
+    // DEBUG TRACE
+    if (lead.name && lead.name.includes("Vijay")) {
+        const now = new Date();
+        const offsetd = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
+        const today = offsetd.toISOString().split('T')[0];
+        console.log(`🔎 TRACE VIJAY: Status=${lead.status}, Due=${lead.next_action_due}, LastAct=${lead.last_action_date}, Today=${today}`);
+    }
+
+    if (lead.status.includes('HANDOFF')) return [];
+
+    // 1. GRADUATION LOGIC
     if ((lead.attempt_count || 0) >= 6 && (lead.score || 0) >= 50) return [];
 
     if (['CALL_INITIATED', 'CALL_CONNECTED', 'CALL_IN_PROGRESS'].includes(lead.status)) return [];
-
-    // 1.5 STICKY CHANNEL (Prefer engaged channel)
-    const sticky = checkStickyChannel(lead);
-    if (sticky) return sticky;
 
     const now = new Date();
     const offsetd = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
     const today = offsetd.toISOString().split('T')[0];
 
-    // Escalation Priority (Overrides Date Check)
+    // 2. STRICT ONE-ACTION-PER-DAY LOCK (Rule 3 & 8)
+    // If we already acted today, SKIP.
+    if (lead.last_action_date === today) {
+        // EXCEPTION: Scheduled Callbacks (Rule 6)
+        if (lead.status === 'SMS_CALL_SCHEDULED' || lead.status === 'MAIL_TO_CALL_REQUESTED') {
+            // Check time...
+        } else {
+            return []; // HARD STOP
+        }
+    }
+
+    // 1.5 STICKY CHANNEL (Prefer engaged channel)
+    // Note: Sticky channel still respected but governed by daily lock above.
+    // 1.5 TIMELINE PRIORITY CHECK (Rule: Voice Calls override Sticky Text Channels)
+    const attempt = lead.attempt_count || 0;
+    const plan = TIMELINE_ACTIONS[attempt] || [];
+    const isVoiceDay = plan.includes('VOICE') && plan.length === 1;
+
+    // 1.6 STICKY CHANNEL (Prefer engaged channel ONLY if not a Voice Day)
+    if (!isVoiceDay) {
+        const sticky = checkStickyChannel(lead);
+        if (sticky) return sticky;
+    }
+
+    // Escalation Priority
     if (lead.status === 'SMS_TO_CALL_REQUESTED') return ['VOICE'];
     if (lead.status === 'MAIL_TO_CALL_REQUESTED') return ['VOICE'];
+
+    // Scheduled Call Logic
     if (lead.status === 'SMS_CALL_SCHEDULED') {
         if (lead.scheduled_call_time && new Date() >= new Date(lead.scheduled_call_time)) return ['VOICE'];
-        // If scheduled for later, we wait (respect date check), but here we return [] specific to schedule logic
-        // Actually, if scheduled time is not met, we should fall through to date check or return []
         return [];
     }
 
+    // Date Check (Timeline enforcement)
     if (lead.next_action_due && lead.next_action_due > today) return [];
 
     // Timeline Default
-    const attempt = lead.attempt_count || 0;
+    // attempt is already defined above
 
-    // STRICT TIMELINE: Halt if exhausted (No infinite loop)
-    const plan = TIMELINE_ACTIONS[attempt];
-    if (!plan) return []; // Auto-Halt
+    // STRICT TIMELINE: Halt if exhausted
+    // plan is already defined above
+    if (!plan) return [];
 
     // Data Priority
     let finalActions = new Set(plan);
     if (finalActions.has('SMS') && lead.email) finalActions.add('MAIL');
+    // Ensure we don't accidentally add MAIL to a VOICE day unless explicit?
+    // User Rule: "Day 3 -> Voice call".
+    // Our array enforces this. Just need to ensure we don't 'fallback' to mail here.
+
     if (finalActions.has('VOICE') && !lead.phone) {
+        // Fallback or Skip? User says "Mandatory".
+        // If no phone, maybe skip or fallback to mail but increment attempt?
         finalActions.delete('VOICE');
-        if (lead.email) finalActions.add('MAIL');
+        if (lead.email) finalActions.add('MAIL'); // Soft fallback to keep moving
     }
     return Array.from(finalActions);
 };
@@ -205,6 +242,15 @@ const finalizeSmsSessions = async () => {
                 const tmrw = new Date(); tmrw.setDate(tmrw.getDate() + 1);
                 leadEntry.next_action_due = tmrw.toISOString().split('T')[0];
                 console.log(`      📅 Set Next Action: ${leadEntry.next_action_due} (Mail)`);
+
+                // CRM PUSH: SMS Conversation Complete
+                crm.pushLeadUpdate(leadEntry, {
+                    status: 'contacted',
+                    intent: 'sms_conversation_ended',
+                    summary: summaryText,
+                    channel: 'sms'
+                });
+
                 fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
             }
 
@@ -236,6 +282,16 @@ const processPostCallActions = async () => {
     }
 
     for (const lead of pendingLeads) {
+        // SAFETY: If lead is already locked for today (e.g. by main loop), skip post-call action to avoid double-tap.
+        // Exception: If the user specifically requested a call, we might want to override, but for safety let's lock.
+        const today = new Date().toISOString().split('T')[0];
+        if (lead.last_action_date === today) {
+            console.log(`      🔒 Skipping Post-Call Action for ${lead.phone}: Already acted today.`);
+            lead.post_call_action_pending = false; // Clear flag to prevent stale processing tomorrow
+            hasUpdates = true;
+            continue;
+        }
+
         console.log(`      ✨ Generating Feedback Request for ${lead.phone}...`);
 
         // 1. Get Summary
@@ -284,9 +340,46 @@ const processPostCallActions = async () => {
             console.error(`      ❌ Failed to send Notification: ${err.message}`);
         }
 
-        // 5. Update Lead
+        // 5. CRM: Log Call (New Feature)
+        await crm.pushCallLog(lead, {
+            status: lead.status,
+            intent: lead.status.includes('INTERESTED') ? 'Interested' : 'General',
+            summary: lead.last_call_summary,
+            duration: 60 // Placeholder or read from metadata if available
+        });
+
+        // 6. Update Lead (FINALIZE & LOCK)
         lead.post_call_action_pending = false;
-        lead.last_updated = new Date().toISOString();
+
+        // This function must be accessible here. It's defined inside runOrchestrator currently.
+        // We need to move markActionComplete to outer scope or pass it.
+        // Since this function is called inside runOrchestrator, let's pass it or assume we refactor.
+        // REFACTOR: We need 'markActionComplete' available.
+        // For now, let's duplicate the logic or (better) move markActionComplete out.
+        // Actually, 'processPostCallActions' is called inside runOrchestrator? Yes.
+        // But it's defined OUTSIDE. So it cannot see markActionComplete.
+        // We will signal the caller or move logic.
+        // Simplest: Just use the same logic here to lock it.
+
+        const now = new Date();
+        // today is already defined at start of loop
+        lead.last_action_date = today;
+        lead.attempt_count = (lead.attempt_count || 0) + 1;
+        const tomorrow = new Date();
+        tomorrow.setDate(now.getDate() + 1);
+        lead.next_action_due = tomorrow.toISOString().split('T')[0];
+
+        console.log(`      📈 Workflow Complete. Locked for today. Attempt -> ${lead.attempt_count}`);
+
+        // CRM PUSH: Detailed Action
+        crm.pushLeadUpdate(lead, {
+            status: 'action_taken',
+            intent: 'voice_workflow_complete',
+            summary: `Call + Feedback Sent. Summary: ${lead.last_call_summary}`,
+            channel: 'voice_workflow'
+        });
+
+        lead.last_updated = now.toISOString();
         hasUpdates = true;
     }
 
@@ -294,10 +387,6 @@ const processPostCallActions = async () => {
         fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
     }
 };
-
-// ---------------------------------------------------------
-// 5. MAIN ORCHESTRATOR RUNNER (INTERLEAVED LOOP)
-// ---------------------------------------------------------
 
 // ---------------------------------------------------------
 // 4.6 GRADUATION CHECK (SCORE BASED)
@@ -349,39 +438,89 @@ const processPrioritySmsActions = async () => {
     if (hasUpdates) fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
 };
 
-const runOrchestrator = async () => {
-    console.log("\n🎻 ORCHESTRATOR PULSE: Checking State...");
+async function runOrchestrator() {
+    process.stdout.write('\x1Bc'); // Clear Console
+    console.log(`
+    =============================================
+       🐝 HIVERICKS INTELLIGENCE ORCHESTRATOR 🐝
+       [Mode: Enterprise Integration]
+    =============================================
+    `);
+
+    // 0. CHECK CRM STATUS (Added for User Clarity)
+    await crm.checkConnection();
+
+    console.log("\n\\n🎻 ORCHESTRATOR PULSE: Checking State...");
+
+    // CRM PULL: Check for new leads
+    await crm.pullNewLeads();
 
     // 0. Maintenance
     await finalizeSmsSessions();
     await processPostCallActions();
-    await processPrioritySmsActions(); // NEW: Priority SMS
+    await processPrioritySmsActions();
     await emailEngine.finalizeMailEvents();
 
     if (!fs.existsSync(LEADS_FILE)) return;
     const leads = readJSON(LEADS_FILE);
     let leadsUpdated = false;
 
-    // TRACKING: Ensure we only increment ONCE per cycle
-    const processedLeadsCycle = new Set();
+    // STATE ENFORCEMENT HELPER (Rule 7 & 8)
+    const markActionComplete = (lead) => {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
 
-    const incrementLeadSafe = (lead) => {
-        if (processedLeadsCycle.has(lead.phone)) return; // Already bumped
+        // CHECK IDEMPOTENCY: If already locked today, DO NOT increment again.
+        if (lead.last_action_date === today) {
+            console.log(`      🔒 Action recorded. Lead already locked for today (No double increment).`);
+            return;
+        }
 
-        // 1. Increment
-        lead.attempt_count = (lead.attempt_count || 0) + 1;
+        // 1. Set Lock
+        lead.last_action_date = today;
 
-        // 2. Set Next Due (Standard 1 Day Gap)
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        lead.next_action_due = tomorrow.toISOString().split('T')[0];
-        lead.last_updated = new Date().toISOString();
+        // 2. Increment Attempt (Only if it's a compulsory scheduled action)
+        const isUserReq = ['SMS_TO_CALL_REQUESTED', 'MAIL_TO_CALL_REQUESTED', 'SMS_CALL_SCHEDULED'].includes(lead.status);
 
-        processedLeadsCycle.add(lead.phone);
-        console.log(`      📈 Attempt Count Incremented -> ${lead.attempt_count} (Next: ${lead.next_action_due})`);
+        if (!isUserReq) {
+            lead.attempt_count = (lead.attempt_count || 0) + 1;
 
+            // 3. Set Next Due (Standard 1 Day Gap, or determined by Schedule)
+            const tomorrow = new Date();
+            tomorrow.setDate(now.getDate() + 1);
+            lead.next_action_due = tomorrow.toISOString().split('T')[0];
+
+            console.log(`      📈 Action Complete. Locked for today. Attempt -> ${lead.attempt_count}`);
+        } else {
+            console.log(`      🛡️  User Request Fulfilled. Action Locked.`);
+        }
+
+        lead.last_updated = now.toISOString();
+
+        // CRM PUSH: Action Recorded
+        crm.pushLeadUpdate(lead, {
+            status: 'action_taken',
+            intent: lead.status.includes('INTERESTED') ? 'potential_interest' : 'outreach',
+            summary: `Action Completed: ${lead.status}`,
+            channel: lead.status.includes('CALL') ? 'voice' : (lead.status.includes('SMS') ? 'sms' : 'email')
+        });
+
+        // CRM FULL SUITE TRIGGERS
+        // 1. Opportunity: If High Interest
+        if (lead.status.includes('INTERESTED') || lead.category === 'HOT') {
+            crm.pushOpportunity(lead);
+        }
+
+        // 2. Meeting: If Scheduled
+        if (lead.status.includes('SCHEDULED') && lead.next_action_due) {
+            // Assume next_action_due is the date, default time 10AM if not parsing detailed time
+            crm.pushMeeting(lead, `${lead.next_action_due} 10:00:00`);
+        }
+
+        // Persist Immediately
         fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
     };
+
 
     // 1. Plan Work
     const batches = { SMS: [], MAIL: [], VOICE: [] };
@@ -405,7 +544,6 @@ const runOrchestrator = async () => {
     if (batches.SMS.length > 0) {
         console.log(`   📨 Processing ${batches.SMS.length} Outbound SMS (Interleaved)...`);
 
-        // CHUNK SIZE = 5 (User Requirement: "Human Real-Time")
         const chunkSize = 5;
         for (let i = 0; i < batches.SMS.length; i += chunkSize) {
 
@@ -416,21 +554,20 @@ const runOrchestrator = async () => {
             // B. Process Chunk
             const chunk = batches.SMS.slice(i, i + chunkSize);
 
-            // INCREMENT ATTEMPTS SAFELY
-            chunk.forEach(l => {
-                // Ensure we bump the count if not already done this cycle
-                const cleanLead = leads.find(lead => lead.phone === l.phone);
-                if (cleanLead) incrementLeadSafe(cleanLead);
-            });
-
-            // console.log(`      ➡️ Sending Chunk ${i / chunkSize + 1}...`);
+            // C. Send & Lock
             await smsEngine.runSmartSmsBatch(chunk);
 
-            // C. Brief Pause (Yield)
+            chunk.forEach(l => {
+                // Re-fetch lead to ensure we have latest object (if mutated by batch) across memory
+                // Actually relying on reference here is fine for this single-process model.
+                const liveLead = leads.find(lead => lead.phone === l.phone);
+                if (liveLead) markActionComplete(liveLead);
+            });
+
+            // D. Brief Pause (Yield)
             await new Promise(r => setTimeout(r, 1000));
         }
     } else {
-        // Even if no outbound, we must check inbound queue!
         await smsQueueManager.processInboundQueue();
     }
 
@@ -438,26 +575,17 @@ const runOrchestrator = async () => {
     // PHASE 2: MAIL
     // ---------------------------------------------------------
 
-    // A. Check Inbound (Priority)
-
-
-    // 4.2 Process Inbound Email Queue (Webhook + IMAP)
     const emailReplies = await emailEngine.processInboundQueue();
-    // NEW: Check IMAP Inbox directly (No Webhook needed)
-    await monitorInbox(); // Will safely skip if already scanning
+    await monitorInbox();
 
-    // 5. Outbound Processing
-    // ...
-
-    // B. Process Outbound
     if (batches.MAIL.length > 0) {
         console.log(`   📧 Processing ${batches.MAIL.length} Outbound Emails...`);
-        const { generateFeedbackRequest } = require('../agent/salesBot'); // Ensure imported
+        const { generateFeedbackRequest } = require('../agent/salesBot');
+        const { getMemory } = require('../agent/memory');
 
         for (const lead of batches.MAIL) {
 
-            // DYNAMIC CONTENT GENERATION (Replcaing Templates)
-            // Context: Use last call summary or just general "Follow up"
+            // DYNAMIC CONTENT GENERATION
             let summaryText = "";
             if (lead.last_call_summary) {
                 try {
@@ -465,6 +593,10 @@ const runOrchestrator = async () => {
                     summaryText = s.conversation_summary || s.text_summary || summaryText;
                 } catch (e) { }
             }
+
+            // FETCH CONTEXT
+            const leadId = lead.phone || lead.email;
+            const memory = await getMemory(leadId);
 
             // MNC-GRADE GENERATION & VALIDATION LOOP
             const { validateEmailContent } = require('../utils/emailValidator');
@@ -475,25 +607,16 @@ const runOrchestrator = async () => {
 
             while (!isValid && attempts < MAX_ATTEMPTS) {
                 attempts++;
-                if (attempts > 1) console.log(`      ⚠️ Retry ${attempts}/${MAX_ATTEMPTS}: Regenerating Email due to validation failure...`);
-
-                fullMsg = await generateFeedbackRequest(summaryText, 'EMAIL', lead.name, lead.attempt_count || 0);
-
+                fullMsg = await generateFeedbackRequest(summaryText, 'EMAIL', lead.name, lead.attempt_count || 0, memory);
                 const validation = validateEmailContent(fullMsg.trim());
-                if (validation.valid) {
-                    isValid = true;
-                } else {
-                    console.warn(`      ❌ Validation Failed (Attempt ${attempts}): ${validation.reason}`);
-                }
+                if (validation.valid) isValid = true;
             }
 
             if (!isValid) {
-                console.error("      ⛔ EMAIL GENERATION ABORTED: Failed validation after retries.");
-                // Skip sending, log error, maybe flag lead for manual review
+                console.error("      ⛔ EMAIL GENERATION ABORTED: Failed validation.");
                 continue;
             }
 
-            // Parse Subject (Safe now because validation guaranteed "Subject:" exists)
             let subject = "Follow up from Hivericks";
             let body = fullMsg;
 
@@ -503,22 +626,13 @@ const runOrchestrator = async () => {
                 body = fullMsg.replace(subjectMatch[0], '').trim();
             }
 
-            console.log("      ✅ FINAL_EMAIL_APPROVED");
-
             const sent = await emailEngine.sendEmail(lead, subject, body);
 
             if (sent) {
-                // UPDATE LEAD TO PREVENT LOOP (Now centralized)
-                const freshLeads = readJSON(LEADS_FILE);
-                const lIndex = freshLeads.findIndex(l => l.phone === lead.phone);
-
-                if (lIndex !== -1) {
-                    // Use centralized increment which handles date checks
-                    incrementLeadSafe(freshLeads[lIndex]);
-                }
+                const liveLead = leads.find(l => l.phone === lead.phone);
+                if (liveLead) markActionComplete(liveLead);
             }
 
-            // Interleaved Check
             await smsQueueManager.processInboundQueue();
         }
     }
@@ -527,18 +641,18 @@ const runOrchestrator = async () => {
     // PHASE 3: VOICE (ARBITRATED)
     // ---------------------------------------------------------
     if (batches.VOICE.length > 0) {
-        if (false && !isCallTime()) { // FORCE ENABLE: BYPASS TIME CHECK
+        if (false && !isCallTime()) {
             console.log(`   ⏳ Skipping VOICE (Outside Window).`);
         } else {
-            // Warmup done globally at start
             console.log(`   ☎️ Processing ${batches.VOICE.length} Calls...`);
 
             for (const lead of batches.VOICE) {
-                // A. Check Inbound SMS Logic FIRST
+                // CAPTURE INTENT BEFORE CALL (Loop Variable 'lead' has the original status)
+                const isScheduledCall = ['SMS_TO_CALL_REQUESTED', 'MAIL_TO_CALL_REQUESTED', 'SMS_CALL_SCHEDULED'].includes(lead.status);
+
                 const queued = await smsQueueManager.processInboundQueue();
                 if (queued > 0) console.log(`      ⚡ Voice Paused for SMS Queue.`);
 
-                // B. PRE-CALL WARMUP (Zero Latency)
                 console.log(`      🔥 Warming up context for ${lead.phone}...`);
                 const { generateOpening } = require('../agent/salesBot');
 
@@ -546,68 +660,42 @@ const runOrchestrator = async () => {
                 let openingText = "Hi, this is Vijay from Hivericks.";
                 try {
                     openingText = await generateOpening(lead);
-                    console.log(`      🗣️  Opening Line: "${openingText}"`);
-                } catch (e) {
-                    console.warn(`      ⚠️ Opening Gen Failed: ${e.message}`);
-                }
+                } catch (e) { }
 
-                // 2. Audio Generation (Voice Clone)
+                // 2. Audio Gen (TTS)
                 let openingFile = null;
                 try {
-                    // Check if server is up
                     const ttsUrl = 'http://localhost:8020/tts';
-                    /* 
-                       Note: api_server.py returns a STREAM. 
-                       We pipe it to a file directly.
-                    */
-                    console.log(`      🎙️  Generating Audio via Streaming Engine...`);
                     const filename = `tts_${Date.now()}.mp3`;
                     const outputPath = path.join(__dirname, '../voice/public/audio', filename);
-
                     const writer = fs.createWriteStream(outputPath);
                     const res = await axios.post(ttsUrl, { text: openingText, speed: 1.3 }, { responseType: 'stream' });
-
                     res.data.pipe(writer);
-
                     await new Promise((resolve, reject) => {
                         writer.on('finish', resolve);
                         writer.on('error', reject);
                     });
-
                     openingFile = filename;
-                    console.log(`      ✅ Audio Streamed & Saved: ${openingFile}`);
-                } catch (e) {
-                    console.warn(`      ⚠️ TTS Gen Failed (Fallback to Greeting): ${e.message}`);
-                }
+                } catch (e) { }
 
-                // C. Dial (Pass Null to use 'greeting.wav')
-                console.log(`      📞 Dialing ${lead.phone}... (Using Standard Greeting)`);
-
-                // 3. DIAL 
+                console.log(`      📞 Dialing ${lead.phone}...`);
                 const sid = await voiceEngine.dialLead(lead, openingFile);
 
-                // D. Wait & Block (Exclusive Port Usage)
                 if (sid) {
                     await waitForCallCompletion(lead.phone, sid);
 
-                    // Attempt Increment Logic (Exempt User Requests)
-                    const isUserReq = ['SMS_TO_CALL_REQUESTED', 'MAIL_TO_CALL_REQUESTED'].includes(lead.status);
+                    // RELOAD LEAD (Get fresh status like CALL_COMPLETED)
+                    const freshLeads = readJSON(LEADS_FILE);
+                    const freshLead = freshLeads.find(l => l.phone === lead.phone);
 
-                    if (!isUserReq) {
-                        // Lock & Load
-                        const freshLeads = readJSON(LEADS_FILE);
-                        const lIndex = freshLeads.findIndex(l => l.phone === lead.phone);
-                        if (lIndex !== -1) {
-                            freshLeads[lIndex].attempt_count = (freshLeads[lIndex].attempt_count || 0) + 1;
-                            fs.writeFileSync(LEADS_FILE, JSON.stringify(freshLeads, null, 2));
-                            console.log(`      📈 Attempt Count Incremented -> ${freshLeads[lIndex].attempt_count}`);
-                        }
-                    } else {
-                        console.log(`      🛡️  Escalation Call: Attempt count NOT incremented.`);
+                    if (freshLead) {
+                        // DEFER COMPLETION:
+                        // We do NOT call markActionComplete here.
+                        // We wait for processPostCallActions to send feedback, THEN mark complete.
+                        console.log(`      ⏳ Call Ended. Deferring lock until Post-Call Actions (${freshLead.post_call_action_pending})...`);
                     }
                 }
 
-                // D. Yield before next call
                 await new Promise(r => setTimeout(r, 2000));
             }
         }
