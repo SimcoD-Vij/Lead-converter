@@ -1,20 +1,24 @@
 [
   {
-    "name": "Vijay R",
+    "lead_id": "697fb2334c1d60c86",
+    "name": "Vijay",
     "phone": "+917604896187",
     "email": "rsvijaypargavan@gmail.com",
-    "attempt_count": 4,
-    "next_action_due": "2026-01-22",
-    "score": 80,
+    "status": "MAIL_COMPLETE",
+    "source": "CRM_IMPORT",
+    "score": 100,
+    "imported_at": "2026-02-01T20:27:52.670Z",
+    "last_sms_time": "2026-02-02T20:03:16.482Z",
+    "last_action_date": "2026-02-05",
+    "attempt_count": 3,
+    "next_action_due": "2026-02-06",
+    "last_updated": "2026-02-05T12:01:38.453Z",
     "category": "HOT",
-    "source": "SYSTEM",
-    "status": "SMS_SENT",
-    "imported_at": "2026-01-19T06:55:08.743Z",
-    "last_call_summary": "{\"lead_status\":\"UNKNOWN\",\"confidence_level\":\"low\",\"key_interests\":[],\"main_objections\":[],\"recommended_next_step\":\"manual_review\",\"generated_at\":\"2026-01-21T02:52:25.947Z\"}",
-    "last_updated": "2026-01-21T02:53:07.718Z",
-    "last_call_sid": "CAe1ce0f88effdf661428ab91f95f51f41",
     "post_call_action_pending": false,
-    "last_interaction": "2026-01-21T02:52:38.525Z",
-    "last_sms_time": "2026-01-21T02:53:11.312Z"
+    "last_call_sid": "CAd4be81cea9f6d6076446da5430e80990",
+    "last_interaction": "2026-02-05T12:00:58.635Z",
+    "last_call_summary": "{\"lead_status\":\"stalled\",\"generated_at\":\"2026-02-05T12:08:01.896Z\",\"text_summary\":\"No response to drip.\"}",
+    "conversation_stage_id": 2,
+    "resistance_attempts": 1
   }
 ]

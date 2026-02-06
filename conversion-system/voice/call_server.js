@@ -27,6 +27,7 @@ const axios = require('axios');
 
 // LLM
 const {
+    SalesBrain,
     detectIntent,
     generateResponse,
     generateStructuredSummary,
@@ -34,7 +35,9 @@ const {
     generateFinalSummary,
     warmup
 } = require('../agent/salesBot');
+const { textToSSML } = require('../agent/voice_utils');
 const { calculateScore, analyzeSentiment } = require('../scoring/scoring_engine');
+const crm = require('../agent/crm_connector');
 
 // ... (existing imports)
 
@@ -58,6 +61,9 @@ const pendingLLMRequests = new Map(); // Store active LLM promises by CallSid
 // ---------------------------------------------------------
 app.post('/voice/deferred-response', async (req, res) => {
     const callSid = req.body.CallSid;
+    const direction = req.body.Direction || 'outbound-api';
+    const leadPhone = direction === 'inbound' ? req.body.From : req.body.To;
+
     console.log(`   ⏳ Fetching Deferred Response for ${callSid}...`);
 
     try {
@@ -68,21 +74,35 @@ app.post('/voice/deferred-response', async (req, res) => {
             const twiml = new twilio.twiml.VoiceResponse();
             // twiml.gather({ input: 'speech', action: '/voice/input' }).say(VOICE_CONFIG, "I didn't catch that. Could you say it again?");
             const gather = twiml.gather({ input: 'speech', action: '/voice/input' });
-            const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
-            gather.play(`${SERVER_URL}/audio/error_repeat.wav`);
+            gather.say(VOICE_CONFIG, "I didn't catch that. Could you say it again?");
             return res.type('text/xml').send(twiml.toString());
         }
 
         // Await the background task
-        // We add a safety timeout here too, just in case
         const TIMEOUT = 10000;
-        const aiResponse = await Promise.race([
+        const llmResult = await Promise.race([
             promise,
             new Promise((_, reject) => setTimeout(() => reject(new Error('DEFERRED_TIMEOUT')), TIMEOUT))
         ]);
 
         // Cleanup
         pendingLLMRequests.delete(callSid);
+
+        let aiResponse = typeof llmResult === 'string' ? llmResult : llmResult.response;
+        const stageId = typeof llmResult === 'object' ? llmResult.stageId : null;
+
+        // PERSIST STAGE & RESISTANCE IMMEDIATELY
+        if (llmResult.stageId || (llmResult.memory && llmResult.memory.resistance_attempts)) {
+            const memory = llmResult.memory || {};
+            updateLeadStatus(
+                leadPhone,
+                'CALL_CONNECTED',
+                null, null, null,
+                callSid,
+                llmResult.stageId,
+                memory.resistance_attempts
+            );
+        }
 
         console.log(`\n\x1b[32m🤖 AI REPLIED (Async): "${aiResponse}"\x1b[0m\n`);
         logTurn(callSid, 'assistant', aiResponse);
@@ -99,22 +119,14 @@ app.post('/voice/deferred-response', async (req, res) => {
 
         const gather = twiml.gather({
             input: 'speech',
-            speechTimeout: 'auto',
+            speechTimeout: '1.5', // Give user more space before cut
             action: '/voice/input',
             method: 'POST'
         });
 
 
         // OLD: gather.say(VOICE_CONFIG, cleanResponse);
-        // NEW: Play Generated Audio
-        const audioFilename = await generateSpeech(cleanResponse);
-        if (audioFilename) {
-            const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
-            gather.play(`${SERVER_URL}/audio/${audioFilename}`);
-        } else {
-            // Fallback if TTS fails (Unlikely if server acts up, but safety)
-            gather.say({ voice: 'Polly.Matthew-Neural' }, cleanResponse);
-        }
+        gather.say(VOICE_CONFIG, textToSSML(cleanResponse));
 
         if (shouldHangup) twiml.hangup();
 
@@ -127,8 +139,7 @@ app.post('/voice/deferred-response', async (req, res) => {
         const twiml = new twilio.twiml.VoiceResponse();
         // twiml.gather({ input: 'speech', action: '/voice/input' }).say(VOICE_CONFIG, "I apologize, I lost my train of thought. What were you saying?");
         const gather = twiml.gather({ input: 'speech', action: '/voice/input' });
-        const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
-        gather.play(`${SERVER_URL}/audio/error_lost_thought.wav`);
+        gather.say(VOICE_CONFIG, "I apologize, I lost my train of thought. What were you saying?");
         res.type('text/xml').send(twiml.toString());
     }
 });
@@ -137,7 +148,11 @@ app.post('/voice/deferred-response', async (req, res) => {
 // FILES CONFIGURATION
 // ---------------------------------------------------------
 const CONVO_DIR = path.join(__dirname, 'voice_conversations'); // Dedicated DB for voice logs
-const EVENTS_FILE = path.resolve(__dirname, '../processed_leads/LeadEvents.json');
+// --- STARTUP WARMUP (MCP TOOLS) ---
+console.log("   🔌 VOICE: Warming up Brain...");
+warmup().catch(e => console.warn("   ⚠️ Voice Brain Warmup Delay:", e.message));
+
+const EVENTS_FILE = path.resolve(__dirname, '../processed_leads/lead-events.json');
 const LEADS_FILE = path.resolve(__dirname, '../processed_leads/clean_leads.json');
 const CALL_LOGS_FILE = path.resolve(__dirname, 'call_logs.json');
 
@@ -150,17 +165,19 @@ if (!fs.existsSync(CALL_LOGS_FILE)) fs.writeFileSync(CALL_LOGS_FILE, '[]');
 // VOICE CONFIGURATION
 // ---------------------------------------------------------
 const VOICE_CONFIG = {
-    // voice: 'Polly.Matthew-Neural', // OLD
-    // language: 'en-US'
-    // NEW: We don't use Twilio Say for main content anymore, we use Play.
+    voice: 'Polly.Matthew-Neural',
+    language: 'en-IN'
 };
 
 // SERVE STATIC AUDIO
 app.use('/audio', express.static(path.join(__dirname, 'public/audio')));
 
 // TTS HELPER
-// TTS HELPER (Streaming Engine)
+// XTTS HELPER (DISABLED BY USER REQUEST -> Standard Voice Fallback)
 async function generateSpeech(text) {
+    // FORCE FALLBACK TO TWILIO <SAY> (Standard Voice)
+    return null;
+    /* 
     try {
         const filename = `tts_${Date.now()}.mp3`;
         const outputPath = path.join(__dirname, 'public/audio', filename);
@@ -183,6 +200,7 @@ async function generateSpeech(text) {
         console.error("❌ TTS Streaming Failed:", e.message);
         return null;
     }
+    */
 }
 
 
@@ -251,10 +269,16 @@ const logTurn = (sid, role, text) => {
 };
 
 // Update Lead Status safely
-const updateLeadStatus = (phone, status, summary = null, newScore = null, newCategory = null, sid = null) => {
+const updateLeadStatus = (phone, status, summary = null, newScore = null, newCategory = null, sid = null, stageId = null, resistanceAttempts = null) => {
     if (!fs.existsSync(LEADS_FILE)) return;
     const leads = readJSON(LEADS_FILE, []);
-    const idx = leads.findIndex(l => l.phone === phone);
+
+    const cleanTarget = String(phone).replace(/\D/g, "");
+    const idx = leads.findIndex(l => {
+        if (!l.phone) return false;
+        const cleanLead = String(l.phone).replace(/\D/g, "");
+        return cleanLead.includes(cleanTarget) || cleanTarget.includes(cleanLead);
+    });
 
     if (idx !== -1) {
         if (VOICE_STATUSES.includes(status)) {
@@ -275,10 +299,17 @@ const updateLeadStatus = (phone, status, summary = null, newScore = null, newCat
             leads[idx].last_call_sid = sid;
             console.log(`   🆔 SID Linked: ${sid}`);
         }
+        if (stageId) {
+            leads[idx].conversation_stage_id = stageId;
+            console.log(`   🎯 Stage Updated: ${stageId}`);
+        }
+        if (resistanceAttempts !== null) {
+            leads[idx].resistance_attempts = resistanceAttempts;
+            console.log(`   ⚠️ Resistance Logged: ${resistanceAttempts}`);
+        }
 
-        // POST-CALL ACTION TRIGGER
-        // If the call reached a terminal state where we spoke to the user, trigger follow-up.
-        if (['CALL_CONNECTED', 'CALL_INTERESTED', 'CALL_NOT_INTERESTED', 'CALL_COMPLETED'].includes(status)) {
+        // POST_CALL_ACTION_PENDING is set only if summary is provided (terminal state)
+        if (summary && ['CALL_CONNECTED', 'CALL_INTERESTED', 'CALL_NOT_INTERESTED', 'CALL_COMPLETED'].includes(status)) {
             leads[idx].post_call_action_pending = true;
             console.log(`   🚩 Flagged for Post-Call Action (Feedback/Summary).`);
         }
@@ -367,43 +398,35 @@ async function processCallCompletion(sid, leadPhone, convo, timestamp = null) {
         const eventId = `evt_${Date.now()}`;
         const eventTimestamp = timestamp;
 
-        // 5. Update LeadEvents.json
-        const eventsFileContent = readJSON(EVENTS_FILE, []);
+        // 5. Update lead-events.json (UNIFIED FLAT STRUCTURE)
+        const events = readJSON(EVENTS_FILE, []);
 
         // Fetch attempt count
         const currentLeadsForEvent = readJSON(LEADS_FILE, []);
         const leadForEvent = currentLeadsForEvent.find(l => l.phone === leadPhone);
         const attemptCount = leadForEvent ? (leadForEvent.attempt_count || 0) : 0;
 
-        let leadRecord = eventsFileContent.find(l => l.lead_id === leadPhone);
-        if (!leadRecord) {
-            leadRecord = {
-                lead_id: leadPhone, channel: 'VOICE',
-                created_at: eventTimestamp, last_updated: eventTimestamp,
-                events: [], final_summary: {}
-            };
-            eventsFileContent.push(leadRecord);
-        }
-
-        // Ensure array
-        if (!Array.isArray(leadRecord.events)) leadRecord.events = [];
-
-        leadRecord.events.push({
+        // Push flat event
+        events.push({
             event_id: eventId,
+            lead_id: leadPhone,
+            channel: 'VOICE',
+            type: 'VOICE_CALL_COMPLETE',
             timestamp: eventTimestamp,
+            attempt_count: attemptCount,
             summary: structuredSummary,
-            attempt_count: attemptCount
+            master_summary: textSummary // Session level summary
         });
 
-        // Recompute Master Summary
-        const finalSummary = await generateFinalSummary(leadRecord.events.map(e => ({ date: e.timestamp, summary: e.summary })));
+        // Recompute Historical Final Summary (Cross-event memory)
+        const leadHistory = events.filter(e => e.lead_id === leadPhone);
+        const finalSummary = await generateFinalSummary(
+            leadHistory.map(e => ({ date: e.timestamp, summary: e.summary }))
+        );
         finalSummary.generated_at = eventTimestamp;
-        leadRecord.final_summary = finalSummary;
-        leadRecord.last_updated = eventTimestamp;
-        leadRecord.master_summary = textSummary;
 
-        writeJSON(EVENTS_FILE, eventsFileContent);
-        console.log(`      ✅ LeadEvents Updated.`);
+        writeJSON(EVENTS_FILE, events);
+        console.log(`      ✅ lead-events.json Updated (Flat + History).`);
 
         // 5. Update Call Logs
         const masterLogs = readJSON(CALL_LOGS_FILE, []);
@@ -472,6 +495,18 @@ async function processCallCompletion(sid, leadPhone, convo, timestamp = null) {
 
         updateLeadStatus(leadPhone, updateStatus, JSON.stringify(finalSummary), finalScore, finalCategory, sid);
 
+        // 7. CRM Stream Integration
+        try {
+            await crm.pushInteractionToStream(leadForEvent || leadContextForScore, 'voice', {
+                summary: textSummary,
+                intent: structuredSummary.user_intent,
+                transcription: transcriptText,
+                nextPrompt: structuredSummary.next_action
+            });
+        } catch (crmErr) {
+            console.error(`      ❌ CRM Interaction Push Failed:`, crmErr.message);
+        }
+
         return true;
 
     } catch (e) {
@@ -485,7 +520,12 @@ async function processCallCompletion(sid, leadPhone, convo, timestamp = null) {
 // ---------------------------------------------------------
 const getLeadContext = (phone) => {
     const leads = readJSON(LEADS_FILE, []);
-    const lead = leads.find(l => l.phone === phone);
+    const cleanTarget = String(phone).replace(/\D/g, "");
+    const lead = leads.find(l => {
+        if (!l.phone) return false;
+        const cleanLead = String(l.phone).replace(/\D/g, "");
+        return cleanLead.includes(cleanTarget) || cleanTarget.includes(cleanLead);
+    });
 
     if (lead) {
         // Find Master Summary
@@ -506,96 +546,50 @@ const getLeadContext = (phone) => {
 // 2. PROMPTS
 // ---------------------------------------------------------
 const getOpening = (ctx) => {
-    if (ctx.type === 'EXISTING') {
-        if (ctx.summary) {
-            return `Hi ${ctx.name}, i am from Hivericks. I see we spoke recently. Is now a good time?`;
-        }
-        return `Hi ${ctx.name}, Vijay here from Hivericks regarding XOptimus. Do you have a quick minute?`;
+    if (ctx.type === 'EXISTING' && ctx.name) {
+        return `Hi ${ctx.name}, this is Vijay from Hivericks regarding the XOptimus charger. Do you have a minute?`;
     }
-    // Anonymous
-    return "Hi, this is Vijay from Hivericks Technologies. I missed a call from this number, or maybe you inquired about our XOptimus chargers?";
+    return "Hi, this is Vijay from Hivericks Technologies. I'm calling to discuss our XOptimus chargers. Do you have a quick minute?";
 };
 
-// NEW FILLER LOGIC (Audio Files)
-const getFillerAudio = (text) => {
-    // 1. Greeting Check (If this is the very first turn, handled separately, but just in case)
-    if (!text) return "filler_moment.wav";
+// ...
 
-    const t = text.toLowerCase();
-
-    // 2. Contextual Fillers
-    if (t.includes('price') || t.includes('cost') || t.includes('how much')) return "filler_check.wav"; // "Let me check that..."
-    if (t.includes('warranty') || t.includes('guarantee')) return "filler_check.wav";
-    if (t.includes('feature') || t.includes('spec') || t.includes('what is')) return "filler_thinking.wav"; // "Let me see..."
-
-    // 3. Random Generic
-    const fillers = [
-        "filler_moment.wav", // "One moment please"
-        "filler_thinking.wav" // "Let me see..."
-    ];
-    return fillers[Math.floor(Math.random() * fillers.length)];
-};
-
-// ---------------------------------------------------------
-// ROUTE: INCOMING / OUTGOING CALL START
-// ---------------------------------------------------------
 app.post('/voice', async (req, res) => {
     const callSid = req.body.CallSid;
     const direction = req.body.Direction || 'outbound-api';
-    // For inbound, 'From' is user. For outbound, 'To' is user.
     const leadPhone = direction === 'inbound' ? req.body.From : req.body.To;
-
-    // #region agent log
-    const callStartTime = Date.now();
-    fetch('http://127.0.0.1:7242/ingest/9a7cfcbb-92ab-4e23-8e2c-dd5be07531c4', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'call_server.js:393', message: 'CALL_START', data: { callSid, leadPhone, direction, startTime: callStartTime }, timestamp: callStartTime, sessionId: 'debug-session', runId: 'run1', hypothesisId: 'A' }) }).catch(() => { });
-    // #endregion
 
     console.log(`\n📞 NEW CALL (${direction}): ${leadPhone} [SID: ${callSid}]`);
 
     try {
-        // 1. Identify Lead
-        const context = getLeadContext(leadPhone);
-        console.log(`   👤 Context: ${context.type} (${context.name})`);
+        const leadContext = getLeadContext(leadPhone);
+        console.log(`   👤 Context: ${leadContext.type} (${leadContext.name})`);
 
-        // 2. Pre-Warm / Initialize Log
+        // 1. Determine Opening Text (Prioritize Passed Opening -> Context -> Default)
+        const openingText = req.query.openingText || getOpening(leadContext);
+        console.log(`\n\x1b[32m🤖 AI GREETING (Polly): "${openingText}"\x1b[0m\n`);
+
         writeJSON(convoFile(callSid), []); // Init empty log
-        updateLeadStatus(leadPhone, 'CALL_CONNECTED', null, null, null, callSid);
+        updateLeadStatus(leadPhone, 'CALL_CONNECTED', null, null, null, callSid, 1);
 
-        // 3. Play Greeting (Dynamic or Pre-recorded)
-        const openingParam = req.query.opening || req.body.opening;
-        const greetingAudio = openingParam || "greeting.wav";
-
-        // 4. Resolve SERVER_URL (Critical for Twilio)
-        // Ensure we prioritize the Env var (Ngrok) over localhost
-        const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
-        console.log(`      🔗 SERVER_URL: ${SERVER_URL}`);
-
-        console.log(`\n\x1b[32m🤖 AI GREETING: [Playing ${greetingAudio}]\x1b[0m\n`);
-
-        const openingText = "Hi, this is Vijay from Hivericks regarding XOptimus. Do you have a quick minute?";
         const initialTurn = { role: 'assistant', text: openingText, timestamp: new Date().toISOString() };
         writeJSON(convoFile(callSid), [initialTurn]);
 
         const twiml = new twilio.twiml.VoiceResponse();
         const gather = twiml.gather({
             input: 'speech',
-            speechTimeout: 'auto',
+            speechTimeout: '1.5', // Give user more space before cut
             action: '/voice/input',
             method: 'POST'
         });
 
-        // Decode in case it was URL encoded
-        const decodedAudio = decodeURIComponent(greetingAudio);
-        const audioUrl = `${SERVER_URL}/audio/${decodedAudio}`;
-
-        console.log(`      🔊 Audio URL: ${audioUrl}`);
-        gather.play(audioUrl);
+        gather.say(VOICE_CONFIG, textToSSML(openingText));
 
         res.type('text/xml').send(twiml.toString());
     } catch (e) {
-        console.error("❌ ERROR in /voice handler:", e);
+        console.error("❌ ERROR in /voice handler:", e.message);
         const twiml = new twilio.twiml.VoiceResponse();
-        twiml.say("System error connecting call.");
+        twiml.say(VOICE_CONFIG, "System busy. Please hold.");
         res.type('text/xml').send(twiml.toString());
     }
 });
@@ -634,11 +628,9 @@ app.post('/voice/input', async (req, res) => {
             // 1 -> Prompt again clearly.
             // 2 -> Hangup.
 
-            if (silenceCount >= 3) { // Increased from 2 to 3
+            if (silenceCount >= 3) {
                 const twiml = new twilio.twiml.VoiceResponse();
-                // twiml.say(VOICE_CONFIG, "I am having trouble hearing you. I will disconnect now. Feel free to call back.");
-                const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
-                twiml.play(`${SERVER_URL}/audio/error_timeout.wav`);
+                twiml.say(VOICE_CONFIG, "I am having trouble hearing you. I will disconnect now. Feel free to call back.");
                 twiml.hangup();
                 logTurn(callSid, 'assistant', "TIMEOUT_HANGUP");
                 return res.type('text/xml').send(twiml.toString());
@@ -658,10 +650,10 @@ app.post('/voice/input', async (req, res) => {
             const gather = twiml.gather({
                 input: 'speech',
                 action: '/voice/input',
-                speechTimeout: 'auto', // Twilio Auto (approx 5s silence)
-                timeout: 10 // Wait up to 10s for start
+                speechTimeout: '1.5',
+                timeout: 5 // Wait up to 5s for start
             });
-            gather.say(VOICE_CONFIG, prompt);
+            gather.say(VOICE_CONFIG, textToSSML(prompt));
 
             return res.type('text/xml').send(twiml.toString());
         }
@@ -673,9 +665,9 @@ app.post('/voice/input', async (req, res) => {
         // ...
 
         // C. Calculate Filler
-        // C. Calculate Filler (Audio File)
-        const fillerAudio = getFillerAudio(userSpeech);
-        console.log(`   💭 FILLER SELECTED: ${fillerAudio}`);
+        // C. Calculate Filler (Switched to Text below)
+        // const fillerAudio = getFillerAudio(userSpeech); 
+        // console.log(`   💭 FILLER SELECTED: ${fillerAudio}`);
 
         // D. Trigger LLM (Parallel)
         // We must start the LLM generation NOW so it runs while the filler plays.
@@ -696,30 +688,78 @@ app.post('/voice/input', async (req, res) => {
         } catch (e) { }
 
         const memory = {
-            history: convo, // Pass full history
+            history: convo,
+            conversation_stage_id: leadContext.conversation_stage_id || 1,
+            resistance_attempts: leadContext.resistance_attempts || 0,
             summaryContext: null
         };
 
-        console.log(`   ⚡ ASYNC: Playing filler ("${fillerAudio}") & Loading LLM...`);
-        const llmPromise = generateResponse({
-            userMessage: userSpeech,
-            memory,
-            mode: 'VOICE_CALL',
-            leadContext: leadContext
+        const brain = new SalesBrain({
+            leadContext: leadContext,
+            memory: memory,
+            mode: 'VOICE_CALL'
         });
+
+        console.log(`   ⚡ ASYNC: Playing filler & Loading Brain...`);
+        const llmPromise = brain.processTurn(userSpeech);
         pendingLLMRequests.set(callSid, llmPromise);
 
         const deferredTwiml = new twilio.twiml.VoiceResponse();
 
-        // NEW AUDIO FILLER
-        // const fillerAudio = getFillerAudio(userSpeech); // Defined above
-        // Assuming filler logic now returns filename (e.g. "filler_moment.wav")
-        // We need URL again.
-        // HACK: We need SERVER_URL globally.
-        // Let's grab it from process.env if available, or just assume relative might fail if not careful.
-        // Ideally we pass it in.
-        const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
-        deferredTwiml.play(`${SERVER_URL}/audio/${fillerAudio}`);
+        // NEW TEXT FILLER (Polly Consistent)
+        const getFillerText = (text) => {
+            if (!text) return "One moment please.";
+            const t = text.toLowerCase();
+
+            const fillers = {
+                general: [
+                    "Let me check that for you.",
+                    "Give me a second to look into this.",
+                    "Let me see... right.",
+                    "Good point, let me verify that for you.",
+                    "I see. Let me pull up the details."
+                ],
+                price: [
+                    "Let me check the latest pricing for you.",
+                    "I'll pull up the price list right now, one second.",
+                    "Sure, let me verify the current offers on that.",
+                    "Pricing, right. Let me just confirm the exact figure for you."
+                ],
+                tech: [
+                    "Let me look at the technical specifications for you.",
+                    "I'll check the compatible devices list, one moment.",
+                    "Let me verify the technical details on that.",
+                    "Interesting question. Let me check the engineering specs."
+                ],
+                needs: [
+                    "I see. That's helpful to know. Let me think...",
+                    "Right, I understand your situation. One second.",
+                    "Got it. Let me just process that and get back to you.",
+                    "That makes sense. Let me see how xOptimus fits there."
+                ],
+                objection: [
+                    "I hear what you're saying. Let me double check something.",
+                    "Fair point. Let me look into that for you.",
+                    "I appreciate you bringing that up. One moment.",
+                    "Let me verify a few details to address that properly."
+                ]
+            };
+
+            let category = 'general';
+            if (t.includes('price') || t.includes('cost') || t.includes('offer')) category = 'price';
+            else if (t.includes('feature') || t.includes('specs') || t.includes('work') || t.includes('compatible') || t.includes('heat') || t.includes('gaming')) category = 'tech';
+            else if (t.includes('battery') || t.includes('dying') || t.includes('charge') || t.includes('often') || t.includes('use')) category = 'needs';
+            else if (t.includes('expensive') || t.includes('sure') || t.includes('later') || t.includes('skeptical') || t.includes('not interested')) category = 'objection';
+
+            const categoryFillers = fillers[category];
+            const choice = categoryFillers[Math.floor(Math.random() * categoryFillers.length)];
+            return choice;
+        };
+
+        const fillerText = getFillerText(userSpeech);
+        console.log(`   💭 FILLER SPOKEN: "${fillerText}"`);
+
+        deferredTwiml.say(VOICE_CONFIG, textToSSML(fillerText));
 
         deferredTwiml.redirect({ method: 'POST' }, '/voice/deferred-response');
 
@@ -740,10 +780,7 @@ app.post('/voice/input', async (req, res) => {
             action: '/voice/input',
             method: 'POST'
         });
-        // gather.say(VOICE_CONFIG, "I apologize, I'm having a technical issue. Could you repeat that?");
-        const SERVER_URL = process.env.SERVER_URL || `https://${req.headers.host}`;
-        gather.play(`${SERVER_URL}/audio/error_tech_issue.wav`);
-
+        gather.say(VOICE_CONFIG, "I apologize, I'm having a technical issue. Could you repeat that?");
         res.type('text/xml').send(errorTwiml.toString());
     }
 });

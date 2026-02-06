@@ -16,15 +16,26 @@ const path = require("path");
 
 const LEADS_FILE = path.join(__dirname, "../processed_leads/clean_leads.json");
 
-// HELPER: Read/Write Leads safely
 const updateLeadState = (phone, updates) => {
     if (!fs.existsSync(LEADS_FILE)) return { success: false, error: "Database not found" };
+    if (!phone) return { success: false, error: "Phone number is required for lookup" };
 
     try {
         const leads = JSON.parse(fs.readFileSync(LEADS_FILE, "utf8"));
-        const idx = leads.findIndex(l => l.phone.includes(phone.replace("whatsapp:", "")) || phone.includes(l.phone));
 
-        if (idx === -1) return { success: false, error: "Lead not found" };
+        // Normalize strings for matching
+        const cleanTarget = String(phone).replace(/\D/g, ""); // Keep only digits
+
+        const idx = leads.findIndex(l => {
+            if (!l.phone) return false;
+            const cleanLead = String(l.phone).replace(/\D/g, "");
+            return cleanLead.includes(cleanTarget) || cleanTarget.includes(cleanLead);
+        });
+
+        if (idx === -1) {
+            console.error(`[MCP] Lead Search Failed for phone: ${phone} (Clean: ${cleanTarget})`);
+            return { success: false, error: "Lead not found in clean_leads.json" };
+        }
 
         // Apply Updates
         Object.keys(updates).forEach(key => {
@@ -130,9 +141,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     if (name === "schedule_call") {
-        const res = updateLeadState(args.phone, { status: "SMS_CALL_SCHEDULED" });
+        const res = updateLeadState(args.phone, {
+            status: "SMS_CALL_SCHEDULED",
+            next_action_due: args.when || "tomorrow"
+        });
         if (res.success) {
-            return { content: [{ type: "text", text: "Call Scheduled. Status updated." }] };
+            return { content: [{ type: "text", text: `Call Scheduled for ${args.when || 'tomorrow'}.` }] };
         }
         return { content: [{ type: "text", text: `Failed: ${res.error}` }], isError: true };
     }

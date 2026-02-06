@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 const { openMailEvent, logMailInteraction, getOpenMailEvent, summarizeMailEvent } = require('./email_events');
 const { getMemory, upsertMemory } = require('../agent/memory');
 const { generateResponse, detectIntent } = require('../agent/salesBot');
+const crm = require('../agent/crm_connector');
 
 const LEADS_FILE = path.join(__dirname, '../processed_leads/clean_leads.json');
 const TRACKING_DOMAIN = process.env.TRACKING_DOMAIN || 'http://localhost:5000';
@@ -112,6 +113,16 @@ const sendEmail = async (lead, subjectOrTemplate, bodyContent) => {
         // D. Update Lead
         // Note: Orchestrator might also manage status, but we update timestamp here.
         // Lead Status should be updated by Orchestrator based on this result.
+
+        // CRM SYNC (Outbound)
+        try {
+            await crm.pushInteractionToStream(lead, 'email', {
+                summary: `Outbound Email: ${subject}`,
+                intent: 'outreach',
+                content: body,
+                nextPrompt: 'Waiting for reply'
+            });
+        } catch (e) { }
 
         return true;
 
@@ -283,6 +294,18 @@ const processInboundEmail = async (webhookPayload) => {
 
     writeJSON(LEADS_FILE, leads);
 
+    // CRM Stream Integration
+    try {
+        await crm.pushInteractionToStream(lead, 'email', {
+            summary: `Inbound Email from ${sender}`,
+            intent: lead.status === 'MAIL_TO_CALL_REQUESTED' ? 'request_call' : 'engaged',
+            transcription: body,
+            nextPrompt: aiResponse
+        });
+    } catch (crmErr) {
+        console.error(`      ❌ CRM Interaction Push Failed:`, crmErr.message);
+    }
+
     return true;
 };
 
@@ -295,55 +318,102 @@ const startMaintenance = async () => {
 };
 
 const finalizeMailEvents = async () => {
-    console.log("   🧹 MAIL MAINTENANCE: Checking for stale events...");
-    const { readEvents } = require('./email_events'); // Lazy load to avoid circular if any? 
-    // Actually we iterate events file directly or use getter?
-    // We need 'readEvents' exposed or we just read the file ourselves.
-    // email_events.js doesn't export readEvents.
-    // Let's rely on 'summarizeMailEvent' which does the read/write locally but we need to ID the stale ones.
-
-    // Better strategy: Add 'searchStaleEvents' to email_events.js?
-    // Or just read lead-events.json here. It is shared.
-
     const EVENTS_FILE = path.join(__dirname, '../processed_leads/lead-events.json');
     if (!fs.existsSync(EVENTS_FILE)) return;
 
-    const events = JSON.parse(fs.readFileSync(EVENTS_FILE, 'utf8'));
+    // 1. Read once
+    let events;
+    try {
+        events = JSON.parse(fs.readFileSync(EVENTS_FILE, 'utf8'));
+    } catch (e) { return; }
+
     const now = new Date();
     const TIMEOUT_HOURS = 24;
 
+    // 2. Identify stale events
     const staleEvents = events.filter(e => {
-        if (e.channel !== 'MAIL' || e.status !== 'OPEN') return false;
+        if (['CLOSED', 'FAILED_FINAL', 'SKIPPED'].includes(e.status)) return false;
         const lastTouch = new Date(e.last_updated || e.timestamp);
-        const diffMs = now - lastTouch;
-        const diffHours = diffMs / (1000 * 60 * 60);
-        return diffHours > TIMEOUT_HOURS;
+        return (now - lastTouch) / (1000 * 60 * 60) > TIMEOUT_HOURS;
     });
 
     if (staleEvents.length === 0) return;
 
-    console.log(`      Found ${staleEvents.length} stale MAIL events. Summarizing...`);
+    // 3. CAP PROCESSING: Limit to 5 per pulse to prevent blocking
+    const BATCH_SIZE = 5;
+    const toProcess = staleEvents.slice(0, BATCH_SIZE);
+
+    console.log(`   🧹 MAIL MAINTENANCE: Summarizing ${toProcess.length}/${staleEvents.length} stale events...`);
 
     const leads = readJSON(LEADS_FILE);
     let leadsUpdated = false;
+    let eventsChanged = false;
 
-    for (const evt of staleEvents) {
-        // 1. Generate Summary
-        const summaryData = await summarizeMailEvent(evt.event_id);
-
+    // 4. Process in memory
+    for (const evt of toProcess) {
+        // Optimization: Use a local version of summarize that doesn't R/W file
+        const summaryData = await summarizeMailEventInMemory(evt, events);
         if (summaryData) {
-            // 2. Update Lead Context
+            eventsChanged = true;
             const lead = leads.find(l => (l.phone === evt.lead_id || l.email === evt.lead_id));
             if (lead) {
-                lead.last_call_summary = `[MAIL SUMMARY]: ${summaryData.conversation_summary}`;
-                lead.status = "MAIL_COMPLETE"; // Or keep previous?
-                // If interest is high, maybe bump score?
+                lead.last_call_summary = JSON.stringify({
+                    lead_status: "stalled",
+                    generated_at: new Date().toISOString(),
+                    text_summary: summaryData.conversation_summary
+                });
+                lead.status = "MAIL_COMPLETE";
                 leadsUpdated = true;
+
+                try {
+                    await crm.pushInteractionToStream(lead, 'email', {
+                        summary: summaryData.conversation_summary,
+                        intent: summaryData.user_intent || 'email_session_complete',
+                        transcription: `Email Thread Completed.`,
+                        nextPrompt: 'N/A'
+                    });
+                } catch (e) { }
             }
         }
     }
 
+    // 5. Write once
+    if (eventsChanged) fs.writeFileSync(EVENTS_FILE, JSON.stringify(events, null, 2));
     if (leadsUpdated) writeJSON(LEADS_FILE, leads);
+};
+
+// Helper: Local summary logic to avoid file I/O within loops
+const summarizeMailEventInMemory = async (evt, eventsList) => {
+    if (['CLOSED', 'FAILED_FINAL'].includes(evt.status)) return evt.structured_analysis;
+
+    evt.summary_attempts = (evt.summary_attempts || 0) + 1;
+    if (evt.summary_attempts > 3) {
+        evt.status = 'FAILED_FINAL';
+        return null;
+    }
+
+    const { generateStructuredSummary } = require('../agent/salesBot');
+    const transcriptText = (evt.transcript || [])
+        .filter(t => t.role === 'user')
+        .map(t => `${t.role.toUpperCase()}: ${t.content}`)
+        .join('\n');
+
+    if (!transcriptText) {
+        evt.status = 'CLOSED';
+        evt.summary = "No response to drip.";
+        evt.structured_analysis = { conversation_summary: evt.summary, user_intent: "no_response" };
+        return evt.structured_analysis;
+    }
+
+    try {
+        const summaryData = await generateStructuredSummary(transcriptText);
+        evt.summary = summaryData.conversation_summary;
+        evt.structured_analysis = summaryData;
+        evt.status = 'CLOSED';
+        return summaryData;
+    } catch (e) {
+        return null;
+    }
 };
 
 // ---------------------------------------------------------

@@ -3,9 +3,9 @@
 // ---------------------------------------------------------
 
 // 1. IMPORTS
-require('dotenv').config({ path: '../.env' });
-const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+const fs = require('fs');
 const axios = require('axios');
 const { parsePhoneNumber } = require('libphonenumber-js');
 

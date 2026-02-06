@@ -1,5 +1,6 @@
 
-require('dotenv').config({ path: '../.env' });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const express = require('express');
 const bodyParser = require('body-parser');
 const twilio = require('twilio');
@@ -14,7 +15,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const PORT = 3000; 
+const PORT = 3000;
 
 // --- 1. VOICE: HANDLE SPEECH (The "Ear") ---
 app.post('/gather', async (req, res) => {
@@ -36,17 +37,17 @@ app.post('/gather', async (req, res) => {
     // A. BRAIN: Generate Answer
     // We explicitly set mode to 'VOICE_CALL' so it keeps it short & spoken
     const memory = await getMemory(leadId);
-    const aiText = await generateResponse({ 
-        userMessage: userSpeech, 
-        memory: memory, 
-        mode: 'VOICE_CALL' 
+    const aiText = await generateResponse({
+        userMessage: userSpeech,
+        memory: memory,
+        mode: 'VOICE_CALL'
     });
 
     // B. LOGGING: Extract Intent
     let summary = null;
     if (userSpeech.match(/price|cost/i)) summary = "Lead asked about Pricing";
     if (userSpeech.match(/not interested|busy/i)) summary = "Lead Objected/Busy";
-    
+
     await logInteraction(leadId, 'VOICE', `User: ${userSpeech} | AI: ${aiText}`, summary);
 
     // C. HUMANIZE: Apply SSML
@@ -57,7 +58,7 @@ app.post('/gather', async (req, res) => {
     // "language='en-IN'" ensures Indian accent compatibility if preferred
     const twiml = `
     <Response>
-        <Say voice="Polly.Matthew" language="en-IN">${ssmlResponse}</Say>
+        <Say voice="Polly.Matthew-Neural" language="en-IN">${ssmlResponse}</Say>
         <Gather input="speech" action="/gather" method="POST" timeout="2" language="en-IN"></Gather>
     </Response>
     `;
@@ -72,7 +73,7 @@ app.post('/voice', async (req, res) => {
 
     const twiml = `
     <Response>
-        <Say voice="Polly.Matthew" language="en-IN">${ssmlGreeting}</Say>
+        <Say voice="Polly.Matthew-Neural" language="en-IN">${ssmlGreeting}</Say>
         <Gather input="speech" action="/gather" method="POST" timeout="2" language="en-IN"></Gather>
     </Response>
     `;
@@ -89,16 +90,16 @@ app.post('/sms', async (req, res) => {
     // A. BRAIN: Generate Answer
     // Mode is 'SMS_CHAT' allows emojis and links
     const memory = await getMemory(leadId);
-    const aiText = await generateResponse({ 
-        userMessage: incomingMsg, 
-        memory: memory, 
-        mode: 'SMS_CHAT' 
+    const aiText = await generateResponse({
+        userMessage: incomingMsg,
+        memory: memory,
+        mode: 'SMS_CHAT'
     });
 
     // B. LOGGING
     let summary = null;
     if (incomingMsg.match(/call me/i)) summary = "Requested Call";
-    
+
     await logInteraction(leadId, 'SMS', `User: ${incomingMsg} | AI: ${aiText}`, summary);
 
     // C. RESPOND

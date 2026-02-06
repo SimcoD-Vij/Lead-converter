@@ -21,7 +21,7 @@ console.log("DEBUG AUTH: AUTH length", (process.env.TWILIO_AUTH || "").length);
 // ---------------------------------------------------------
 // DIAL LEAD FUNCTION
 // ---------------------------------------------------------
-async function dialLead(lead, openingFile) {
+async function dialLead(lead, openingFile, openingText) {
     // ⚠️ CRITICAL: Always read process.env here to get the LATEST Ngrok URL
     // (Orchestrator updates this value dynamically when switching ports)
     const SERVER_URL = process.env.SERVER_URL;
@@ -41,9 +41,10 @@ async function dialLead(lead, openingFile) {
     console.log("      🔍 DEBUG AUTH: TWILIO_AUTH Length =", (process.env.TWILIO_AUTH || "").length);
 
     try {
-        // Append opening file to URL if present
-        let callUrl = `${SERVER_URL}/voice`;
-        if (openingFile) callUrl += `?opening=${encodeURIComponent(openingFile)}`;
+        // Build URL with parameters
+        let callUrl = `${SERVER_URL}/voice?`;
+        if (openingFile) callUrl += `openingFile=${encodeURIComponent(openingFile)}&`;
+        if (openingText) callUrl += `openingText=${encodeURIComponent(openingText)}&`;
 
         const call = await client.calls.create({
             url: callUrl,

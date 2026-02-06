@@ -32,7 +32,8 @@ const startService = (name, script, color) => {
 console.log("🚀 STARTING UNIFIED SYSTEM...");
 
 // 1. Start Call Server (Backend) - Port 3000
-startService('SERVER', 'voice/call_server.js', COLORS.server);
+// DISABLED: Orchestrator now manages its own voice server instance
+// startService('SERVER', 'voice/call_server.js', COLORS.server);
 
 // 2. Wait for Server to Initialize, then Start Orchestrator
 setTimeout(() => {

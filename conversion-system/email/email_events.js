@@ -81,36 +81,74 @@ const summarizeMailEvent = async (eventId) => {
     const events = readEvents();
     const evt = events.find(e => e.event_id === eventId);
 
-    if (!evt || evt.summary) return null; // Already done or missing
+    if (!evt) return null;
 
-    // Flatten Transcript
-    const transcriptText = evt.transcript.map(t => `${t.role.toUpperCase()}: ${t.content}`).join('\n');
-
-    console.log(`      📝 Generating Summary for Event ${eventId}...`);
-
-    // Use SalesBot
-    // We reuse generateStructuredSummary but might want a simpler one for Mail?
-    // User Requirement: "concise, two-line, human-readable summary"
-    // Let's use a custom prompt here or adapt SalesBot?
-    // SalesBot `generateStructuredSummary` returns a JSON object. We need that for the Lead File update.
-
-    const summaryData = await generateStructuredSummary(transcriptText);
-
-    // Fallback for Malformed structured summary
-    if (summaryData.user_intent === 'error_parsing') {
-        console.log("      ⚠️ Structured Summary Failed. Falling back to Text Summary...");
-        const textFallback = await require('../agent/salesBot').generateTextSummary(transcriptText);
-        summaryData.conversation_summary = textFallback;
+    // 0. IDEMPOTENCY & CAP CHECK
+    if (['CLOSED', 'FAILED_FINAL'].includes(evt.status)) {
+        return evt.structured_analysis || { conversation_summary: evt.summary };
     }
 
-    // Finalize
-    evt.summary = summaryData.conversation_summary;
-    evt.structured_analysis = summaryData; // Store full JSON too in details
-    evt.status = 'CLOSED';
+    evt.summary_attempts = (evt.summary_attempts || 0) + 1;
+    if (evt.summary_attempts > 3) {
+        console.error(`      ⛔ Event ${eventId} exceeded max summary attempts. Marking FAILED_FINAL.`);
+        evt.status = 'FAILED_FINAL';
+        evt.failure_reason = 'MAX_ATTEMPTS_EXCEEDED';
+        writeEvents(events);
+        return null; // Stop processing
+    }
 
-    writeEvents(events);
-    console.log(`      ✅ Event Summarized and Closed: ${eventId}`);
-    return summaryData;
+    writeEvents(events); // Persist attempt count immediately (Lock)
+
+    // 1. Flatten Transcript (User Focused)
+    // We include Assistant for context but can filter if needed. 
+    // User Tip: "Never summarize ASSISTANT". Let's focus on USER content primarily.
+    const transcriptText = (evt.transcript || [])
+        .filter(t => t.role === 'user') // Focus on what User said
+        .map(t => `${t.role.toUpperCase()}: ${t.content}`)
+        .join('\n');
+
+    if (!transcriptText) {
+        // No user content? Just close it as NO_RESPONSE.
+        evt.status = 'CLOSED';
+        evt.summary = "Lead did not respond to the email drip.";
+        evt.structured_analysis = {
+            interest_level: 'low',
+            user_intent: 'no_response',
+            objections: 'none',
+            next_action: 'continue_drip',
+            conversation_summary: "Lead did not respond to the email drip."
+        };
+        writeEvents(events);
+        console.log(`      ⏩ Event ${eventId} closed (No User Response).`);
+        return evt.structured_analysis;
+    }
+
+    console.log(`      📝 Generating Summary for Event ${eventId} (Attempt ${evt.summary_attempts})...`);
+
+    try {
+        // 2. Use SalesBot
+        const summaryData = await generateStructuredSummary(transcriptText);
+
+        // Fallback for Malformed structured summary
+        if (summaryData.user_intent === 'error_parsing') {
+            const textFallback = await require('../agent/salesBot').generateTextSummary(transcriptText);
+            summaryData.conversation_summary = textFallback;
+        }
+
+        // 3. Finalize Success
+        evt.summary = summaryData.conversation_summary;
+        evt.structured_analysis = summaryData;
+        evt.status = 'CLOSED';
+
+        console.log(`      ✅ Event Summarized and Closed: ${eventId}`);
+    } catch (error) {
+        console.error(`      ❌ Summary Failed for ${eventId}: ${error.message}`);
+        // Do NOT set to CLOSED. Leave OPEN/RETRYING.
+        // Attempt count was already incremented.
+    }
+
+    writeEvents(events); // Final Persistence
+    return evt.structured_analysis;
 };
 
 module.exports = {

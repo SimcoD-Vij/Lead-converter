@@ -10,6 +10,18 @@ const axios = require('axios');
 
 console.log("\n🚀 MASTER ORCHESTRATOR: Initializing Unified System...");
 
+// 0. INSTANCE LOCK (Rule: Never run twice)
+const LOCK_FILE = path.join(__dirname, '../orchestrator.lock');
+if (fs.existsSync(LOCK_FILE)) {
+    console.error(`\n❌ ERROR: Another Orchestrator instance is already running!`);
+    console.error(`   If this is an error, delete: ${LOCK_FILE}\n`);
+    process.exit(1);
+}
+fs.writeFileSync(LOCK_FILE, process.pid.toString());
+process.on('exit', () => { if (fs.existsSync(LOCK_FILE)) fs.unlinkSync(LOCK_FILE); });
+process.on('SIGINT', () => { if (fs.existsSync(LOCK_FILE)) fs.unlinkSync(LOCK_FILE); process.exit(); });
+process.on('SIGTERM', () => { if (fs.existsSync(LOCK_FILE)) fs.unlinkSync(LOCK_FILE); process.exit(); });
+
 // ---------------------------------------------------------
 // 1. INFRASTRUCTURE & STARTUP
 // ---------------------------------------------------------
@@ -17,16 +29,20 @@ console.log("\n🚀 MASTER ORCHESTRATOR: Initializing Unified System...");
 // A. VOICE SERVER (Internal Port 3000)
 const voiceServerPath = path.join(__dirname, '../voice/call_server.js');
 console.log(`🔌 INFRASTRUCTURE: Launching Internal Voice Server (Port 3000)...`);
-const voiceProcess = fork(voiceServerPath, [], { stdio: 'pipe' });
+const voiceProcess = fork(voiceServerPath, [], { stdio: ['inherit', 'pipe', 'pipe', 'ipc'] });
 
-voiceProcess.stdout.on('data', (d) => process.stdout.write(d));
-voiceProcess.stderr.on('data', (d) => process.stderr.write(d));
+voiceProcess.stdout.on('data', (d) => {
+    process.stdout.write(d.toString());
+});
+voiceProcess.stderr.on('data', (d) => {
+    process.stderr.write(d.toString());
+});
 voiceProcess.on('close', (c) => console.log(`[VOICE] Exited: ${c}`));
 
-// B. GATEWAY SERVER (Public Port 8080)
+// B. GATEWAY SERVER (Public Port 8082)
 // This is the new "Single Ingress"
 const gatewayPath = path.join(__dirname, '../gateway/server.js');
-console.log(`🔌 INFRASTRUCTURE: Launching Unified Gateway (Port 8080)...`);
+console.log(`🔌 INFRASTRUCTURE: Launching Unified Gateway (Port 8082)...`);
 // Inherit stdio so we see "INCOMING SMS" logs in the main terminal
 const gatewayProcess = spawn('node', [gatewayPath], { stdio: 'inherit', shell: true });
 
@@ -41,7 +57,7 @@ console.log(`   🌍 Ngrok Public URL: https://oretha-geniculate-addictedly.ngro
 const smsEngine = require('../sms/sms_engine');
 const smsQueueManager = require('../sms/sms_queue_manager');
 const { monitorInbox } = require('../email/reply_monitor'); // NEW QUEUE MANAGER
-const { generateResponse, warmup } = require('../agent/salesBot');
+const { generateResponse, generateOpening, generateFeedbackRequest, warmup } = require('../agent/salesBot');
 // Initialize "Brain" immediately (Starts MCP)
 warmup().catch(e => console.error("💥 Warmup Failed:", e.message));
 
@@ -89,9 +105,9 @@ const isCallTime = () => {
 // ---------------------------------------------------------
 
 const TIMELINE_ACTIONS = [
-    ['SMS', 'MAIL'],        // Attempt 0 (Day 1)
-    ['SMS', 'MAIL'],        // Attempt 1 (Day 2)
-    ['VOICE'],              // Attempt 2 (Day 3) - STRICT VOICE ONLY (Rule 1)
+    ['SMS', 'MAIL'],        // Attempt 0 (Day 1) - Simultaneous Outreach
+    ['SMS', 'MAIL'],        // Attempt 1 (Day 2) - Simultaneous Outreach
+    ['VOICE'],              // Attempt 2 (Day 3) - STRICT VOICE ONLY
     ['SMS', 'MAIL'],        // Attempt 3 (Day 5)
     ['VOICE'],              // Attempt 4 (Day 7)
     ['SMS', 'MAIL'],        // Attempt 5 (Day 10)
@@ -190,80 +206,11 @@ const determineActions = (lead) => {
     return Array.from(finalActions);
 };
 
+
 // ---------------------------------------------------------
 // 4. MEMORY & FINALIZATION (LOGICAL WINDOWS)
 // ---------------------------------------------------------
-
-const finalizeSmsSessions = async () => {
-    const smsHistory = readJSON(SMS_HISTORY_FILE, {});
-    const allLeadEvents = readJSON(EVENTS_FILE, []);
-    const SESSION_TIMEOUT_MS = 10 * 1000; // 10 Seconds (TESTING MODE)
-    const now = new Date().getTime();
-    let hasUpdates = false;
-
-    for (const [leadId, session] of Object.entries(smsHistory)) {
-        if (!session.last_interaction || !session.messages?.length) continue;
-
-        // Timeout Checker
-        const lastTime = new Date(session.last_interaction).getTime();
-        if ((now - lastTime) > SESSION_TIMEOUT_MS) {
-            console.log(`   🏁 Finalizing Inactive Session: ${leadId}`);
-
-            // Generate Summary
-            const transcript = session.messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n');
-            const summaryPrompt = `
-            Analyze this COMPLETED SMS conversation.
-            Write a human-readable summary (max 2 sentences).
-            Focus on: User Intent, key objections, and final outcome.
-            Do NOT mention "AI", "System", or confidence scores.
-            TRANSCRIPT:
-            ${transcript}
-            `;
-            const summaryText = await generateResponse({
-                userMessage: summaryPrompt,
-                memory: {}, mode: 'SMS_CHAT'
-            });
-
-            // Create Event
-            allLeadEvents.push({
-                event_id: `evt_sms_${Date.now()}`,
-                lead_id: leadId,
-                channel: 'WHATSAPP',
-                type: 'CONVERSATION_COMPLETE',
-                timestamp: new Date().toISOString(),
-                summary: summaryText
-            });
-
-            // Trigger Follow-up (1 Day)
-            const leads = readJSON(LEADS_FILE, []);
-            const leadEntry = leads.find(l => l.phone === leadId || l.phone === leadId.replace('whatsapp:', ''));
-            if (leadEntry) {
-                leadEntry.last_call_summary = summaryText;
-                const tmrw = new Date(); tmrw.setDate(tmrw.getDate() + 1);
-                leadEntry.next_action_due = tmrw.toISOString().split('T')[0];
-                console.log(`      📅 Set Next Action: ${leadEntry.next_action_due} (Mail)`);
-
-                // CRM PUSH: SMS Conversation Complete
-                crm.pushLeadUpdate(leadEntry, {
-                    status: 'contacted',
-                    intent: 'sms_conversation_ended',
-                    summary: summaryText,
-                    channel: 'sms'
-                });
-
-                fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
-            }
-
-            delete smsHistory[leadId];
-            hasUpdates = true;
-        }
-    }
-
-    if (hasUpdates) {
-        fs.writeFileSync(SMS_HISTORY_FILE, JSON.stringify(smsHistory, null, 2));
-        saveLeadEvents(allLeadEvents);
-    }
-};
+// (finalizeSmsSessions moved to sms_queue_manager.js)
 
 // ---------------------------------------------------------
 // 4.5 POST-CALL FOLLOW-UP (IMMEDIATE FEEDBACK)
@@ -281,25 +228,29 @@ const processPostCallActions = async () => {
         console.log(`   🏁 Processing Post-Call Actions for ${pendingLeads.length} leads...`);
     }
 
+    // Get Exactly Today (Local Date)
+    const now_obj = new Date();
+    const offset_obj = new Date(now_obj.getTime() - (now_obj.getTimezoneOffset() * 60000));
+    const today = offset_obj.toISOString().split('T')[0];
+
     for (const lead of pendingLeads) {
-        // SAFETY: If lead is already locked for today (e.g. by main loop), skip post-call action to avoid double-tap.
-        // Exception: If the user specifically requested a call, we might want to override, but for safety let's lock.
-        const today = new Date().toISOString().split('T')[0];
-        if (lead.last_action_date === today) {
-            console.log(`      🔒 Skipping Post-Call Action for ${lead.phone}: Already acted today.`);
-            lead.post_call_action_pending = false; // Clear flag to prevent stale processing tomorrow
-            hasUpdates = true;
-            continue;
-        }
+        // Post-call actions are part of the voice interaction follow-up and should NOT be blocked by the daily lock.
+
+        // IMMEDIATE LOCK (before generation to prevent race from pulse)
+        lead.last_action_date = today;
+        lead.post_call_action_pending = false;
+        fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
 
         console.log(`      ✨ Generating Feedback Request for ${lead.phone}...`);
 
-        // 1. Get Summary
+        // 1. Get Summary & Requests
         let summaryText = "our recent conversation";
         if (lead.last_call_summary) {
             try {
                 const s = JSON.parse(lead.last_call_summary);
-                summaryText = s.conversation_summary || s.text_summary || summaryText;
+                const convoSummary = s.conversation_summary || s.text_summary || "";
+                const requests = s.unhandled_requests || "";
+                summaryText = `${convoSummary} ${requests ? "\nUSER REQUESTS: " + requests : ""}`.trim() || summaryText;
             } catch (e) {
                 // heuristic fallback
             }
@@ -307,19 +258,18 @@ const processPostCallActions = async () => {
 
         // 3. Generate & Send (Multi-channel)
         const { generateFeedbackRequest } = require('../agent/salesBot');
-
         try {
             console.log(`\n**************************************************************`);
             // SMS
             if (lead.phone) {
-                const smsMsg = await generateFeedbackRequest(summaryText, 'SMS');
+                const smsMsg = await generateFeedbackRequest(summaryText, 'SMS', lead.name);
                 console.log(`📝 GENERATED SMS FEEDBACK: "${smsMsg}"`);
                 try { await smsEngine.sendSms(lead.phone, smsMsg); } catch (e) { }
             }
 
             // EMAIL
             if (lead.email) {
-                const fullMsg = await generateFeedbackRequest(summaryText, 'EMAIL');
+                const fullMsg = await generateFeedbackRequest(summaryText, 'EMAIL', lead.name);
 
                 // Parse Subject (e.g., "SUBJECT: Summary of Call")
                 let subject = "Follow up from Hivericks";
@@ -374,8 +324,8 @@ const processPostCallActions = async () => {
         // CRM PUSH: Detailed Action
         crm.pushLeadUpdate(lead, {
             status: 'action_taken',
-            intent: 'voice_workflow_complete',
-            summary: `Call + Feedback Sent. Summary: ${lead.last_call_summary}`,
+            intent: lead.status.includes('INTERESTED') ? 'interested' : 'not_interested',
+            summary: lead.last_call_summary,
             channel: 'voice_workflow'
         });
 
@@ -439,7 +389,7 @@ const processPrioritySmsActions = async () => {
 };
 
 async function runOrchestrator() {
-    process.stdout.write('\x1Bc'); // Clear Console
+    // process.stdout.write('\x1Bc'); // DISABLED: Don't clear console, it wipes history
     console.log(`
     =============================================
        🐝 HIVERICKS INTELLIGENCE ORCHESTRATOR 🐝
@@ -450,13 +400,13 @@ async function runOrchestrator() {
     // 0. CHECK CRM STATUS (Added for User Clarity)
     await crm.checkConnection();
 
-    console.log("\n\\n🎻 ORCHESTRATOR PULSE: Checking State...");
+    console.log(`\n\x1b[94m-- ORCHESTRATOR PULSE [${new Date().toLocaleTimeString()}] --\x1b[0m`);
 
     // CRM PULL: Check for new leads
     await crm.pullNewLeads();
 
     // 0. Maintenance
-    await finalizeSmsSessions();
+    await smsQueueManager.finalizeSmsSessions();
     await processPostCallActions();
     await processPrioritySmsActions();
     await emailEngine.finalizeMailEvents();
@@ -497,12 +447,13 @@ async function runOrchestrator() {
 
         lead.last_updated = now.toISOString();
 
-        // CRM PUSH: Action Recorded
-        crm.pushLeadUpdate(lead, {
-            status: 'action_taken',
-            intent: lead.status.includes('INTERESTED') ? 'potential_interest' : 'outreach',
+        console.log(`      📊 DIAGNOSTIC: Initiating CRM Sync Phase...`);
+        console.log(`      📝 DIAGNOSTIC: Channel=${lead.status.includes('CALL') ? 'VOICE' : 'TEXT'} | ID=${lead.lead_id}`);
+        crm.pushInteractionToStream(lead, lead.status.includes('CALL') ? 'voice' : (lead.status.includes('SMS') ? 'sms' : 'email'), {
             summary: `Action Completed: ${lead.status}`,
-            channel: lead.status.includes('CALL') ? 'voice' : (lead.status.includes('SMS') ? 'sms' : 'email')
+            intent: lead.status.includes('INTERESTED') ? 'potential_interest' : 'outreach',
+            conversation: lead.conversation || [], // Pass transcript if available
+            nextPrompt: `Next Action Due: ${lead.next_action_due}`
         });
 
         // CRM FULL SUITE TRIGGERS
@@ -519,6 +470,23 @@ async function runOrchestrator() {
 
         // Persist Immediately
         fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
+    };
+
+    /**
+     * PRE-CALL LOCK: Reserve the lead immediately before starting the call process.
+     * Prevents race conditions from simultaneous orchestrator processes.
+     */
+    const markActionInitiated = (lead) => {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+
+        if (lead.last_action_date === today) return false; // Already locked
+
+        lead.last_action_date = today;
+        lead.last_updated = now.toISOString();
+        fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
+        console.log(`      🔒 Pre-Call Lock Applied for ${lead.phone}.`);
+        return true;
     };
 
 
@@ -647,6 +615,13 @@ async function runOrchestrator() {
             console.log(`   ☎️ Processing ${batches.VOICE.length} Calls...`);
 
             for (const lead of batches.VOICE) {
+                // 1. PRE-CALL LOCK (Rule: Only one process can capture the lead today)
+                const locked = markActionInitiated(lead);
+                if (!locked) {
+                    console.log(`      ⏭️  Skipping ${lead.phone}: Already locked by another process.`);
+                    continue;
+                }
+
                 // CAPTURE INTENT BEFORE CALL (Loop Variable 'lead' has the original status)
                 const isScheduledCall = ['SMS_TO_CALL_REQUESTED', 'MAIL_TO_CALL_REQUESTED', 'SMS_CALL_SCHEDULED'].includes(lead.status);
 
@@ -654,32 +629,15 @@ async function runOrchestrator() {
                 if (queued > 0) console.log(`      ⚡ Voice Paused for SMS Queue.`);
 
                 console.log(`      🔥 Warming up context for ${lead.phone}...`);
-                const { generateOpening } = require('../agent/salesBot');
-
                 // 1. Generate Opening Text
-                let openingText = "Hi, this is Vijay from Hivericks.";
+                let openingText = "Hi, this is Vijay from Hivericks. Do you have a minute?";
                 try {
                     openingText = await generateOpening(lead);
                 } catch (e) { }
 
-                // 2. Audio Gen (TTS)
-                let openingFile = null;
-                try {
-                    const ttsUrl = 'http://localhost:8020/tts';
-                    const filename = `tts_${Date.now()}.mp3`;
-                    const outputPath = path.join(__dirname, '../voice/public/audio', filename);
-                    const writer = fs.createWriteStream(outputPath);
-                    const res = await axios.post(ttsUrl, { text: openingText, speed: 1.3 }, { responseType: 'stream' });
-                    res.data.pipe(writer);
-                    await new Promise((resolve, reject) => {
-                        writer.on('finish', resolve);
-                        writer.on('error', reject);
-                    });
-                    openingFile = filename;
-                } catch (e) { }
-
                 console.log(`      📞 Dialing ${lead.phone}...`);
-                const sid = await voiceEngine.dialLead(lead, openingFile);
+                // Passing openingText instead of a generated file to ensure Polly handles it
+                const sid = await voiceEngine.dialLead(lead, null, openingText);
 
                 if (sid) {
                     await waitForCallCompletion(lead.phone, sid);
@@ -689,10 +647,9 @@ async function runOrchestrator() {
                     const freshLead = freshLeads.find(l => l.phone === lead.phone);
 
                     if (freshLead) {
-                        // DEFER COMPLETION:
-                        // We do NOT call markActionComplete here.
-                        // We wait for processPostCallActions to send feedback, THEN mark complete.
-                        console.log(`      ⏳ Call Ended. Deferring lock until Post-Call Actions (${freshLead.post_call_action_pending})...`);
+                        // IMMEDIATE FOLLOW-UP: Explicitly trigger post-call actions after call ends
+                        console.log(`      ⏳ Call Ended. Triggering Immediate Post-Call Actions...`);
+                        await processPostCallActions();
                     }
                 }
 

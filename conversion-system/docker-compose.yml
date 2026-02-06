@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  hivericks-core:
+    container_name: hivericks_core
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000" # Voice Server
+      - "8082:8082" # Gateway
+    environment:
+      - NODE_ENV=production
+    volumes:
+      # 1. MOUNT CONFIGURATION: Local .env file maps to container .env
+      - ./.env:/app/.env
+
+      # 2. PERSIST VITAL DATA: Map local folders to container folders
+      # Leads Data
+      - ./processed_leads:/app/processed_leads
+
+      # Voice Logs & Conversations
+      - ./voice/voice_conversations:/app/voice/voice_conversations
+      - ./voice/call_logs.json:/app/voice/call_logs.json
+      - ./voice/summary_calls.json:/app/voice/summary_calls.json
+
+      # SMS Logs
+      - ./sms/sms_history.json:/app/sms/sms_history.json
+
+      # Email Logs (if applicable)
+      - ./email/email_history.json:/app/email/email_history.json
+
+    # Extra host configuration to allow talking to services on host machine (like local CRM)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

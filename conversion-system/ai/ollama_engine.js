@@ -5,7 +5,7 @@ const axios = require('axios');
 
 // CONFIGURATION
 const OLLAMA_URL = 'http://127.0.0.1:11434/api/chat';
-const MODEL = 'llama3.2:1b'; 
+const MODEL = 'llama3.2:3b';
 const TIMEOUT_MS = 20000; // 20 Second Timeout
 
 // 1. HARDCODED KNOWLEDGE BASE (From Manual)
@@ -103,7 +103,7 @@ Keep it short.
         // We include history if provided, otherwise just System + User
         const messages = [
             { role: "system", content: structuredSystemMsg },
-            ...history, 
+            ...history,
             { role: "user", content: userMessage }
         ];
 
@@ -118,7 +118,7 @@ Keep it short.
         };
 
         const response = await axios.post(OLLAMA_URL, payload, { timeout: TIMEOUT_MS });
-        
+
         const reply = response.data.message.content.trim();
         console.log(`   💡 AI Answer: "${reply}"`);
         return reply;

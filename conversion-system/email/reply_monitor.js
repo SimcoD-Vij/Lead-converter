@@ -2,11 +2,13 @@
 // TASK 2+: EMAIL AI RESPONDER (HEADER FIX - FULL VERSION)
 // ---------------------------------------------------------
 
-require('dotenv').config({ path: '../.env' });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const imaps = require('imap-simple');
 const { simpleParser } = require('mailparser');
 const nodemailer = require('nodemailer');
+const fs = require('fs');
 const { processInboundEmail } = require('./email_engine');
 
 // ---------------------------------------------------------

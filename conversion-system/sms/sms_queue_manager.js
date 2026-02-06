@@ -7,18 +7,21 @@
 
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const client = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
 
 // MODULES
-const { generateResponse, detectIntent } = require('../agent/salesBot');
+const { generateResponse, detectIntent, generateStructuredSummary } = require('../agent/salesBot');
 const { getMemory, upsertMemory } = require('../agent/memory');
 const { logSmsSession } = require('./sms_engine'); // Shared Logger
+const crm = require('../agent/crm_connector'); // CRM Integration
 
 // PATHS
 const SMS_QUEUE_FILE = path.join(__dirname, 'inbound_sms_queue.json');
 const ACTIVE_WINDOWS_FILE = path.join(__dirname, 'active_conversations.json');
 const LEADS_FILE = path.join(__dirname, '../processed_leads/clean_leads.json');
+const SMS_HISTORY_FILE = path.join(__dirname, 'sms_history.json');
+const EVENTS_FILE = path.join(__dirname, '../processed_leads/lead-events.json');
 
 // HELPERS
 const readJSON = (file) => {
@@ -158,6 +161,16 @@ const handleInboundMessage = async (leadId, userMessage) => {
             leads[lIndex].category = scoreResult.category;
             console.log(`      💯 Score Updated: ${scoreResult.score} (${scoreResult.category})`);
             writeJSON(LEADS_FILE, leads);
+
+            // CRM Push Turn (NEW)
+            try {
+                await crm.pushInteractionToStream(leads[lIndex], 'whatsapp', {
+                    summary: `WhatsApp Inbound: ${userMessage.substring(0, 50)}...`,
+                    intent: 'engaged',
+                    transcription: userMessage,
+                    nextPrompt: finalResponse
+                });
+            } catch (err) { /* ignore */ }
         }
     }
 
@@ -225,5 +238,78 @@ const updateLeadStatus = (phone, status) => {
     }
 };
 
-module.exports = { processInboundQueue };
+const finalizeSmsSessions = async () => {
+    console.log("   🧹 SMS MAINTENANCE: Checking for stale sessions...");
 
+    if (!fs.existsSync(SMS_HISTORY_FILE)) return;
+    const history = JSON.parse(fs.readFileSync(SMS_HISTORY_FILE, 'utf8'));
+
+    const now = new Date();
+    const TIMEOUT_HOURS = 12;
+    let leadsUpdated = false;
+    const leads = readJSON(LEADS_FILE);
+
+    for (const leadId in history) {
+        const session = history[leadId];
+        if (session.summarized) continue;
+
+        const lastInteraction = new Date(session.last_interaction || session.session_start);
+        const diffHours = (now - lastInteraction) / (1000 * 60 * 60);
+
+        if (diffHours >= TIMEOUT_HOURS) {
+            console.log(`      Finalizing SMS Session for ${leadId} (${diffHours.toFixed(1)}h idle)`);
+
+            const transcriptText = session.messages
+                .map(m => `${m.role.toUpperCase()}: ${m.content}`)
+                .join('\n');
+
+            try {
+                const summaryData = await generateStructuredSummary(transcriptText);
+
+                // 1. Log to unified lead-events.json
+                const events = readJSON(EVENTS_FILE);
+                events.push({
+                    event_id: `evt_sms_${Date.now()}`,
+                    lead_id: leadId,
+                    channel: 'WHATSAPP',
+                    type: 'SMS_SESSION_COMPLETE',
+                    timestamp: now.toISOString(),
+                    summary: summaryData,
+                    master_summary: summaryData.conversation_summary
+                });
+                writeJSON(EVENTS_FILE, events);
+
+                // 2. CRM Push
+                const lead = leads.find(l => l.phone === leadId || l.phone === leadId.replace('whatsapp:', ''));
+                if (lead) {
+                    await crm.pushInteractionToStream(lead, 'whatsapp', {
+                        summary: summaryData.conversation_summary,
+                        intent: summaryData.user_intent,
+                        transcription: `SMS Thread Finalized. Transcript: ${transcriptText.substring(0, 500)}...`,
+                        nextPrompt: summaryData.next_action
+                    });
+
+                    // Recompute Historical Final Summary (Cross-channel memory)
+                    const { generateFinalSummary } = require('../agent/salesBot');
+                    const leadHistory = events.filter(e => e.lead_id === leadId);
+                    const finalSummary = await generateFinalSummary(
+                        leadHistory.map(e => ({ date: e.timestamp, summary: e.summary || e.structured_analysis }))
+                    );
+
+                    lead.last_call_summary = JSON.stringify(finalSummary);
+                    leadsUpdated = true;
+                }
+
+                session.summarized = true;
+                session.summary = summaryData;
+            } catch (err) {
+                console.error(`      ❌ SMS Summary Failed for ${leadId}:`, err.message);
+            }
+        }
+    }
+
+    if (leadsUpdated) writeJSON(LEADS_FILE, leads);
+    fs.writeFileSync(SMS_HISTORY_FILE, JSON.stringify(history, null, 2));
+};
+
+module.exports = { processInboundQueue, handleInboundMessage, finalizeSmsSessions };

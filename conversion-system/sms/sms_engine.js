@@ -2,10 +2,10 @@
 // SMS ENGINE: WHATSAPP + AI SALES BOT INTEGRATION
 // ---------------------------------------------------------
 
-require('dotenv').config({ path: '../.env' });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const client = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
 const fs = require('fs');
-const path = require('path');
 
 // IMPORT AI BRAIN
 const { generateResponse } = require('../agent/salesBot');
@@ -160,6 +160,16 @@ const runSmartSmsBatch = async (forcedLeads = null) => {
                 logSmsSession(leadId, 'assistant', aiBody);
                 await upsertMemory(leadId, { last_bot_message: aiBody });
 
+                // G. CRM SYNC
+                const crm_connector = require('../agent/crm_connector');
+                try {
+                    await crm_connector.pushInteractionToStream(lead, 'sms', {
+                        summary: `Outbound WhatsApp Message`,
+                        intent: 'follow_up',
+                        content: aiBody
+                    });
+                } catch (e) { }
+
                 // F. UPDATE LEAD STATE
                 // Advance timeline logic moved to Orchestrator to prevent double-counting.
                 // We only update status here to mark completion.
@@ -185,15 +195,20 @@ const runSmartSmsBatch = async (forcedLeads = null) => {
 };
 
 // DIRECT SENDER (New Export)
-const sendSms = async (to, body) => {
+const sendSms = async (to, body, log = true) => {
     const fromNum = 'whatsapp:+14155238886';
     const toNum = to.includes('whatsapp:') ? to : `whatsapp:${to}`;
 
-    return await client.messages.create({
+    const res = await client.messages.create({
         body: body,
         from: fromNum,
         to: toNum
     });
+
+    if (log) {
+        logSmsSession(to, 'assistant', body);
+    }
+    return res;
 };
 
 module.exports = { runSmartSmsBatch, logSmsSession, sendSms };

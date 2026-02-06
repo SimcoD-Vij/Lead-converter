@@ -1,2 +1,31 @@
-PRODUCT NAME: XOptimus Smart Charger (Wall Adapter)MANUFACTURER: Hivericks Technologies Pvt Ltd (Chennai).CORE VALUE PROPOSITION:Increases Li-Ion battery life expectancy and performance.Saves energy by maintaining optimal charge levels.Prevents overcharging and heating issues using real-time parameters.KEY FEATURES & MODES:Smart Mode (Default): Optimizes charging for daily battery health.Gaming Mode: High-end mode for heavy multimedia usage/high discharge rates.Full Charge Mode: Charges device to 100% when needed.TECHNICAL SPECS:Input/Output: 110-230V AC.Max Current: 5A.Connectivity: Bluetooth 5.0 (BLE).App: "Xoptimus" on Play Store (Required for setup).SAFETY:Protection against overcharging, voltage spikes, and heating.IP20 Protection Class.
-PRODUCT NAME: XOptimus Smart Charger (Wall Adapter)MANUFACTURER: Hivericks Technologies Pvt Ltd (Chennai).CORE VALUE PROPOSITION:Increases Li-Ion battery life expectancy and performance.Saves energy by maintaining optimal charge levels.Prevents overcharging and heating issues using real-time parameters.KEY FEATURES & MODES:Smart Mode (Default): Optimizes charging for daily battery health.Gaming Mode: High-end mode for heavy multimedia usage/high discharge rates.Full Charge Mode: Charges device to 100% when needed.TECHNICAL SPECS:Input/Output: 110-230V AC.Max Current: 5A.Connectivity: Bluetooth 5.0 (BLE).App: "Xoptimus" on Play Store (Required for setup).SAFETY:Protection against overcharging, voltage spikes, and heating.IP20 Protection Class.
+PRODUCT NAME: XOptimus Smart Charger (Wall Adapter)
+MANUFACTURER: Hivericks Technologies Pvt Ltd (Chennai).
+PRICE: ₹1499 INR.
+
+CORE VALUE PROPOSITION:
+Increases Li-Ion battery life expectancy and performance by up to 2x.
+Prevents overcharging and heating issues using real-time parameter monitoring.
+Extends the overall lifespan of your expensive devices.
+
+KEY FEATURES:
+- Smart Cut-off: Automatically disconnects power when the battery reaches the optimal level to prevent overheating.
+- Heating Management: Built-in thermal sensors shut down the charger if internal or ambient temperatures exceed safe limits (Safe-Heat Technology).
+- Battery Preservation: Minimizes micro-cycles during trickle charging.
+- Smart Connect: Bluetooth 5.0 (BLE) for app-based monitoring.
+
+MODES:
+- Smart Mode (Default): Optimizes charging for long-term daily battery health.
+- Gaming Mode: Specifically designed for high-end multimedia usage and gaming discharge rates. Highly suitable for gaming laptops and high-drain devices.
+- Full Charge Mode: Standard charging to 100% when time is a priority.
+
+TECHNICAL SPECS & COMPATIBILITY:
+- Input: 110-240V AC (Standard).
+- Output: Supports high-power delivery for laptops and smartphones.
+- Plug Compatibility: Standard 3-pin and 2-pin compatibility. 
+- 12A/15A Socket Compatibility: Yes, the XOptimus is designed to fit and work safely in standard 6A, 10A, 12A, and 16A (power) plug points commonly found in household and office environments.
+- Laptop Suitability: Perfectly suitable for gaming laptop power strips and high-wattage adapters.
+
+SAFETY:
+- Protection against overcharging, voltage spikes, and short circuits.
+- IP20 Protection Class.
+- Fire-retardant industrial-grade casing.

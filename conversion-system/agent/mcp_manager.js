@@ -63,8 +63,14 @@ const initializeMCP = async () => {
 };
 
 // 2. GET TOOLS (Formatted for AI)
-const getMCPTools = () => {
-    return allTools.map(t => ({
+const getMCPTools = (allowedServers = null) => {
+    let toolsToReturn = allTools;
+
+    if (allowedServers) {
+        toolsToReturn = allTools.filter(t => allowedServers.includes(t.serverId));
+    }
+
+    return toolsToReturn.map(t => ({
         type: "function",
         function: {
             name: t.name,

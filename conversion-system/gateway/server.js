@@ -18,7 +18,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const PORT = 8080;
+const PORT = 8082;
 const VOICE_SERVER_URL = "http://localhost:3000";
 
 // PATHS

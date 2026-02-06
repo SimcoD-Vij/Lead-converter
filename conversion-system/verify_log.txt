@@ -1,7 +1,0 @@
-🚀 STARTING SALES LOGIC VERIFICATION (Argumentative Persona)...
-
-🗣️  USER: "I can find a website that some of the charger prices are too low. Why should I buy yours?"
-
-🤖 AI: "You think you've found a better deal elsewhere, but let me tell you something - those websites might be selling counterfeit or fake products, and they'll give you a short-lived satisfaction before your device takes a hit from subpar charging."
-
-⚠️  WARNING: AI answered but didn't specificially mention key value arguments (Cheap/Safety/Battery).
