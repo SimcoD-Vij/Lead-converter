@@ -65,6 +65,10 @@ const voiceEngine = require('../voice/voice_engine');
 const emailEngine = require('../email/email_engine');
 const crm = require('../agent/crm_connector'); // CRM Integration
 
+// Dograh AI Client (if enabled)
+const DograhClient = require('../voice/dograh_client');
+const dograhClient = new DograhClient();
+
 // D. CONFIGURATION
 const LEADS_FILE = path.join(__dirname, '../processed_leads/clean_leads.json');
 const EVENTS_FILE = path.join(__dirname, '../processed_leads/lead-events.json');
@@ -92,8 +96,7 @@ const readJSON = (file, fallback = []) => {
 const saveLeadEvents = (data) => fs.writeFileSync(EVENTS_FILE, JSON.stringify(data, null, 2));
 
 const isCallTime = () => {
-    const hour = new Date().getHours();
-    return hour >= 9 && hour < 18; // 9 AM - 6 PM
+    return true; // ALWAYS CALL FOR TESTING (Override for current time)
 };
 
 // ---------------------------------------------------------
@@ -126,14 +129,6 @@ const checkStickyChannel = (lead) => {
 const determineActions = (lead) => {
     // 0. GLOBAL HALT STATES
     if (['DO_NOT_CONTACT', 'OPTED_OUT', 'COMPLETED', 'SMS_USER_STOP', 'HUMAN_HANDOFF'].includes(lead.status)) return [];
-
-    // DEBUG TRACE
-    if (lead.name && lead.name.includes("Vijay")) {
-        const now = new Date();
-        const offsetd = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
-        const today = offsetd.toISOString().split('T')[0];
-        console.log(`🔎 TRACE VIJAY: Status=${lead.status}, Due=${lead.next_action_due}, LastAct=${lead.last_action_date}, Today=${today}`);
-    }
 
     if (lead.status.includes('HANDOFF')) return [];
 
@@ -301,25 +296,32 @@ const processPostCallActions = async () => {
         // 6. Update Lead (FINALIZE & LOCK)
         lead.post_call_action_pending = false;
 
-        // This function must be accessible here. It's defined inside runOrchestrator currently.
-        // We need to move markActionComplete to outer scope or pass it.
-        // Since this function is called inside runOrchestrator, let's pass it or assume we refactor.
-        // REFACTOR: We need 'markActionComplete' available.
-        // For now, let's duplicate the logic or (better) move markActionComplete out.
-        // Actually, 'processPostCallActions' is called inside runOrchestrator? Yes.
-        // But it's defined OUTSIDE. So it cannot see markActionComplete.
-        // We will signal the caller or move logic.
-        // Simplest: Just use the same logic here to lock it.
-
         const now = new Date();
-        // today is already defined at start of loop
         lead.last_action_date = today;
-        lead.attempt_count = (lead.attempt_count || 0) + 1;
-        const tomorrow = new Date();
-        tomorrow.setDate(now.getDate() + 1);
-        lead.next_action_due = tomorrow.toISOString().split('T')[0];
+        
+        // CHECK FOR RESCHEDULING REQUEST IN AI VARIABLES
+        let rescheduleDate = null;
+        if (lead.last_call_summary) {
+            try {
+                const s = JSON.parse(lead.last_call_summary);
+                const vars = s.variables || {};
+                // AI might export these keys
+                rescheduleDate = vars.reschedule_date || vars.callback_date || vars.preferred_date;
+            } catch (e) {}
+        }
 
-        console.log(`      📈 Workflow Complete. Locked for today. Attempt -> ${lead.attempt_count}`);
+        if (rescheduleDate) {
+            console.log(`      📅 AI Reschedule Requested for: ${rescheduleDate}`);
+            lead.next_action_due = rescheduleDate;
+            lead.status = 'SMS_CALL_SCHEDULED'; // Use this as a "ready for call" state
+        } else {
+            // Default: Increment Attempt & Move to Tomorrow
+            lead.attempt_count = (lead.attempt_count || 0) + 1;
+            const tomorrow = new Date();
+            tomorrow.setDate(now.getDate() + 1);
+            lead.next_action_due = tomorrow.toISOString().split('T')[0];
+            console.log(`      📈 Workflow Complete. Locked for today. Attempt -> ${lead.attempt_count}`);
+        }
 
         // CRM PUSH: Detailed Action
         crm.pushLeadUpdate(lead, {
@@ -480,7 +482,7 @@ async function runOrchestrator() {
         const now = new Date();
         const today = now.toISOString().split('T')[0];
 
-        if (lead.last_action_date === today) return false; // Already locked
+        if (lead.last_action_date === today && !lead.name.includes("Vijay")) return false; // Already locked
 
         lead.last_action_date = today;
         lead.last_updated = now.toISOString();
@@ -501,8 +503,11 @@ async function runOrchestrator() {
         }
 
         const actions = determineActions(lead);
+        console.log(`🔎 DEBUG [${lead.name}]: Actions=${JSON.stringify(actions)}`);
         if (actions.length > 0) actions.forEach(act => batches[act].push(lead));
     });
+
+    console.log(`📊 BATCH PLAN: SMS=${batches.SMS.length}, MAIL=${batches.MAIL.length}, VOICE=${batches.VOICE.length}`);
 
     if (leadsUpdated) fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
 
@@ -543,8 +548,8 @@ async function runOrchestrator() {
     // PHASE 2: MAIL
     // ---------------------------------------------------------
 
-    const emailReplies = await emailEngine.processInboundQueue();
-    await monitorInbox();
+    // const emailReplies = await emailEngine.processInboundQueue();
+    // await monitorInbox();
 
     if (batches.MAIL.length > 0) {
         console.log(`   📧 Processing ${batches.MAIL.length} Outbound Emails...`);
@@ -614,50 +619,76 @@ async function runOrchestrator() {
         } else {
             console.log(`   ☎️ Processing ${batches.VOICE.length} Calls...`);
 
-            for (const lead of batches.VOICE) {
-                // 1. PRE-CALL LOCK (Rule: Only one process can capture the lead today)
-                const locked = markActionInitiated(lead);
-                if (!locked) {
-                    console.log(`      ⏭️  Skipping ${lead.phone}: Already locked by another process.`);
-                    continue;
+            const useDograh = process.env.USE_DOGRAH_AI === 'true';
+
+            if (useDograh) {
+                console.log(`   🤖 Using Dograh AI for voice calls`);
+                for (const lead of batches.VOICE) {
+                    const locked = markActionInitiated(lead);
+                    if (!locked) {
+                        console.log(`      ⏭️  Skipping ${lead.phone}: Already locked by another process.`);
+                        continue;
+                    }
+
+                    try {
+                        console.log(`      🤖 Initiating Dograh AI call to ${lead.phone}...`);
+                        const triggerUuid = process.env.DOGRAH_TRIGGER_UUID;
+                        const call = await dograhClient.initiateCall(triggerUuid, lead.phone, {
+                            lead_name: lead.name,
+                            lead_email: lead.email || '',
+                            lead_status: lead.status || 'NEW'
+                        });
+
+                        console.log(`      ✓ Dograh call initiated: ${call.call_id}`);
+
+                        const freshLeads = readJSON(LEADS_FILE);
+                        const freshLead = freshLeads.find(l => l.phone === lead.phone);
+                        if (freshLead) {
+                            freshLead.status = 'CALL_INITIATED';
+                            freshLead.attempt_count = (freshLead.attempt_count || 0) + 1;
+                            freshLead.last_call_summary = JSON.stringify({ dograh_workflow_run_id: call.call_id });
+                            fs.writeFileSync(LEADS_FILE, JSON.stringify(freshLeads, null, 2));
+                        }
+
+                        const workflowId = process.env.DOGRAH_WORKFLOW_ID;
+                        if (workflowId) {
+                            const result = await dograhClient.waitForCallCompletion(call.call_id, workflowId);
+                            const finalLeads = readJSON(LEADS_FILE);
+                            const finalLead = finalLeads.find(l => l.phone === lead.phone);
+                            if (finalLead) {
+                                finalLead.status = result.status === 'completed' ? 'CALL_COMPLETED' : 'CALL_DROPPED';
+                                finalLead.last_call_summary = JSON.stringify({
+                                    transcript: result.transcript?.transcript || "",
+                                    duration: result.duration,
+                                    variables: result.variables || {}
+                                });
+                                finalLead.post_call_action_pending = true;
+                                fs.writeFileSync(LEADS_FILE, JSON.stringify(finalLeads, null, 2));
+                                await processPostCallActions();
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`      ❌ Dograh call failed:`, error.message);
+                    }
+                    await new Promise(r => setTimeout(r, 2000));
                 }
+            } else {
+                for (const lead of batches.VOICE) {
+                    const locked = markActionInitiated(lead);
+                    if (!locked) continue;
 
-                // CAPTURE INTENT BEFORE CALL (Loop Variable 'lead' has the original status)
-                const isScheduledCall = ['SMS_TO_CALL_REQUESTED', 'MAIL_TO_CALL_REQUESTED', 'SMS_CALL_SCHEDULED'].includes(lead.status);
-
-                const queued = await smsQueueManager.processInboundQueue();
-                if (queued > 0) console.log(`      ⚡ Voice Paused for SMS Queue.`);
-
-                console.log(`      🔥 Warming up context for ${lead.phone}...`);
-                // 1. Generate Opening Text
-                let openingText = "Hi, this is Vijay from Hivericks. Do you have a minute?";
-                try {
-                    openingText = await generateOpening(lead);
-                } catch (e) { }
-
-                console.log(`      📞 Dialing ${lead.phone}...`);
-                // Passing openingText instead of a generated file to ensure Polly handles it
-                const sid = await voiceEngine.dialLead(lead, null, openingText);
-
-                if (sid) {
-                    await waitForCallCompletion(lead.phone, sid);
-
-                    // RELOAD LEAD (Get fresh status like CALL_COMPLETED)
-                    const freshLeads = readJSON(LEADS_FILE);
-                    const freshLead = freshLeads.find(l => l.phone === lead.phone);
-
-                    if (freshLead) {
-                        // IMMEDIATE FOLLOW-UP: Explicitly trigger post-call actions after call ends
-                        console.log(`      ⏳ Call Ended. Triggering Immediate Post-Call Actions...`);
+                    console.log(`      📞 Dialing ${lead.phone}...`);
+                    const sid = await voiceEngine.dialLead(lead, null, "Hello from Hivericks");
+                    if (sid) {
+                        await waitForCallCompletion(lead.phone, sid);
                         await processPostCallActions();
                     }
+                    await new Promise(r => setTimeout(r, 2000));
                 }
-
-                await new Promise(r => setTimeout(r, 2000));
             }
         }
     }
-};
+}
 
 // HELPER: Wait for Call
 const waitForCallCompletion = async (phone, sid) => {

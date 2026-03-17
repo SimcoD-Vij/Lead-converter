@@ -139,11 +139,13 @@ const runSmartSmsBatch = async (forcedLeads = null) => {
                 }
 
                 // Generate Content using Sales Bot
-                const aiBody = await generateResponse({
+                const aiResponse = await generateResponse({
                     userMessage: prompt,
                     memory: memory,
                     mode: 'SMS_CHAT'
                 });
+
+                const aiBody = aiResponse.response || aiResponse;
 
                 console.log(`   🤖 AI Generated: "${aiBody}"`);
 

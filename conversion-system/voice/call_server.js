@@ -530,11 +530,14 @@ const getLeadContext = (phone) => {
     if (lead) {
         // Find Master Summary
         const events = readJSON(EVENTS_FILE, []);
-        const leadRecord = events.find(l => l.lead_id === phone);
+        // FIX: Get the LATEST event with a summary (reverse search or sort)
+        const leadEvents = events.filter(l => l.lead_id === phone && l.master_summary);
+        const latestSummary = leadEvents.length > 0 ? leadEvents[leadEvents.length - 1].master_summary : null;
+
         return {
             type: 'EXISTING',
             name: lead.name,
-            summary: leadRecord ? leadRecord.master_summary : null,
+            summary: latestSummary, // Use latest
             score: lead.score
         };
     }

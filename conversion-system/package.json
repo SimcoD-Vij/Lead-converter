@@ -10,6 +10,7 @@
     "inquirer": "^8.2.5",
     "libphonenumber-js": "^1.12.29",
     "mailparser": "^3.9.0",
+    "minio": "^8.0.6",
     "nodemailer": "^7.0.10",
     "openai": "^6.10.0",
     "simple-parser": "^0.0.0",

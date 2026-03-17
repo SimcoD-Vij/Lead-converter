@@ -64,6 +64,7 @@ class SalesBrain {
   constructor({ leadContext = {}, memory = {}, mode = 'VOICE_CALL' }) {
     this.memory = memory;
     this.history = memory.history || [];
+    this.leadContext = leadContext; // Store for prompt injection
     // We minimaly track if we are at the start for greeting control
     this.isStart = this.history.length === 0;
   }
@@ -71,6 +72,12 @@ class SalesBrain {
   async processTurn(userMessage) {
     const lastAssistantMsg = this.history.filter(h => h.role === 'assistant').pop()?.text || "";
     const context = this.history.slice(-6).map(h => `${h.role}: ${h.text}`).join("\n");
+
+    // INJECT SUMMARY FROM PREVIOUS CALLS
+    let summaryContext = "";
+    if (this.leadContext && this.leadContext.summary) {
+      summaryContext = `PREVIOUS CONVERSATION SUMMARY:\n${this.leadContext.summary}\n`;
+    }
 
     // 1. HARD TEMPLATE OVERRIDES (For 100% reliability on exits)
     let hardResponse = null;
@@ -107,10 +114,12 @@ class SalesBrain {
     // Build Prompt
     let prompt = "";
     if (override) {
-      prompt = `${override}\n\nCONVERSATION SO FAR:\n${context}\nUser: ${userMessage}\n\nVijay:`;
+      prompt = `${override}\n\n${summaryContext}\nCONVERSATION SO FAR:\n${context}\nUser: ${userMessage}\n\nVijay:`;
     } else {
       prompt = `
 ${SALES_IDENTITY_PROMPT}
+
+${summaryContext}
 
 PRODUCT DATASHEET:
 - Description: ${PRODUCT_FACTS.description}
@@ -188,35 +197,82 @@ async function generateStructuredSummary(history) {
 }
 
 async function generateTextSummary(history) {
-  const prompt = `Summarize this sales call in 1 sentence. Start with "User was...":\n${JSON.stringify(history)}`;
-  const res = await axios.post(OLLAMA_URL.replace('/chat', '/generate'), { model: MODEL, prompt, stream: false });
-  return res.data?.response?.trim() || "User discussed product details.";
+  try {
+    let content = history;
+    if (Array.isArray(history)) {
+      content = JSON.stringify(history);
+    } else if (typeof history === 'object') {
+      content = JSON.stringify(history);
+    }
+
+    const prompt = `Summarize this sales call transcript in 1 sentence. Start with "User was...":\n${content}`;
+    const res = await axios.post(OLLAMA_URL.replace('/chat', '/generate'), { model: MODEL, prompt, stream: false }, { timeout: 5000 });
+    return res.data?.response?.trim() || "User involved in discussion.";
+  } catch (e) {
+    console.warn("⚠️ AI Summary Failed (Ollama offline):", e.message);
+    return "User was contacted for a sales follow-up regarding XOptimus battery health.";
+  }
 }
 
 async function generateFinalSummary(history) {
-  const structured = await generateStructuredSummary(history);
+  try {
+    const structured = await generateStructuredSummary(history);
 
-  let status = "active";
-  if (structured.interest_level === "callback") status = "CALL_CALLBACK";
-  else if (structured.interest_level === "high") status = "CALL_INTERESTED";
-  else status = "CALL_COMPLETED";
+    let status = "active";
+    if (structured.interest_level === "callback") status = "CALL_CALLBACK";
+    else if (structured.interest_level === "high") status = "CALL_INTERESTED";
+    else status = "CALL_COMPLETED";
 
-  return { lead_status: status, analysis: structured };
+    return { lead_status: status, analysis: structured };
+  } catch (e) {
+    return { lead_status: "CALL_COMPLETED", analysis: { interest_level: "medium", next_action: "send_whatsapp" } };
+  }
 }
 
 async function generateFeedbackRequest(summary, mode, name) {
-  // Tailor feedback based on intent (extracted from summary content loosely)
-  const isCallback = /callback|busy|later/i.test(JSON.stringify(summary));
+  try {
+    // Tailor feedback based on intent (extracted from summary content loosely)
+    const summaryStr = JSON.stringify(summary);
+    const isCallback = /callback|busy|later/i.test(summaryStr);
 
-  let prompt = "";
-  if (isCallback) {
-    prompt = `Write a short, polite WhatsApp message to ${name}. Say: "Hi ${name}, as discussed, I'll share the XOptimus battery saver details here. Let me know when you're free to chat!" Link: hivericks.com/xoptimus. Vijay.`;
-  } else {
-    prompt = `Write a professional WhatsApp summary to ${name} about XOptimus (₹1499). Highlight it extends battery life. Link: hivericks.com/xoptimus. Vijay.`;
+    let prompt = "";
+    if (isCallback) {
+      prompt = `Write a short, polite WhatsApp message to ${name}.
+      Context: The user was busy or asked for a callback.
+      Summary: ${summaryStr}
+      Product: XOptimus (??1499).
+      Link: hivericks.com/xoptimus.
+      
+      Say: "Hi ${name}, as discussed, I'll share the XOptimus battery saver details here. Let me know when you're free to chat!" (Sign off: Vijay)`;
+    } else {
+      prompt = `Write a professional ${mode === 'EMAIL' ? 'Email' : 'WhatsApp'} message to ${name}.
+      Context: Follow-up after a call.
+      Call Summary: ${summaryStr}
+      Product: XOptimus (??1499, extends battery life).
+      Goal: Nudge them to buy or learn more.
+      Link: hivericks.com/xoptimus.
+      
+      Keep it short and friendly. (Sign off: Vijay)`;
+    }
+
+    const res = await axios.post(OLLAMA_URL.replace('/chat', '/generate'), { model: MODEL, prompt: prompt, stream: false }, { timeout: 5000 });
+    return res.data?.response || getDefaultFeedback(mode, name, isCallback);
+  } catch (e) {
+    console.warn("⚠️ AI Feedback Generation Failed (Ollama offline):", e.message);
+    const summaryStr = JSON.stringify(summary);
+    const isCallback = /callback|busy|later/i.test(summaryStr);
+    return getDefaultFeedback(mode, name, isCallback);
   }
+}
 
-  const res = await axios.post(OLLAMA_URL.replace('/chat', '/generate'), { model: MODEL, prompt: prompt, stream: false });
-  return res.data?.response || "";
+function getDefaultFeedback(mode, name, isCallback) {
+  if (isCallback) {
+    return `Hi ${name}, as discussed, I'll share the XOptimus battery saver details here. Let me know when you're free to chat! - Vijay, Hivericks`;
+  }
+  if (mode === 'EMAIL') {
+    return `Subject: Follow up from Hivericks\n\nHi ${name},\n\nIt was great speaking with you. As promised, here are the details for XOptimus (hivericks.com/xoptimus), our battery health protector. It extends your device's battery life up to 2x for just ??1499.\n\nBest regards,\nVijay`;
+  }
+  return `Hi ${name}, thanks for your time today! Here are the details for XOptimus: hivericks.com/xoptimus. Let me know if you have any questions! - Vijay`;
 }
 
 async function generateOpening(lead) {

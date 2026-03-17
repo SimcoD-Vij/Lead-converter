@@ -20,12 +20,94 @@ const mapLeadStatus = (status) => {
     return mappings[status] || 'Assigned';
 };
 
+async function syncLead(lead) {
+    if (!CRM_BASE_URL) return null;
+    const authHeader = { Authorization: 'Basic ' + Buffer.from('admin:admin').toString('base64') };
+
+    // 1. If we have a lead_id, verify it exists
+    if (lead.lead_id) {
+        try {
+            await axios.get(`${CRM_BASE_URL}/v1/Lead/${lead.lead_id}`, { headers: authHeader });
+            return lead.lead_id;
+        } catch (e) {
+            if (e.response && e.response.status !== 404) throw e;
+            // If 404, we need to find it by phone/email
+        }
+    }
+
+    // 2. Search by Phone or Email
+    try {
+        const searchParams = {
+            select: 'id',
+            limit: 1
+        };
+        if (lead.phone) {
+            const rawPhone = lead.phone.replace('+', '');
+            searchParams['where[0][type]'] = 'in';
+            searchParams['where[0][attribute]'] = 'phoneNumber';
+            searchParams['where[0][value]'] = [lead.phone, rawPhone];
+        } else if (lead.email) {
+            searchParams['where[0][type]'] = 'equals';
+            searchParams['where[0][attribute]'] = 'emailAddress';
+            searchParams['where[0][value]'] = lead.email;
+        }
+
+        const res = await axios.get(`${CRM_BASE_URL}/v1/Lead`, { params: searchParams, headers: authHeader, timeout: 5000 });
+        if (res.data.list && res.data.list.length > 0) {
+            const newId = res.data.list[0].id;
+            console.log(`   🔄 CRM Sync: Found lead ${lead.name || lead.phone} with new ID: ${newId}`);
+            lead.lead_id = newId;
+            return newId;
+        }
+    } catch (e) {
+        console.warn(`   ⚠️ CRM Sync Search Failed: ${e.message}`);
+    }
+
+    // 3. Create if not found
+    try {
+        const createPayload = {
+            lastName: lead.name || lead.phone || 'Unknown Lead',
+            phoneNumber: lead.phone,
+            source: 'Other'
+        };
+        // Optional fields
+        if (lead.email) createPayload.emailAddress = lead.email;
+        if (lead.name && lead.name.includes(' ')) {
+            createPayload.firstName = lead.name.split(' ')[0];
+            createPayload.lastName = lead.name.split(' ').slice(1).join(' ');
+        }
+        const res = await axios.post(`${CRM_BASE_URL}/v1/Lead`, createPayload, { headers: authHeader });
+        const newId = res.data.id;
+        console.log(`   📥 CRM Sync: Created new lead ${lead.name || lead.phone} on server. ID: ${newId}`);
+        lead.lead_id = newId;
+        return newId;
+    } catch (e) {
+        let details = '';
+        if (e.response && e.response.data) {
+            details = JSON.stringify(e.response.data);
+        }
+        console.error(`   ❌ CRM Sync Create Failed: ${e.message} ${details}`);
+        return null;
+    }
+}
+
 async function pushUnifiedEvent(lead, eventType, data) {
     if (!CRM_BASE_URL) return;
 
+    // Ensure lead is synced with server CRM before pushing
+    const serverId = await syncLead(lead);
+    if (!serverId) {
+        console.warn(`   ⚠️ CRM Push Skipped: Could not sync lead ${lead.name} with server.`);
+        return;
+    }
+
+    // Update payload with correct server ID for associations
+    if (data.parentId) data.parentId = serverId;
+    if (data.leadId) data.leadId = serverId;
+
     // CONFIGURATION MAP
     const ENTITY_CONFIG = {
-        'LEAD_UPDATE': { endpoint: `/v1/Lead/${lead.lead_id || lead.id}`, method: 'PUT', entity: 'Lead' },
+        'LEAD_UPDATE': { endpoint: `/v1/Lead/${serverId}`, method: 'PUT', entity: 'Lead' },
         TASK_LOG: { endpoint: '/v1/Task', method: 'POST', entity: 'Task' },
         OPPORTUNITY: { endpoint: '/v1/Opportunity', method: 'POST', entity: 'Opportunity' },
         CASE: { endpoint: '/v1/Case', method: 'POST', entity: 'Case' },
@@ -39,7 +121,9 @@ async function pushUnifiedEvent(lead, eventType, data) {
         return;
     }
 
-    const url = `${CRM_BASE_URL}${config.endpoint}`;
+    // Sanitize URL: Remove any double slashes or trailing slashes that might cause 403 directory listing errors
+    let endpoint = config.endpoint.replace(/\/$/, ''); // Remove trailing slash
+    const url = `${CRM_BASE_URL}${endpoint}`;
     const method = config.method;
     const authHeader = { Authorization: 'Basic ' + Buffer.from('admin:admin').toString('base64') };
 
@@ -82,7 +166,22 @@ async function pushLeadUpdate(lead, data) {
     await pushUnifiedEvent(lead, 'LEAD_UPDATE', data);
 }
 
+const getAdminUserId = async () => {
+    try {
+        const authHeader = { Authorization: 'Basic ' + Buffer.from('admin:admin').toString('base64') };
+        const res = await axios.get(`${CRM_BASE_URL}/v1/User`, {
+            headers: authHeader,
+            params: {
+                select: 'id',
+                where: [{ type: 'equals', attribute: 'userName', value: 'admin' }]
+            }
+        });
+        return res.data.list?.[0]?.id || null;
+    } catch (e) { return null; }
+};
+
 async function pushCallLog(lead, data) {
+    const adminId = await getAdminUserId();
     const payload = {
         name: `Call with ${lead.name || lead.phone}`,
         parentType: 'Lead',
@@ -91,7 +190,8 @@ async function pushCallLog(lead, data) {
         direction: 'Outbound',
         dateStart: new Date().toISOString().replace('T', ' ').substring(0, 19),
         duration: data.duration || 60,
-        description: data.summary || 'No summary provided.'
+        description: data.summary || 'No summary provided.',
+        assignedUserId: adminId // REQUIRED FIELD
     };
     await pushUnifiedEvent(lead, 'TASK_LOG', payload);
 }
