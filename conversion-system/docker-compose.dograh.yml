@@ -1,0 +1,178 @@
+# Dograh AI Platform - Docker Compose Configuration
+# Adapted from https://github.com/dograh-hq/dograh
+# Runs alongside conversion-system for AI voice calls
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: dograh_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dograh
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "5433:5432" # Changed to avoid conflict with existing PostgreSQL
+    volumes:
+      - dograh_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    networks:
+      - dograh-network
+
+  redis:
+    image: redis:7
+    container_name: dograh_redis
+    ports:
+      - "6380:6379" # Changed to avoid conflict
+    command: >
+      --requirepass redissecret
+    volumes:
+      - dograh_redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "redissecret", "ping" ]
+      interval: 3s
+      timeout: 10s
+      retries: 10
+    networks:
+      - dograh-network
+
+  minio:
+    image: minio/minio
+    container_name: dograh_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_API_CORS_ALLOW_ORIGIN: "*"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - dograh_minio_data:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dograh-network
+
+  api:
+    image: ghcr.io/dograh-hq/dograh-api:latest
+    container_name: dograh_api
+    volumes:
+      - dograh_shared_tmp:/tmp
+    environment:
+      # Core application config
+      ENVIRONMENT: "local"
+      LOG_LEVEL: "INFO"
+
+      # API endpoint - using cloudflared public URL for Twilio webhooks
+      BACKEND_API_ENDPOINT: "http://44.211.23.183:8000"
+
+      # Database configuration
+      DATABASE_URL: "postgresql+asyncpg://postgres:postgres@postgres:5432/dograh"
+
+      # Redis configuration
+      REDIS_URL: "redis://:redissecret@redis:6379"
+
+      # Storage configuration - using local MinIO
+      ENABLE_AWS_S3: "false"
+
+      # MinIO
+      MINIO_ENDPOINT: "minio:9000"
+      MINIO_ACCESS_KEY: "minioadmin"
+      MINIO_SECRET_KEY: "minioadmin"
+      MINIO_BUCKET: "voice-audio"
+      MINIO_SECURE: "false"
+
+      # Langfuse (optional tracing)
+      ENABLE_TRACING: "false"
+
+      # Sentry (optional telemetry)
+      ENABLE_TELEMETRY: "false"
+
+      # Twilio Configuration (for telephony)
+      TWILIO_ACCOUNT_SID: "${TWILIO_SID}"
+      TWILIO_AUTH_TOKEN: "${TWILIO_AUTH}"
+      TWILIO_PHONE_NUMBER: "${TWILIO_PHONE}"
+      # NOTE: LLM/TTS/STT API keys are NOT required!
+      # Dograh provides free built-in API keys for testing
+      # You can configure your own keys later in the Dograh UI
+
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", 'python -c "import urllib.request; urllib.request.urlopen(''http://localhost:8000/api/v1/health'').read()"' ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - dograh-network
+
+  ui:
+    image: ghcr.io/dograh-hq/dograh-ui:latest
+    container_name: dograh_ui
+    environment:
+      # Server-side URL (SSR, internal Docker network)
+      BACKEND_URL: "http://api:8000"
+      NODE_ENV: "oss"
+
+      # Flag to enable/disable telemetry
+      ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-false}"
+
+    ports:
+      - "3010:3010"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3010 || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - dograh-network
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: dograh_cloudflared
+    command: tunnel --no-autoupdate --url http://api:8000 --metrics 0.0.0.0:2000
+    ports:
+      - "2000:2000" # Expose metrics endpoint
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - dograh-network
+
+volumes:
+  dograh_postgres_data:
+    driver: local
+  dograh_redis_data:
+    driver: local
+  dograh_minio_data:
+    driver: local
+  dograh_shared_tmp:
+    driver: local
+
+networks:
+  dograh-network:
+    driver: bridge

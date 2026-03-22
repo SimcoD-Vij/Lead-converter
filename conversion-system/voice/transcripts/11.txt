@@ -1,0 +1,8 @@
+[2026-02-13T00:52:42.986+00:00] assistant: Hi there, this is Sam from TechCharge Solutions calling with a quick word about our new XOptimus hardware charging adapter that really helps protect and extend your device's battery life—how are you doing today?
+[2026-02-13T00:52:59.068+00:00] user: Ok,
+[2026-02-13T00:53:01.254+00:00] user: Just give me the price. He can talk later.
+[2026-02-13T00:53:04.064+00:00] assistant: Okay, price is ₹1499 for XOptimus. Would you want me to send product info on WhatsApp for you to check later?
+[2026-02-13T00:53:13.732+00:00] user: Send it send it. Let's talk later.
+[2026-02-13T00:53:16.820+00:00] assistant: Got it—sending details on WhatsApp now, and I’ll check in with you in a couple of weeks to see if you have any questions or want to move forward. Sound good?
+[2026-02-13T00:53:28.936+00:00] user: Yes, good-good.
+[2026-02-13T00:53:32.305+00:00] assistant: Great, I'll send the info and follow up soon. Meanwhile, anything else you want help with?

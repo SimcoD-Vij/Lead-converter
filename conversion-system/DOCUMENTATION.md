@@ -538,9 +538,9 @@ All dependencies defined in `package.json`:
 | **`libphonenumber-js`** | `^1.12.29` | International phone number validation and formatting. Ensures lead phone numbers are valid before calling |
 | **`zod`** | `^4.3.5` | Schema validation library. Used for validating MCP tool inputs and API payload structures |
 | **`simple-parser`** | `^0.0.0` | Lightweight parser utility used for simple text/data parsing tasks |
-
+| `langchain` | To manage the AI's "thought process". |
 ---
-
+| `mysql2` | To store lead info and logs. |
 ## 5. Dograh AI Voice Integration
 
 Dograh is an AI voice platform that provides a managed, cloud-hosted AI agent pipeline for phone calls. Instead of running our own speech-to-text (STT) → LLM → text-to-speech (TTS) pipeline manually via Twilio, Dograh handles the entire voice conversation autonomously.

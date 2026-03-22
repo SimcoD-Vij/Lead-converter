@@ -1265,5 +1265,12 @@
     "sid": "CAd4be81cea9f6d6076446da5430e80990",
     "generated_at": "2026-02-05T12:00:58.605Z",
     "summary_text": "User was presented with a sales pitch for a battery health update solution called XOptronics, which prevents overcharging by stopping charging at 80% capacity, priced at ₹1499, and can be sent via WhatsApp for further discussion."
+  },
+  {
+    "event_id": "evt_1770791314653",
+    "lead_id": "+917604896187",
+    "sid": "CA0772b4b053e7658a80e52aadf8dc1dec",
+    "generated_at": "2026-02-11T06:28:34.653Z",
+    "summary_text": "User was presented with a sales pitch about the XOptimus battery health update device priced at ₹1499 by Vijay from Hivericks."
   }
 ]

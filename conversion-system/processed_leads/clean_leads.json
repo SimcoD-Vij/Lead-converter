@@ -1,24 +1,26 @@
 [
   {
-    "lead_id": "697fb2334c1d60c86",
+    "lead_id": "69b7b526e613b3e4d",
     "name": "Vijay",
     "phone": "+917604896187",
     "email": "rsvijaypargavan@gmail.com",
-    "status": "MAIL_COMPLETE",
+    "status": "CALL_INITIATED",
     "source": "CRM_IMPORT",
-    "score": 100,
+    "score": 55,
     "imported_at": "2026-02-01T20:27:52.670Z",
-    "last_sms_time": "2026-02-02T20:03:16.482Z",
-    "last_action_date": "2026-02-05",
-    "attempt_count": 3,
-    "next_action_due": "2026-02-06",
-    "last_updated": "2026-02-05T12:01:38.453Z",
-    "category": "HOT",
-    "post_call_action_pending": false,
-    "last_call_sid": "CAd4be81cea9f6d6076446da5430e80990",
-    "last_interaction": "2026-02-05T12:00:58.635Z",
-    "last_call_summary": "{\"lead_status\":\"stalled\",\"generated_at\":\"2026-02-05T12:08:01.896Z\",\"text_summary\":\"No response to drip.\"}",
-    "conversation_stage_id": 2,
-    "resistance_attempts": 1
+    "last_interaction": "2026-03-20T04:22:15.587391+00:00",
+    "attempt_count": 1,
+    "next_action_due": "2026-03-23",
+    "category": "WARM"
+  },
+  {
+    "lead_id": "69b7a76837d069fc7",
+    "name": "Test Smith",
+    "phone": "1234567890",
+    "email": null,
+    "status": "SMS_IDLE",
+    "source": "CRM_IMPORT",
+    "score": 50,
+    "imported_at": "2026-03-21T20:53:16.341132+00:00"
   }
 ]

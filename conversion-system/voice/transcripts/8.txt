@@ -1,0 +1,10 @@
+[2026-02-13T00:23:20.404+00:00] assistant: Hi there, this is Sam from ChargeTech calling quickly about a new hardware charging adapter called XOptimus that helps improve battery health and extend battery life, how's your day going so far?
+[2026-02-13T00:23:35.463+00:00] user: Ok, can you just
+[2026-02-13T00:23:36.078+00:00] user: yes it's good but can you just about the price details?
+[2026-02-13T00:23:41.783+00:00] assistant: Okay, sure—talking about price now. I’ll get someone to connect with you soon for detailed pricing that fits your needs. Meanwhile, can I quickly share how XOptimus helps keep your battery healthier longer?
+[2026-02-13T00:23:56.489+00:00] user: Yes.
+[2026-02-13T00:23:59.139+00:00] assistant: Great! So, XOptimus is a hardware adapter that stops your device charging at about eighty percent, which really helps stop overcharging—that’s a big reason batteries wear out fast. It also cuts down heat during charging,
+[2026-02-13T00:24:12.133+00:00] user: Can we talk later? Can we talk later?
+[2026-02-13T00:24:15.089+00:00] assistant: Okay, sounds like a busy time—did you want me to send the XOptimus details to your WhatsApp for you to check when free?
+[2026-02-13T00:24:26.185+00:00] user: Yes. Yes. Send it. Let's hang up soon.
+[2026-02-13T00:24:28.955+00:00] assistant: Got it—I'll send the details on WhatsApp right away. If you want to talk more later, just let me know. Take care!

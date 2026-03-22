@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mariadb:10.6
+    container_name: espocrm_db
+    environment:
+      MYSQL_ROOT_PASSWORD: espoorootpassword
+      MYSQL_DATABASE: espocrm_db
+      MYSQL_USER: espouser
+      MYSQL_PASSWORD: espopassword123
+    volumes:
+      - db-data:/var/lib/mysql
+    restart: always
+
+  app:
+    image: espocrm/espocrm:7.4.3
+    container_name: espocrm_app
+    environment:
+      ESPO_DATABASE_HOST: db
+      ESPO_DATABASE_NAME: espocrm_db
+      ESPO_DATABASE_USER: espouser
+      ESPO_DATABASE_PASSWORD: espopassword123
+    ports:
+      - "8080:80"
+    volumes:
+      - app-data:/var/www/html
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  db-data:
+  app-data:

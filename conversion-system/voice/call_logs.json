@@ -8459,5 +8459,150 @@
       "conversation_summary": "User was presented with a sales pitch for a battery health update solution called XOptronics, which prevents overcharging by stopping charging at 80% capacity, priced at ₹1499, and can be sent via WhatsApp for further discussion.",
       "text_summary": "User was presented with a sales pitch for a battery health update solution called XOptronics, which prevents overcharging by stopping charging at 80% capacity, priced at ₹1499, and can be sent via WhatsApp for further discussion."
     }
+  },
+  {
+    "event_id": "evt_1770791314655",
+    "lead_id": "+917604896187",
+    "sid": "CA0772b4b053e7658a80e52aadf8dc1dec",
+    "channel": "VOICE",
+    "started_at": "2026-02-11T06:28:00.810Z",
+    "ended_at": "2026-02-11T06:28:22.660Z",
+    "conversation": [
+      {
+        "role": "assistant",
+        "message": "Hi Vijay, this is Vijay from Hivericks calling regarding a quick battery health update. Is this a good time?"
+      },
+      {
+        "role": "user",
+        "message": "once I thought about,"
+      },
+      {
+        "role": "assistant",
+        "message": "You're thinking of updating your charging habits, which is great! Is it mainly the price or just timing?"
+      },
+      {
+        "role": "user",
+        "message": "The product."
+      },
+      {
+        "role": "assistant",
+        "message": "The XOptimus is our hardware charging adapter, designed to protect your Li-Ion batteries from overcharging and heat buildup. It's ₹1499 for the peace of mind"
+      }
+    ],
+    "summary": {
+      "interest_level": "medium",
+      "key_topics": [
+        "price"
+      ],
+      "next_action": "send_whatsapp",
+      "generated_at": "2026-02-11T06:28:33.592Z",
+      "conversation_summary": "User was presented with a sales pitch about the XOptimus battery health update device priced at ₹1499 by Vijay from Hivericks.",
+      "text_summary": "User was presented with a sales pitch about the XOptimus battery health update device priced at ₹1499 by Vijay from Hivericks."
+    }
+  },
+  {
+    "sid": "CA43f677c8a00fcf5638e11f0f8a31101e",
+    "phone": "+917604896187",
+    "status": "initiated",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:50:12.162445+00:00"
+  },
+  {
+    "sid": "CA43f677c8a00fcf5638e11f0f8a31101e",
+    "phone": "+917604896187",
+    "status": "ringing",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:50:13.646857+00:00"
+  },
+  {
+    "sid": "CA43f677c8a00fcf5638e11f0f8a31101e",
+    "phone": "+917604896187",
+    "status": "in-progress",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:50:17.909498+00:00"
+  },
+  {
+    "sid": "CA43f677c8a00fcf5638e11f0f8a31101e",
+    "phone": "+917604896187",
+    "status": "completed",
+    "duration": "8",
+    "timestamp": "2026-03-20T04:50:26.343292+00:00"
+  },
+  {
+    "sid": "CAdc4a37259d48a650815611cf4754a423",
+    "phone": "+917604896187",
+    "status": "initiated",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:52:56.715549+00:00"
+  },
+  {
+    "sid": "CAdc4a37259d48a650815611cf4754a423",
+    "phone": "+917604896187",
+    "status": "ringing",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:52:58.828630+00:00"
+  },
+  {
+    "sid": "CAdc4a37259d48a650815611cf4754a423",
+    "phone": "+917604896187",
+    "status": "in-progress",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:53:01.954089+00:00"
+  },
+  {
+    "sid": "CAdc4a37259d48a650815611cf4754a423",
+    "phone": "+917604896187",
+    "status": "completed",
+    "duration": "8",
+    "timestamp": "2026-03-20T04:53:10.412561+00:00"
+  },
+  {
+    "sid": "CA8b07a557d710f7508ba8016d061e6e09",
+    "phone": "+917604896187",
+    "status": "initiated",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:56:19.528513+00:00"
+  },
+  {
+    "sid": "CA8b07a557d710f7508ba8016d061e6e09",
+    "phone": "+917604896187",
+    "status": "ringing",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:56:21.000433+00:00"
+  },
+  {
+    "sid": "CA8b07a557d710f7508ba8016d061e6e09",
+    "phone": "+917604896187",
+    "status": "in-progress",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:56:24.021977+00:00"
+  },
+  {
+    "sid": "CA8b07a557d710f7508ba8016d061e6e09",
+    "phone": "+917604896187",
+    "status": "completed",
+    "duration": "49",
+    "timestamp": "2026-03-20T04:57:14.078189+00:00"
+  },
+  {
+    "sid": "CA604de9333ac59f848ce95db96dcc92e3",
+    "phone": "+917604896187",
+    "status": "initiated",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:59:10.425812+00:00"
+  },
+  {
+    "sid": "CA604de9333ac59f848ce95db96dcc92e3",
+    "phone": "+917604896187",
+    "status": "ringing",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:59:12.626140+00:00"
+  },
+  {
+    "sid": "CA604de9333ac59f848ce95db96dcc92e3",
+    "phone": "+917604896187",
+    "status": "in-progress",
+    "duration": "0",
+    "timestamp": "2026-03-20T04:59:16.722256+00:00"
   }
 ]

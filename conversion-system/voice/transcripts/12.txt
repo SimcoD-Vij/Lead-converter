@@ -1,0 +1,14 @@
+[2026-02-13T01:02:33.422+00:00] assistant: Hi there, this is Sam from ChargePlus, just calling to share a quick note about our new XOptimus charging adapter that helps keep your device battery healthier and lasts longer—how are you doing today?
+[2026-02-13T01:02:47.748+00:00] user: Ok.
+[2026-02-13T01:02:48.482+00:00] user: It's going fine. I want to get to know the
+[2026-02-13T01:02:53.298+00:00] user: detail like whether it's working with
+[2026-02-13T01:02:56.055+00:00] user: gaming laptops?
+[2026-02-13T01:02:57.643+00:00] assistant: Okay - so you want to know about gaming laptops?
+[2026-02-13T01:03:05.754+00:00] user: Yes. Whether the Tajiti Tuesday works with gaming laptop.
+[2026-02-13T01:03:09.804+00:00] assistant: Got it - you mean the XOptimus working well with gaming laptops?
+[2026-02-13T01:03:17.031+00:00] user: Yes.
+[2026-02-13T01:03:18.561+00:00] assistant: Absolutely, XOptimus works great with gaming laptops, it regulates charging smartly - protecting battery health even during heavy use. Do you often play games on your laptop?
+[2026-02-13T01:03:32.256+00:00] user: Me details on WhatsApp.
+[2026-02-13T01:03:34.504+00:00] assistant: Okay then, I can arrange to send details on WhatsApp. Could you please share your WhatsApp number?
+[2026-02-13T01:03:43.969+00:00] user: You have already have it.
+[2026-02-13T01:03:47.035+00:00] user: Let's hang up.

@@ -1,0 +1,138 @@
+# Dograh AI Platform - Docker Compose Configuration
+# Adapted for AWS Server 44.211.23.183
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: dograh_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dograh
+    volumes:
+      - dograh_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    networks:
+      - dograh-network
+
+  redis:
+    image: redis:7
+    container_name: dograh_redis
+    ports:
+      - "6380:6379"
+    command: --requirepass redissecret
+    volumes:
+      - dograh_redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "redissecret", "ping" ]
+      interval: 3s
+      timeout: 10s
+      retries: 10
+    networks:
+      - dograh-network
+
+  minio:
+    image: minio/minio
+    container_name: dograh_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_API_CORS_ALLOW_ORIGIN: "*"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - dograh_minio_data:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dograh-network
+
+  api:
+    image: ghcr.io/dograh-hq/dograh-api:latest
+    container_name: dograh_api
+    volumes:
+      - dograh_shared_tmp:/tmp
+    environment:
+      ENVIRONMENT: "production"
+      LOG_LEVEL: "INFO"
+      BACKEND_API_ENDPOINT: "http://44.211.23.183:8000"
+      DATABASE_URL: "postgresql+asyncpg://postgres:postgres@postgres:5432/dograh"
+      REDIS_URL: "redis://:redissecret@redis:6379"
+      MINIO_ENDPOINT: "minio:9000"
+      MINIO_ACCESS_KEY: "minioadmin"
+      MINIO_SECRET_KEY: "minioadmin"
+      MINIO_BUCKET: "voice-audio"
+      MINIO_SECURE: "false"
+      ALLOWED_ORIGINS: "*"
+      UI_APP_URL: "http://44.211.23.183:3010"
+      DOGRAH_API_KEY: "${DOGRAH_API_KEY}"
+      DOGRAH_MPS_SECRET_KEY: "${DOGRAH_API_KEY}"
+      DEPLOYMENT_MODE: "oss"
+      PORT: "8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      # Using python since curl is missing in the container
+      test: [ "CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')\" || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - dograh-network
+
+  ui:
+    image: ghcr.io/dograh-hq/dograh-ui:latest
+    container_name: dograh_ui
+    environment:
+      BACKEND_URL: "http://api:8000"
+      NEXT_PUBLIC_API_URL: "http://44.211.23.183:8000"
+      NEXT_PUBLIC_BACKEND_URL: "http://44.211.23.183:8000"
+      NEXT_PUBLIC_NODE_ENV: "production"
+      NEXT_PUBLIC_DEPLOYMENT_MODE: "oss"
+      NEXT_PUBLIC_AUTH_PROVIDER: "local"
+      NODE_ENV: "oss"
+      ALLOWED_ORIGINS: "*"
+    ports:
+      - "3010:3010"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - dograh-network
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: dograh_cloudflared
+    command: tunnel --no-autoupdate --url http://api:8000 --metrics 0.0.0.0:2000
+    depends_on:
+      - api
+    networks:
+      - dograh-network
+
+volumes:
+  dograh_postgres_data:
+  dograh_redis_data:
+  dograh_minio_data:
+  dograh_shared_tmp:
+
+
+networks:
+  dograh-network:
+    driver: bridge

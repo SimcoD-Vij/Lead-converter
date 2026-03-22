@@ -1,0 +1,5 @@
+[2026-02-11T10:19:09.596+00:00] assistant: Hi there, this is Sam from PowerSmart Solutions, just calling to share a quick update about smart battery solutions with XOptimus, how are you doing today?
+[2026-02-11T10:19:22.785+00:00] user: Yes, it's going fine. What you're calling about?
+[2026-02-11T10:19:26.913+00:00] assistant: Okay,
+[2026-02-11T10:19:33.727+00:00] user: Hello.
+[2026-02-11T10:19:34.648+00:00] assistant: Okay, got it — you want to know what I’m calling about? So, I’m reaching out to share how XOptimus helps protect your device’s battery by stopping overcharging around eighty percent, keeping it cool and lasting longer. Have you noticed your device getting hot while charging lately?
