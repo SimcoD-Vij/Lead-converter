@@ -30,7 +30,7 @@ Write-Host ""
 Write-Host "⏳ Waiting for services to be healthy..." -ForegroundColor Yellow
 Start-Sleep -Seconds 10
 
-# Check service health
+# Check service status
 Write-Host ""
 Write-Host "🔍 Checking service status..." -ForegroundColor Yellow
 docker compose -f docker-compose.dograh.yml ps

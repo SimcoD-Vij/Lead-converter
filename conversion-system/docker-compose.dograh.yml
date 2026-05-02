@@ -76,7 +76,7 @@ services:
       LOG_LEVEL: "INFO"
 
       # API endpoint - using cloudflared public URL for Twilio webhooks
-      BACKEND_API_ENDPOINT: "http://44.211.23.183:8000"
+      BACKEND_API_ENDPOINT: "https://oretha-geniculate-addictedly.ngrok-free.dev"
 
       # Database configuration
       DATABASE_URL: "postgresql+asyncpg://postgres:postgres@postgres:5432/dograh"
@@ -104,9 +104,12 @@ services:
       TWILIO_ACCOUNT_SID: "${TWILIO_SID}"
       TWILIO_AUTH_TOKEN: "${TWILIO_AUTH}"
       TWILIO_PHONE_NUMBER: "${TWILIO_PHONE}"
-      # NOTE: LLM/TTS/STT API keys are NOT required!
-      # Dograh provides free built-in API keys for testing
-      # You can configure your own keys later in the Dograh UI
+      
+      # ==== 100% FREE LOCAL AI STACK OVERRIDES ====
+      USE_LOCAL_OLLAMA: "true"
+      USE_LOCAL_TTS: "true"
+      USE_LOCAL_STT: "true"
+      # ============================================
 
     ports:
       - "8000:8000"
@@ -127,15 +130,18 @@ services:
       - dograh-network
 
   ui:
-    image: ghcr.io/dograh-hq/dograh-ui:latest
+    build:
+      context: ../dograh
+      dockerfile: ui/Dockerfile
     container_name: dograh_ui
     environment:
       # Server-side URL (SSR, internal Docker network)
       BACKEND_URL: "http://api:8000"
-      NODE_ENV: "oss"
+      NODE_ENV: "development"
 
       # Flag to enable/disable telemetry
       ENABLE_TELEMETRY: "${ENABLE_TELEMETRY:-false}"
+      NEXT_PUBLIC_AUTH_PROVIDER: "local"
 
     ports:
       - "3010:3010"

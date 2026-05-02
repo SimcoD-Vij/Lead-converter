@@ -19,4 +19,4 @@ brain/
 __pycache__/
 *.pyc
 *.pem
-*.json
+debug_*.json

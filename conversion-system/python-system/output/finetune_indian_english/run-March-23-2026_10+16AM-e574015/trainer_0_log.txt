@@ -1,0 +1,35 @@
+ > Training Environment:
+ | > Backend: Torch
+ | > Mixed precision: True
+ | > Precision: fp16
+ | > Current device: 0
+ | > Num. of GPUs: 1
+ | > Num. of CPUs: 16
+ | > Num. of Torch Threads: 1
+ | > Torch seed: 1
+ | > Torch CUDNN: True
+ | > Torch CUDNN deterministic: False
+ | > Torch CUDNN benchmark: False
+ | > Torch TF32 MatMul: False
+ > Start Tensorboard: tensorboard --logdir=D:\Hivericks\conversion-system\python-system\output\finetune_indian_english\run-March-23-2026_10+16AM-e574015
+ > Training Environment:
+ | > Backend: Torch
+ | > Mixed precision: True
+ | > Precision: fp16
+ | > Current device: 0
+ | > Num. of GPUs: 1
+ | > Num. of CPUs: 16
+ | > Num. of Torch Threads: 1
+ | > Torch seed: 1
+ | > Torch CUDNN: True
+ | > Torch CUDNN deterministic: False
+ | > Torch CUDNN benchmark: False
+ | > Torch TF32 MatMul: False
+ > Start Tensorboard: tensorboard --logdir=D:\Hivericks\conversion-system\python-system\output\finetune_indian_english\run-March-23-2026_10+16AM-e574015
+
+ > Model has 498699671 parameters
+
+[4m[1m > EPOCH: 0/10[0m
+ --> D:\Hivericks\conversion-system\python-system\output\finetune_indian_english\run-March-23-2026_10+16AM-e574015
+
+[1m > TRAINING (2026-03-23 10:16:54) [0m

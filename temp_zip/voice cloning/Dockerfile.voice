@@ -1,0 +1,32 @@
+# Use the official PyTorch CUDA runtime image
+FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+
+# Set the working directory
+WORKDIR /workspace/GPT-SoVITS
+
+# Avoid interactive prompts during apt-get
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    ffmpeg \
+    libsox-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone the repository (or copy it from the local context)
+# COPY . /workspace/GPT-SoVITS
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir x_transformers ffmpeg-python pandas
+
+# Expose ports for WebUI and APIs
+EXPOSE 9871 9872 9873 9874 9880
+
+# Set PYTHONPATH to include the project directories
+ENV PYTHONPATH="/workspace/GPT-SoVITS:/workspace/GPT-SoVITS/GPT_SoVITS"
+
+# Command to start the system (or keep it interactive for training)
+CMD ["python", "GPT_SoVITS/s2_train.py", "--config", "GPT_SoVITS/configs/s2_english.json"]

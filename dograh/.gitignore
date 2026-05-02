@@ -1,0 +1,17 @@
+__pycache__
+.DS_Store
+.env
+.env.prod
+.env.test
+
+# logs and run directory on production
+/logs/
+/run/
+infrastructure/
+nginx/
+prd/
+.vercel
+
+venv/
+.venv/
+.playwright-mcp

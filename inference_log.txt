@@ -1,0 +1,29 @@
+GPT model   : d:\Hivericks\Hivericks\conversion-system\voice cloning\GPT-SoVITS\GPT_SoVITS\pretrained_models\gsv-v2final-pretrained\s1bert25hz-5kh-longer-epoch=12-step=369668.ckpt
+SoVITS model: d:\Hivericks\Hivericks\conversion-system\voice cloning\GPT-SoVITS\logs\english_voice\logs_s2_v2\G_233333333333.pth
+Ref audio   : d:\Hivericks\Hivericks\conversion-system\voice cloning\english accent\dataset\sliced\english dataset.wav_0000000000_0000157120.wav
+Ref exists  : True
+GPT exists  : True
+S2 exists   : True
+
+已将进程优先级设为 High
+E:\NvidiaGPU\conda310\lib\site-packages\jieba\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+GPT_SoVITS/pretrained_models/gsv-v2final-pretrained/s2G2333k.pth v2 v2 False
+loading sovits_v2 <All keys matched successfully>
+Loading GPT model...
+Loading SoVITS model...
+Generating speech for: 'Hello! My name is Vijay and I am your personal AI assistant. How can I help you today?'
+Actual Input Reference Text: I mean, another video and we are starting with a new topic.
+Actual Input Target Text: Hello! My name is Vijay and I am your personal AI assistant. How can I help you today?
+Actual Input Target Text (after sentence segmentation): Hello! My name is Vijay and I am your personal AI assistant. How can I help you today?
+['I mean, another video and we are starting with a new topic.']
+['en']
+Actual Input Target Text (per sentence): Hello! My name is Vijay and I am your personal AI assistant. How can I help you today?
+['Hello! My name is Vijay and I am your personal AI assistant. How can I help you today?']
+['en']
+Processed text from the frontend (per sentence): Hello! My name is Vijay and I am your personal A I assistant. How can I help you today?
+  0%|          | 0/1500 [00:00<?, ?it/s]  0%|          | 1/1500 [00:00<09:10,  2.72it/s]  0%|          | 3/1500 [00:00<03:22,  7.38it/s]  0%|          | 7/1500 [00:00<01:37, 15.34it/s]  1%|          | 13/1500 [00:00<00:59, 25.19it/s]  1%|1         | 20/1500 [00:00<00:41, 35.56it/s]  2%|1         | 27/1500 [00:00<00:33, 44.03it/s]  2%|1         | 29/1500 [00:01<00:52, 28.27it/s]
+29.715	9.115	1.150	1.630
+
+[SUCCESS] Saved to: d:\Hivericks\Hivericks\cloned_voice_output.wav
+   Sample rate: 32000 Hz | Duration: 1.46s

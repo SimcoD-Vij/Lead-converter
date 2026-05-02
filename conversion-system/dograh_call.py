@@ -1,14 +1,33 @@
 #!/usr/bin/env python3
-"""Get full API key from Dograh and fire the call."""
-import urllib.request, urllib.error, json, sys
+"""Trigger a voice call using an external Dograh AI instance."""
+import urllib.request
+import urllib.error
+import json
+import os
+import sys
 
-BASE = "http://localhost:8000/api/v1"
-TRIGGER_UUID = "ba47abe6-b676-483e-9740-67ab881b9e2c"
-PHONE = "+917604896187"
-EMAIL = "admin@hivericks.com"
-PASSWORD = "Hivericks@2025"
+def load_env(env_path):
+    """Simple env loader if python-dotenv is not available."""
+    if os.path.exists(env_path):
+        with open(env_path) as f:
+            for line in f:
+                if "=" in line and not line.startswith("#"):
+                    key, val = line.strip().split("=", 1)
+                    os.environ[key] = val.strip('"').strip("'")
+
+# Load environment variables
+env_file = os.path.join(os.path.dirname(__file__), ".env")
+load_env(env_file)
+
+# Configuration from .env
+API_URL = os.getenv("DOGRAH_API_URL", "http://3.95.139.180:8000").rstrip("/")
+API_KEY = os.getenv("DOGRAH_API_KEY")
+TRIGGER_UUID = os.getenv("DOGRAH_TRIGGER_UUID")
+WORKFLOW_ID = os.getenv("DOGRAH_WORKFLOW_ID")
+PHONE_NUMBER = "+917604896187"
 
 def req(method, url, payload=None, headers={}):
+    """Standard HTTP request helper."""
     data = json.dumps(payload).encode() if payload else None
     h = {"Content-Type": "application/json"}
     h.update(headers)
@@ -17,82 +36,38 @@ def req(method, url, payload=None, headers={}):
         with urllib.request.urlopen(r, timeout=30) as resp:
             return resp.status, json.loads(resp.read().decode())
     except urllib.error.HTTPError as e:
-        return e.code, json.loads(e.read().decode())
+        err_body = e.read().decode()
+        try:
+            return e.code, json.loads(err_body)
+        except:
+            return e.code, {"error": err_body}
+    except Exception as e:
+        return 500, {"error": str(e)}
 
-# Login
-print("[1] Login...")
-code, resp = req("POST", f"{BASE}/auth/login", {"email": EMAIL, "password": PASSWORD})
-TOKEN = resp.get("token")
-if not TOKEN:
-    print(f"Login failed: {resp}"); sys.exit(1)
-print(f"    ✅ Logged in")
-AUTH = {"Authorization": f"Bearer {TOKEN}"}
+def trigger_call():
+    if not all([API_KEY, TRIGGER_UUID]):
+        print("❌ Error: DOGRAH_API_KEY and DOGRAH_TRIGGER_UUID must be set in .env")
+        return
 
-# Get full API keys
-print("\n[2] Getting API keys...")
-code, keys = req("GET", f"{BASE}/user/api-keys", headers=AUTH)
-print(f"    HTTP {code}")
-print(f"    Full response: {json.dumps(keys, indent=2)}")
+    print(f"🚀 Triggering call to {PHONE_NUMBER} via {API_URL}...")
+    
+    url = f"{API_URL}/api/v1/public/agent/{TRIGGER_UUID}"
+    headers = {"X-API-Key": API_KEY}
+    payload = {
+        "phone_number": PHONE_NUMBER,
+        "initial_context": {
+            "lead_name": "Vijay",
+            "lead_email": "rsvijaypargavan@gmail.com"
+        }
+    }
 
-api_key = None
-if code == 200 and isinstance(keys, list) and keys:
-    # Find full key value
-    for k in keys:
-        key_val = k.get("key") or k.get("api_key") or k.get("value") or k.get("token")
-        if key_val:
-            api_key = key_val
-            print(f"    ✅ API Key found: {api_key[:30]}...")
-            break
+    code, resp = req("POST", url, payload, headers)
 
-# If no full key in list, create one
-if not api_key:
-    print("\n[3] Creating new API key...")
-    code, resp = req("POST", f"{BASE}/user/api-keys", {"name": "hivericks-live"}, AUTH)
-    print(f"    HTTP {code}: {json.dumps(resp, indent=2)}")
-    api_key = resp.get("key") or resp.get("api_key") or resp.get("value") or resp.get("token")
+    if code == 200 or (isinstance(resp, dict) and "workflow_run_id" in resp):
+        print(f"✅ Success! Workflow Run ID: {resp.get('workflow_run_id')}")
+        print(f"🔗 View Call: {API_URL.replace(':8000', ':3010')}/calls/{resp.get('workflow_run_id')}")
+    else:
+        print(f"❌ Failed (HTTP {code}): {resp}")
 
-print(f"\n[4] Firing call to {PHONE}...")
-print(f"    Using API key: {str(api_key)[:30] if api_key else 'None - using Bearer'}")
-
-call_headers = AUTH.copy()
-if api_key:
-    call_headers["X-API-Key"] = api_key
-
-call_payload = {
-    "phone_number": PHONE,
-    "initial_context": {"lead_name": "Vijay", "lead_email": "rsvijaypargavan@gmail.com"}
-}
-
-# Try with X-API-Key
-if api_key:
-    code, resp = req("POST", f"{BASE}/public/agent/{TRIGGER_UUID}", call_payload, {"X-API-Key": api_key, "Content-Type": "application/json"})
-    print(f"    X-API-Key attempt → HTTP {code}: {json.dumps(resp)[:300]}")
-    if code in (200, 201):
-        print(f"\n✅ CALL FIRED! Run ID: {resp.get('workflow_run_id','N/A')}")
-        print(f"📱 Phone {PHONE} should ring shortly!")
-        sys.exit(0)
-
-# Try with Bearer token
-code, resp = req("POST", f"{BASE}/public/agent/{TRIGGER_UUID}", call_payload, AUTH)
-print(f"    Bearer attempt → HTTP {code}: {json.dumps(resp)[:300]}")
-if code in (200, 201):
-    print(f"\n✅ CALL FIRED with Bearer token!")
-    print(f"📱 Phone {PHONE} should ring shortly!")
-    sys.exit(0)
-
-# Save token to env for future use
-print(f"\n[5] Saving credentials for hivericks..")
-env_file = "/home/ubuntu/conversion-system/.env"
-try:
-    with open(env_file) as f:
-        content = f.read()
-    if api_key:
-        import re
-        content = re.sub(r"DOGRAH_API_KEY=.*", f"DOGRAH_API_KEY={api_key}", content)
-        with open(env_file, "w") as f:
-            f.write(content)
-        print(f"    ✅ Updated .env DOGRAH_API_KEY={api_key[:20]}...")
-except Exception as e:
-    print(f"    Could not update .env: {e}")
-
-print("\n❌ Call could not be fired. Check output above.")
+if __name__ == "__main__":
+    trigger_call()

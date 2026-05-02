@@ -1,0 +1,43 @@
+Seed set to 1234
+Using 16bit Automatic Mixed Precision (AMP)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+\U0001f4a1 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\utilities\model_summary\model_summary.py:242: Precision 16-mixed is not supported by the model summary.  Estimated model size in MB will not be accurate. Using 32 bits instead.
+Traceback (most recent call last):
+  File "d:\Hivericks\Hivericks\conversion-system\voice cloning\GPT-SoVITS\GPT_SoVITS\s1_train.py", line 169, in <module>
+    main(args)
+  File "d:\Hivericks\Hivericks\conversion-system\voice cloning\GPT-SoVITS\GPT_SoVITS\s1_train.py", line 145, in main
+    trainer.fit(model, data_module, ckpt_path=ckpt_path)
+  File "E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\trainer\trainer.py", line 584, in fit
+    call._call_and_handle_interrupt(
+  File "E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\trainer\call.py", line 49, in _call_and_handle_interrupt
+    return trainer_fn(*args, **kwargs)
+  File "E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\trainer\trainer.py", line 630, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path, weights_only=weights_only)
+  File "E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\trainer\trainer.py", line 1079, in _run
+    results = self._run_stage()
+  File "E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\trainer\trainer.py", line 1123, in _run_stage
+    self.fit_loop.run()
+  File "E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\loops\fit_loop.py", line 209, in run
+    self.setup_data()
+  File "E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\loops\fit_loop.py", line 238, in setup_data
+    train_dataloader = _request_dataloader(source)
+  File "E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\trainer\connectors\data_connector.py", line 335, in _request_dataloader
+    return data_source.dataloader()
+  File "E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\trainer\connectors\data_connector.py", line 302, in dataloader
+    return call._call_lightning_datamodule_hook(self.instance.trainer, self.name)
+  File "E:\NvidiaGPU\conda310\lib\site-packages\pytorch_lightning\trainer\call.py", line 199, in _call_lightning_datamodule_hook
+    return fn(*args, **kwargs)
+  File "d:\Hivericks\Hivericks\conversion-system\voice cloning\GPT-SoVITS\GPT_SoVITS\AR\data\data_module.py", line 52, in train_dataloader
+    sampler = DistributedBucketSampler(self._train_dataset, batch_size=batch_size)
+  File "d:\Hivericks\Hivericks\conversion-system\voice cloning\GPT-SoVITS\GPT_SoVITS\AR\data\bucket_sampler.py", line 42, in __init__
+    num_replicas = dist.get_world_size() if torch.cuda.is_available() else 1
+  File "E:\NvidiaGPU\conda310\lib\site-packages\torch\distributed\distributed_c10d.py", line 1769, in get_world_size
+    return _get_group_size(group)
+  File "E:\NvidiaGPU\conda310\lib\site-packages\torch\distributed\distributed_c10d.py", line 841, in _get_group_size
+    default_pg = _get_default_group()
+  File "E:\NvidiaGPU\conda310\lib\site-packages\torch\distributed\distributed_c10d.py", line 1008, in _get_default_group
+    raise ValueError(
+ValueError: Default process group has not been initialized, please make sure to call init_process_group.

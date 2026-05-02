@@ -1,0 +1,12 @@
+ > Training Environment:
+ | > Backend: Torch
+ | > Mixed precision: True
+ | > Precision: fp16
+ | > Num. of CPUs: 16
+ | > Num. of Torch Threads: 8
+ | > Torch seed: 54321
+ | > Torch CUDNN: True
+ | > Torch CUDNN deterministic: False
+ | > Torch CUDNN benchmark: False
+ | > Torch TF32 MatMul: False
+ > Start Tensorboard: tensorboard --logdir=output\run-March-23-2026_09+54AM-e574015
